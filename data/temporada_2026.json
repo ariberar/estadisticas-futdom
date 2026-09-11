@@ -9,7 +9,9 @@
   "jugadores": [
     {
       "id": "Ale",
-      "nombre": "Ale",
+      "apodo": "Ale",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -24,7 +26,9 @@
     },
     {
       "id": "AleC",
-      "nombre": "AleC",
+      "apodo": "AleC",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -39,7 +43,9 @@
     },
     {
       "id": "Alejo",
-      "nombre": "Alejo",
+      "apodo": "Alejo",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -54,7 +60,9 @@
     },
     {
       "id": "Berar",
-      "nombre": "Berar",
+      "apodo": "Berar",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -69,7 +77,9 @@
     },
     {
       "id": "Bernny",
-      "nombre": "Bernny",
+      "apodo": "Bernny",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -84,7 +94,9 @@
     },
     {
       "id": "Chancha",
-      "nombre": "Chancha",
+      "apodo": "Chancha",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -99,7 +111,9 @@
     },
     {
       "id": "DaroP",
-      "nombre": "DaroP",
+      "apodo": "DaroP",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -114,7 +128,9 @@
     },
     {
       "id": "Diego",
-      "nombre": "Diego",
+      "apodo": "Diego",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -129,7 +145,9 @@
     },
     {
       "id": "Druca",
-      "nombre": "Druca",
+      "apodo": "Druca",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -144,7 +162,9 @@
     },
     {
       "id": "Dubi",
-      "nombre": "Dubi",
+      "apodo": "Dubi",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -159,7 +179,9 @@
     },
     {
       "id": "Fede",
-      "nombre": "Fede",
+      "apodo": "Fede",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -174,7 +196,9 @@
     },
     {
       "id": "FedeF",
-      "nombre": "FedeF",
+      "apodo": "FedeF",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -189,7 +213,9 @@
     },
     {
       "id": "FedeN",
-      "nombre": "FedeN",
+      "apodo": "FedeN",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -204,7 +230,9 @@
     },
     {
       "id": "Fer",
-      "nombre": "Fer",
+      "apodo": "Fer",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -219,7 +247,9 @@
     },
     {
       "id": "Godo",
-      "nombre": "Godo",
+      "apodo": "Godo",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -234,7 +264,9 @@
     },
     {
       "id": "Gordo",
-      "nombre": "Gordo",
+      "apodo": "Gordo",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -249,7 +281,9 @@
     },
     {
       "id": "Guido",
-      "nombre": "Guido",
+      "apodo": "Guido",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -264,7 +298,9 @@
     },
     {
       "id": "J",
-      "nombre": "J",
+      "apodo": "J",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -279,7 +315,9 @@
     },
     {
       "id": "JoacoF",
-      "nombre": "JoacoF",
+      "apodo": "JoacoF",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -294,7 +332,9 @@
     },
     {
       "id": "Joc",
-      "nombre": "Joc",
+      "apodo": "Joc",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -309,7 +349,9 @@
     },
     {
       "id": "Jorge",
-      "nombre": "Jorge",
+      "apodo": "Jorge",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -324,7 +366,9 @@
     },
     {
       "id": "Juancito",
-      "nombre": "Juancito",
+      "apodo": "Juancito",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -339,7 +383,9 @@
     },
     {
       "id": "Julo",
-      "nombre": "Julo",
+      "apodo": "Julo",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -354,7 +400,9 @@
     },
     {
       "id": "Lea",
-      "nombre": "Lea",
+      "apodo": "Lea",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -369,7 +417,9 @@
     },
     {
       "id": "Luki",
-      "nombre": "Luki",
+      "apodo": "Luki",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -384,7 +434,9 @@
     },
     {
       "id": "Lunge",
-      "nombre": "Lunge",
+      "apodo": "Lunge",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -399,7 +451,9 @@
     },
     {
       "id": "Mario",
-      "nombre": "Mario",
+      "apodo": "Mario",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -414,7 +468,9 @@
     },
     {
       "id": "Martin",
-      "nombre": "Martin",
+      "apodo": "Martin",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -429,7 +485,9 @@
     },
     {
       "id": "MatiP",
-      "nombre": "MatiP",
+      "apodo": "MatiP",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -444,7 +502,9 @@
     },
     {
       "id": "Natos",
-      "nombre": "Natos",
+      "apodo": "Natos",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -459,7 +519,9 @@
     },
     {
       "id": "Nico",
-      "nombre": "Nico",
+      "apodo": "Nico",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -474,7 +536,9 @@
     },
     {
       "id": "NicoF",
-      "nombre": "NicoF",
+      "apodo": "NicoF",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -489,7 +553,9 @@
     },
     {
       "id": "NicoP",
-      "nombre": "NicoP",
+      "apodo": "NicoP",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -504,7 +570,9 @@
     },
     {
       "id": "Pato",
-      "nombre": "Pato",
+      "apodo": "Pato",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -519,7 +587,9 @@
     },
     {
       "id": "Pei",
-      "nombre": "Pei",
+      "apodo": "Pei",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -534,7 +604,9 @@
     },
     {
       "id": "Poni",
-      "nombre": "Poni",
+      "apodo": "Poni",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -549,7 +621,9 @@
     },
     {
       "id": "Raña",
-      "nombre": "Raña",
+      "apodo": "Raña",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -564,7 +638,9 @@
     },
     {
       "id": "Rodri",
-      "nombre": "Rodri",
+      "apodo": "Rodri",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -579,7 +655,9 @@
     },
     {
       "id": "SantiV",
-      "nombre": "SantiV",
+      "apodo": "SantiV",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -594,7 +672,9 @@
     },
     {
       "id": "Tin",
-      "nombre": "Tin",
+      "apodo": "Tin",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -609,7 +689,9 @@
     },
     {
       "id": "TomiL",
-      "nombre": "TomiL",
+      "apodo": "TomiL",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -624,7 +706,9 @@
     },
     {
       "id": "Vic",
-      "nombre": "Vic",
+      "apodo": "Vic",
+      "nombre": "",
+      "apellido": "",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -19595,6 +19679,28 @@
       },
       "events": [
         {
+          "type": "tiro",
+          "team": 1,
+          "p1": "Lunge",
+          "p2": "J",
+          "minuto": 1,
+          "tSec": 260.463393,
+          "tipo": "fuera del area",
+          "gk": null,
+          "id": 260463
+        },
+        {
+          "type": "atajada",
+          "team": 2,
+          "p1": "Jorge",
+          "p2": "Vic",
+          "minuto": 1,
+          "tSec": 285.196946,
+          "tipo": "fuera del area",
+          "gk": null,
+          "id": 285196
+        },
+        {
           "type": "gol",
           "team": 2,
           "p1": "Ale",
@@ -19605,6 +19711,72 @@
           "gk": "Berar",
           "enContra": false,
           "id": 233
+        },
+        {
+          "type": "atajada",
+          "team": 2,
+          "p1": "Jorge",
+          "p2": "Nico",
+          "minuto": 3,
+          "tSec": 394.822848,
+          "tipo": "fuera del area",
+          "gk": null,
+          "id": 394822
+        },
+        {
+          "type": "atajada",
+          "team": 1,
+          "p1": "Alejo",
+          "p2": "Fede",
+          "minuto": 5,
+          "tSec": 511.236234,
+          "tipo": "fuera del area",
+          "gk": null,
+          "id": 511236
+        },
+        {
+          "type": "tiro",
+          "team": 2,
+          "p1": "NicoP",
+          "p2": "Ale",
+          "minuto": 6,
+          "tSec": 582.568958,
+          "tipo": "fuera del area",
+          "gk": null,
+          "id": 582568
+        },
+        {
+          "type": "atajada",
+          "team": 1,
+          "p1": "Alejo",
+          "p2": "Ale",
+          "minuto": 7,
+          "tSec": 640.368457,
+          "tipo": "dentro del area",
+          "gk": null,
+          "id": 640368
+        },
+        {
+          "type": "tiro",
+          "team": 2,
+          "p1": "Godo",
+          "p2": "JoacoF",
+          "minuto": 7,
+          "tSec": 655.342808,
+          "tipo": "fuera del area",
+          "gk": null,
+          "id": 655342
+        },
+        {
+          "type": "atajada",
+          "team": 2,
+          "p1": "Jorge",
+          "p2": "J",
+          "minuto": 8,
+          "tSec": 713.050537,
+          "tipo": "fuera del area",
+          "gk": null,
+          "id": 713050
         },
         {
           "type": "gol",
@@ -19629,6 +19801,28 @@
           "gk": "Jorge",
           "enContra": false,
           "id": 235
+        },
+        {
+          "type": "atajada",
+          "team": 1,
+          "p1": "Nico",
+          "p2": "Godo",
+          "minuto": 10,
+          "tSec": 839.284185,
+          "tipo": "fuera del area",
+          "gk": null,
+          "id": 839284
+        },
+        {
+          "type": "tiro",
+          "team": 2,
+          "p1": "JoacoF",
+          "p2": "Fede",
+          "minuto": 11,
+          "tSec": 850.3589479999999,
+          "tipo": "fuera del area",
+          "gk": null,
+          "id": 850358
         },
         {
           "type": "gol",
