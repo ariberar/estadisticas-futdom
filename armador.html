@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Armador de equipos F7</title>
+<style>
+:root{
+  color-scheme: light;
+  --plane:#f9f9f7; --surface:#fcfcfb; --surface2:#f2f1ec;
+  --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --border:rgba(11,11,11,0.10);
+  --t1:#2a78d6; --t2:#eb6834;
+  --good:#1baf7a; --bad:#e34948; --warn:#eda100; --accent:#4a3aa7;
+  --radius:12px; --sh:0 1px 2px rgba(11,11,11,.06),0 2px 8px rgba(11,11,11,.05);
+  --gk:#4a3aa7;
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --plane:#14140f; --surface:#1c1c17; --surface2:#26261f;
+  --ink:#f3f2ec; --ink2:#c3c1b7; --muted:#8f8d83;
+  --grid:#33332a; --border:rgba(255,255,255,0.12);
+  --t1:#5b9bea; --t2:#f18a5c;
+  --good:#2fce97; --bad:#f0655f; --warn:#f2b53a; --accent:#9385e6;
+  --sh:0 1px 2px rgba(0,0,0,.4),0 2px 10px rgba(0,0,0,.35);
+  --gk:#9385e6;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--plane);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--plane) 90%,transparent);
+  backdrop-filter:saturate(1.4) blur(8px);border-bottom:1px solid var(--border)}
+.hbar{display:flex;align-items:center;gap:12px;padding:12px 18px;max-width:1180px;margin:0 auto}
+.brand{font-weight:700;font-size:16px;display:flex;align-items:center;gap:8px}
+.brand .sub{font-weight:500;color:var(--muted);font-size:12px}
+.spacer{flex:1}
+.btn{appearance:none;border:1px solid var(--border);background:var(--surface);color:var(--ink);
+  border-radius:10px;padding:7px 12px;font-size:13px;cursor:pointer;font-weight:600;
+  transition:.12s;white-space:nowrap}
+.btn:hover{background:var(--surface2)}
+.btn.icon{padding:7px 9px}
+.btn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.primary{background:var(--ink);color:var(--plane);border-color:var(--ink)}
+.btn.primary:hover{opacity:.88}
+.wrap{max-width:1180px;margin:0 auto;padding:18px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--sh)}
+.card .hd{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.card .hd h2{margin:0;font-size:14px;font-weight:700}
+.card .hd .count{margin-left:auto;color:var(--muted);font-size:12px;font-weight:600}
+.card .bd{padding:14px 16px}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tools .btn{padding:5px 10px;font-size:12px}
+.searchbox{width:100%;border:1px solid var(--border);background:var(--plane);color:var(--ink);
+  border-radius:10px;padding:8px 11px;font-size:13px;margin-bottom:12px}
+.plist{display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:430px;overflow:auto;padding-right:4px}
+@media(max-width:520px){.plist{grid-template-columns:1fr}}
+.pl{display:flex;align-items:center;gap:9px;padding:7px 9px;border:1px solid var(--border);
+  border-radius:10px;background:var(--plane);cursor:pointer;user-select:none;transition:.1s}
+.pl:hover{border-color:var(--muted)}
+.pl.sel{background:color-mix(in srgb,var(--good) 12%,var(--surface));border-color:color-mix(in srgb,var(--good) 45%,var(--border))}
+.pl .nm{font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pl .nota{font-variant-numeric:tabular-nums;font-weight:700;font-size:13px;
+  background:var(--surface2);border-radius:7px;padding:1px 7px;min-width:34px;text-align:center}
+.pl .dot{width:16px;height:16px;border-radius:5px;border:1.5px solid var(--muted);flex:none;
+  display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff}
+.pl.sel .dot{background:var(--good);border-color:var(--good)}
+.pl .pocos{font-size:10px;color:var(--warn);font-weight:700}
+.pl .gk{font-size:12px}
+.selbar{margin-top:12px;padding-top:12px;border-top:1px dashed var(--border)}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:999px;padding:3px 6px 3px 10px;font-size:12px;font-weight:600;margin:0 6px 6px 0}
+.chip .x{cursor:pointer;color:var(--muted);font-weight:700;padding:0 3px;border-radius:50%}
+.chip .x:hover{color:var(--bad)}
+.chip input{width:40px;border:1px solid var(--border);background:var(--plane);color:var(--ink);
+  border-radius:6px;padding:1px 4px;font-size:12px;text-align:center;font-weight:700}
+.chip .teamtog{cursor:pointer;font-size:10px;font-weight:700;border-radius:6px;padding:2px 7px;margin-right:4px;
+  border:1px solid var(--border);background:var(--plane);color:var(--muted)}
+.chip .teamtog.A{background:var(--t1);color:#fff;border-color:var(--t1)}
+.chip .teamtog.B{background:var(--t2);color:#fff;border-color:var(--t2)}
+.chip .roltog{display:inline-flex;gap:2px;margin:0 2px}
+.chip .roltog b{cursor:pointer;font-size:10px;font-weight:700;width:15px;height:16px;line-height:16px;
+  text-align:center;border-radius:4px;background:var(--plane);border:1px solid var(--border);color:var(--muted)}
+.chip .roltog b.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip .gkbtn{cursor:pointer;font-size:13px;opacity:.35}
+.chip.gk .gkbtn{opacity:1}
+.chip.gk{border-color:var(--gk);background:color-mix(in srgb,var(--gk) 14%,var(--surface2))}
+label.field{display:block;margin-bottom:14px}
+label.field .lb{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13px;margin-bottom:5px}
+label.field .lb .val{margin-left:auto;color:var(--muted);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+select,.mini{border:1px solid var(--border);background:var(--plane);color:var(--ink);border-radius:9px;padding:7px 9px;font-size:13px}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.seg button{appearance:none;border:0;background:var(--surface);color:var(--ink2);padding:7px 11px;font-size:12.5px;
+  font-weight:600;cursor:pointer;border-right:1px solid var(--border)}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--ink);color:var(--plane)}
+.muted{color:var(--muted)}
+.hint{font-size:12px;color:var(--muted);margin-top:2px}
+.disabledblock{opacity:.42;pointer-events:none;filter:grayscale(.3)}
+.constraints .row{display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.teams{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.teams{grid-template-columns:1fr}}
+.team{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--plane)}
+.team .th{padding:10px 13px;color:#fff;display:flex;align-items:center;gap:8px;font-weight:700}
+.team.a .th{background:var(--t1)} .team.b .th{background:var(--t2)}
+.team .th .tot{margin-left:auto;font-variant-numeric:tabular-nums;font-size:13px;
+  background:rgba(255,255,255,.22);padding:2px 9px;border-radius:8px}
+.team ul{list-style:none;margin:0;padding:6px}
+.team li{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px}
+.team li:nth-child(odd){background:color-mix(in srgb,var(--surface2) 60%,transparent)}
+.team li .nm{flex:1;font-weight:600}
+.team li .n{font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink2)}
+.team li .gk{color:var(--gk);font-weight:700;font-size:12px}
+.balancebox{margin-top:14px}
+.balbar{height:12px;border-radius:8px;background:var(--surface2);overflow:hidden;display:flex;border:1px solid var(--border)}
+.balbar .a{background:var(--t1)} .balbar .b{background:var(--t2)}
+.ballabels{display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-top:6px;color:var(--ink2)}
+.verdict{text-align:center;margin-top:12px;font-weight:700;font-size:14px}
+.verdict .diff{font-variant-numeric:tabular-nums}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700}
+.pill.good{background:color-mix(in srgb,var(--good) 20%,transparent);color:var(--good)}
+.pill.mid{background:color-mix(in srgb,var(--warn) 22%,transparent);color:var(--warn)}
+.pill.bad{background:color-mix(in srgb,var(--bad) 20%,transparent);color:var(--bad)}
+.altbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.notes{font-size:12px;color:var(--muted);margin-top:12px;line-height:1.55}
+.empty{text-align:center;color:var(--muted);padding:40px 20px}
+.empty .big{font-size:34px;margin-bottom:8px}
+.addrow{display:flex;gap:6px;margin-top:10px}
+.addrow input{flex:1}
+details.help{margin-top:16px;font-size:12.5px;color:var(--ink2)}
+details.help summary{cursor:pointer;font-weight:600;color:var(--ink)}
+details.help p{margin:8px 0}
+.kbd{font-variant-numeric:tabular-nums;font-weight:700}
+</style>
+</head>
+<body>
+<header>
+  <div class="hbar">
+    <div class="brand">⚖️ Armador de equipos F7 <span class="sub" id="sub"></span></div>
+    <div class="spacer"></div>
+    <a class="btn" href="index.html" style="text-decoration:none">📊 Panel de estadísticas</a>
+    <button class="btn icon" id="themeBtn" title="Tema claro/oscuro">◐</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="grid">
+    <!-- LEFT: selección + controles -->
+    <div>
+      <div class="card">
+        <div class="hd"><h2>¿Quiénes juegan el domingo?</h2><span class="count" id="selCount">0 elegidos</span></div>
+        <div class="bd">
+          <input class="searchbox" id="search" placeholder="Buscar jugador…" autocomplete="off">
+          <div class="tools">
+            <button class="btn" id="selPon" title="Cargar los ponedores del mes">🗓️ Ponedores del mes</button>
+            <button class="btn" id="filtPJ" title="Ocultar de la lista a los que jugaron menos de 5 partidos">≥5 PJ</button>
+            <button class="btn" id="selClear">Limpiar</button>
+            <select class="mini" id="sortBy" title="Ordenar">
+              <option value="pj">Ordenar: PJ ↓</option>
+              <option value="nota">Ordenar: nota ↓</option>
+              <option value="nombre">Ordenar: nombre</option>
+            </select>
+          </div>
+          <div class="plist" id="plist"></div>
+
+          <div class="addrow">
+            <input class="searchbox" id="newName" style="margin:0" placeholder="Agregar jugador nuevo (nombre)">
+            <input class="searchbox" id="newNota" style="margin:0;max-width:90px" placeholder="nota" inputmode="decimal">
+            <button class="btn" id="addNew">＋</button>
+          </div>
+          <div class="hint">Los jugadores nuevos entran con nota 6.0 por defecto (editable).</div>
+
+          <div class="selbar" id="selbarWrap" style="display:none">
+            <div class="lb" style="font-weight:600;margin-bottom:6px">Elegidos — tocá 🧤 para marcar arqueros (0, 1 o 2), o la nota para editarla. <span id="gkHint" class="muted" style="font-weight:500"></span></div>
+            <div id="selChips"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px">
+        <div class="hd"><h2>Ajustes</h2></div>
+        <div class="bd">
+          <label class="field">
+            <span class="lb">Compensación de ataque al equipo sin arquero <span class="val" id="gkVal">0.1</span></span>
+            <input type="range" id="gkComp" min="0" max="30" value="1">
+            <div class="hint">Solo cuando hay <b>1</b> arquero: a su equipo se le agrega ventaja defensiva, así el otro recibe un poco más de ataque para emparejar. Con 0 o 2 arqueros no aplica.</div>
+          </label>
+
+          <label class="field">
+            <span class="lb">Equilibrio de posiciones <span class="val" id="roleVal">75%</span></span>
+            <input type="range" id="roleW" min="0" max="100" value="75">
+            <div class="hint">Reparte los <b>Def</b> y los <b>Delantero</b> parejo entre los dos equipos (los Mixto son comodín). Editá el rol de cada uno en los chips de arriba: D / M / A, podés marcar varios.</div>
+          </label>
+
+          <label class="field">
+            <span class="lb">Peso de rivalidad 1-vs-1 <span class="val" id="rivVal">0%</span></span>
+            <input type="range" id="rivW" min="0" max="100" value="0">
+            <div class="hint">Evita que un equipo acumule jugadores que históricamente le ganan a los del otro (mano a mano). Dato con algo de ruido: se solapa con el nivel. Arranca en 0.</div>
+          </label>
+
+          <label class="field">
+            <span class="lb">Peso de la química <span class="val" id="chemVal">0%</span></span>
+            <input type="range" id="chemW" min="0" max="100" value="0">
+            <div class="hint">Arranca en 0 (solo notas). Subilo para que las duplas influyan en el reparto.</div>
+          </label>
+
+          <div class="field" id="chemModeBlock">
+            <span class="lb">Modo de química</span>
+            <div class="seg" id="chemMode">
+              <button data-m="equil" class="on">Equilibrar</button>
+              <button data-m="cortar">Cortar duplas</button>
+              <button data-m="respetar">Respetar duplas</button>
+            </div>
+            <div class="hint" id="chemModeHint"></div>
+            <label class="field" style="margin-top:12px;margin-bottom:0">
+              <span class="lb">Mínimo de partidos juntos para contar <span class="val" id="minGVal">3</span></span>
+              <input type="range" id="minG" min="2" max="8" value="3">
+            </label>
+          </div>
+
+          <div class="field constraints">
+            <span class="lb">Fijar o separar manual</span>
+            <div class="row">
+              <select class="mini" id="cA"></select>
+              <select class="mini" id="cB"></select>
+              <div class="seg">
+                <button id="cJuntos" class="on" type="button">Juntos</button>
+                <button id="cSep" type="button">Separados</button>
+              </div>
+              <button class="btn" id="addC" type="button">Agregar</button>
+            </div>
+            <div id="clist"></div>
+          </div>
+
+          <div class="field" style="margin-bottom:12px">
+            <span class="lb">Modo</span>
+            <div class="seg" id="modeSeg">
+              <button data-mode="auto" class="on" type="button">⚖️ Automático</button>
+              <button data-mode="manual" type="button">✋ A mano</button>
+            </div>
+            <div class="hint" id="modeHint">El armador propone los equipos más parejos.</div>
+          </div>
+
+          <button class="btn primary" id="build" style="width:100%;padding:11px;font-size:15px">⚖️ Armar equipos</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: resultado -->
+    <div class="card" id="resultCard">
+      <div class="hd"><h2>Equipos</h2><span class="count" id="resMeta"></span></div>
+      <div class="bd" id="resBody">
+        <div class="empty">
+          <div class="big">⚽</div>
+          Elegí a los que van a jugar y tocá <b>Armar equipos</b>.<br>
+          <span class="muted">Te propongo el reparto más parejo según las notas.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <details class="help">
+    <summary>¿Cómo calcula la nota y la química? (leéme)</summary>
+    <p><b>Nota de cada jugador (2 a 10):</b> mezcla su producción ofensiva (goles + asistencias por partido, 40%), su win% (30%) y sus puntos por partido —3 por victoria, 1 por empate— (30%). Todo sacado de los 32 partidos de 2026. A los que tienen pocos partidos se los acerca al promedio (6.0) porque su dato es poco confiable; por eso aparecen marcados <span style="color:var(--warn);font-weight:700">pocos datos</span> y conviene ajustarles la nota a mano.</p>
+    <p><b>Química entre dos jugadores:</b> combina dos cosas — cuánto <b>ganan</b> jugando en el mismo equipo (comparado con lo que gana cada uno por separado, 60%) y cuántas <b>asistencias se hacen entre sí</b> (40%). Alejo+Lunge encabezan (se asistieron 11 veces). Ojo: es un dato ruidoso (muchas duplas jugaron 2-3 partidos juntas, y una dupla que siempre cae en el equipo fuerte parece tener química sin tenerla). Por eso arranca apagada; si la usás, dejala con peso bajo.</p>
+    <p><b>Modos de química:</b> <i>Equilibrar</i> reparte para que ningún equipo junte el talento y las buenas sinergias a la vez. <i>Cortar duplas</i> separa a propósito a las parejas que más ganan juntas (partidos más picantes). <i>Respetar duplas</i> las mantiene juntas.</p>
+    <p><b>Posiciones (Def / Mixto / Delantero):</b> no hay dato histórico de posición, así que arrancan con una sugerencia según cuánto ataca cada uno (goles + asistencias) y las editás a mano en los chips (D/M/A, podés marcar varias en los versátiles). El armador reparte los Def y los Delantero parejo entre los equipos; los Mixto son comodín.</p>
+    <p><b>Rivalidad 1-vs-1:</b> cuánto le gana históricamente un jugador a otro cuando están en equipos rivales. El armador evita que un equipo junte jugadores que le ganan a los del otro. Es a nivel individual porque dupla-vs-dupla o trío-vs-trío casi no tienen datos suficientes. Igual se solapa con el nivel, por eso arranca en 0.</p>
+    <p><b>Probabilidad de ganar:</b> sale de un modelo entrenado con los 32 partidos de la temporada (una logística sobre la diferencia de suma de notas de los dos equipos). Un equipo medio punto más fuerte da ~55/45; tres puntos, ~80/20. La <b>Diferencia de nota (Σ)</b> es la resta directa de la suma de notas de los dos equipos: es lo que verificás a ojo.</p>
+    <p><b>Modo «A mano»:</b> asignás vos cada jugador a Azul o Rojo (botón de equipo en cada chip) y la herramienta te dice la probabilidad de ganar de esos equipos, sin armarlos.</p>
+  </details>
+</div>
+
+<script>
+const DATA = {"meta": {"temporada": "2026", "nPartidos": 32, "k": 0.48}, "players": {"Ale": {"id": "Ale", "nombre": "Ale", "PJ": 9, "G": 5, "A": 2, "W": 6, "D": 0, "L": 3, "ga": 0.78, "win": 0.667, "pts": 2.0, "fz": 0.6677, "nota": 6.9, "arco": 143.0, "pocos": false, "rol": "M"}, "AleC": {"id": "AleC", "nombre": "AleC", "PJ": 1, "G": 1, "A": 1, "W": 1, "D": 0, "L": 0, "ga": 2.0, "win": 1.0, "pts": 3.0, "fz": 0.6278, "nota": 6.9, "arco": 0.0, "pocos": true, "rol": "A"}, "Alejo": {"id": "Alejo", "nombre": "Alejo", "PJ": 22, "G": 17, "A": 14, "W": 13, "D": 3, "L": 6, "ga": 1.41, "win": 0.659, "pts": 1.91, "fz": 1.1041, "nota": 7.5, "arco": 163.0, "pocos": false, "rol": "A"}, "Berar": {"id": "Berar", "nombre": "Berar", "PJ": 29, "G": 27, "A": 9, "W": 11, "D": 4, "L": 14, "ga": 1.24, "win": 0.448, "pts": 1.28, "fz": -0.2138, "nota": 5.7, "arco": 139.0, "pocos": false, "rol": "A"}, "Bernny": {"id": "Bernny", "nombre": "Bernny", "PJ": 2, "G": 0, "A": 0, "W": 1, "D": 0, "L": 1, "ga": 0.0, "win": 0.5, "pts": 1.5, "fz": -0.1605, "nota": 5.8, "arco": 32.0, "pocos": true, "rol": "D"}, "Chancha": {"id": "Chancha", "nombre": "Chancha", "PJ": 1, "G": 1, "A": 1, "W": 1, "D": 0, "L": 0, "ga": 2.0, "win": 1.0, "pts": 3.0, "fz": 0.6278, "nota": 6.9, "arco": 13.0, "pocos": true, "rol": "A"}, "DaroP": {"id": "DaroP", "nombre": "DaroP", "PJ": 3, "G": 0, "A": 0, "W": 1, "D": 0, "L": 2, "ga": 0.0, "win": 0.333, "pts": 1.0, "fz": -0.6219, "nota": 5.1, "arco": 26.0, "pocos": true, "rol": "D"}, "Diego": {"id": "Diego", "nombre": "Diego", "PJ": 3, "G": 4, "A": 1, "W": 0, "D": 1, "L": 2, "ga": 1.67, "win": 0.167, "pts": 0.33, "fz": -0.7181, "nota": 5.0, "arco": 6.0, "pocos": true, "rol": "A"}, "Druca": {"id": "Druca", "nombre": "Druca", "PJ": 1, "G": 0, "A": 0, "W": 0, "D": 1, "L": 0, "ga": 0.0, "win": 0.5, "pts": 1.0, "fz": -0.1786, "nota": 5.8, "arco": 5.0, "pocos": true, "rol": "D"}, "Dubi": {"id": "Dubi", "nombre": "Dubi", "PJ": 1, "G": 0, "A": 1, "W": 0, "D": 0, "L": 1, "ga": 1.0, "win": 0.0, "pts": 0.0, "fz": -0.5186, "nota": 5.3, "arco": 0.0, "pocos": true, "rol": "M"}, "Fede": {"id": "Fede", "nombre": "Fede", "PJ": 16, "G": 25, "A": 5, "W": 8, "D": 1, "L": 7, "ga": 1.88, "win": 0.531, "pts": 1.56, "fz": 0.6033, "nota": 6.8, "arco": 61.0, "pocos": false, "rol": "A"}, "FedeF": {"id": "FedeF", "nombre": "FedeF", "PJ": 1, "G": 1, "A": 0, "W": 1, "D": 0, "L": 0, "ga": 1.0, "win": 1.0, "pts": 3.0, "fz": 0.5303, "nota": 6.7, "arco": 0.0, "pocos": true, "rol": "M"}, "FedeN": {"id": "FedeN", "nombre": "FedeN", "PJ": 1, "G": 1, "A": 0, "W": 1, "D": 0, "L": 0, "ga": 1.0, "win": 1.0, "pts": 3.0, "fz": 0.5303, "nota": 6.7, "arco": 12.0, "pocos": true, "rol": "M"}, "Fer": {"id": "Fer", "nombre": "Fer", "PJ": 30, "G": 3, "A": 12, "W": 11, "D": 5, "L": 14, "ga": 0.5, "win": 0.45, "pts": 1.27, "fz": -0.6408, "nota": 5.1, "arco": 118.0, "pocos": false, "rol": "D"}, "Godo": {"id": "Godo", "nombre": "Godo", "PJ": 26, "G": 2, "A": 4, "W": 11, "D": 4, "L": 11, "ga": 0.23, "win": 0.5, "pts": 1.42, "fz": -0.4695, "nota": 5.3, "arco": 136.0, "pocos": false, "rol": "D"}, "Gordo": {"id": "Gordo", "nombre": "Gordo", "PJ": 21, "G": 2, "A": 7, "W": 7, "D": 4, "L": 10, "ga": 0.43, "win": 0.429, "pts": 1.19, "fz": -0.7697, "nota": 4.9, "arco": 32.0, "pocos": false, "rol": "D"}, "Guido": {"id": "Guido", "nombre": "Guido", "PJ": 1, "G": 0, "A": 0, "W": 0, "D": 0, "L": 1, "ga": 0.0, "win": 0.0, "pts": 0.0, "fz": -0.6162, "nota": 5.1, "arco": 9.0, "pocos": true, "rol": "D"}, "J": {"id": "J", "nombre": "J", "PJ": 25, "G": 12, "A": 12, "W": 9, "D": 4, "L": 12, "ga": 0.96, "win": 0.44, "pts": 1.24, "fz": -0.4229, "nota": 5.4, "arco": 127.0, "pocos": false, "rol": "M"}, "JoacoF": {"id": "JoacoF", "nombre": "JoacoF", "PJ": 15, "G": 8, "A": 7, "W": 6, "D": 1, "L": 8, "ga": 1.0, "win": 0.433, "pts": 1.27, "fz": -0.3495, "nota": 5.5, "arco": 83.0, "pocos": false, "rol": "M"}, "Joc": {"id": "Joc", "nombre": "Joc", "PJ": 1, "G": 0, "A": 0, "W": 1, "D": 0, "L": 0, "ga": 0.0, "win": 1.0, "pts": 3.0, "fz": 0.4328, "nota": 6.6, "arco": 19.0, "pocos": true, "rol": "D"}, "Jorge": {"id": "Jorge", "nombre": "Jorge", "PJ": 22, "G": 0, "A": 0, "W": 9, "D": 3, "L": 10, "ga": 0.0, "win": 0.477, "pts": 1.36, "fz": -0.7006, "nota": 5.0, "arco": 1164.0, "pocos": false, "rol": "D"}, "Juancito": {"id": "Juancito", "nombre": "Juancito", "PJ": 1, "G": 1, "A": 0, "W": 0, "D": 0, "L": 1, "ga": 1.0, "win": 0.0, "pts": 0.0, "fz": -0.5186, "nota": 5.3, "arco": 0.0, "pocos": true, "rol": "M"}, "Julo": {"id": "Julo", "nombre": "Julo", "PJ": 24, "G": 8, "A": 5, "W": 12, "D": 5, "L": 7, "ga": 0.54, "win": 0.604, "pts": 1.71, "fz": 0.2929, "nota": 6.4, "arco": 180.0, "pocos": false, "rol": "D"}, "Lea": {"id": "Lea", "nombre": "Lea", "PJ": 20, "G": 6, "A": 5, "W": 6, "D": 2, "L": 12, "ga": 0.55, "win": 0.35, "pts": 1.0, "fz": -1.0989, "nota": 4.5, "arco": 18.0, "pocos": false, "rol": "D"}, "Luki": {"id": "Luki", "nombre": "Luki", "PJ": 3, "G": 0, "A": 0, "W": 0, "D": 2, "L": 1, "ga": 0.0, "win": 0.333, "pts": 0.67, "fz": -0.757, "nota": 4.9, "arco": 44.0, "pocos": true, "rol": "D"}, "Lunge": {"id": "Lunge", "nombre": "Lunge", "PJ": 29, "G": 33, "A": 25, "W": 14, "D": 5, "L": 10, "ga": 2.0, "win": 0.569, "pts": 1.62, "fz": 0.9321, "nota": 7.3, "arco": 224.0, "pocos": false, "rol": "A"}, "Mario": {"id": "Mario", "nombre": "Mario", "PJ": 4, "G": 5, "A": 1, "W": 1, "D": 2, "L": 1, "ga": 1.5, "win": 0.5, "pts": 1.25, "fz": 0.0312, "nota": 6.0, "arco": 18.0, "pocos": true, "rol": "A"}, "Martin": {"id": "Martin", "nombre": "Martin", "PJ": 1, "G": 1, "A": 0, "W": 0, "D": 0, "L": 1, "ga": 1.0, "win": 0.0, "pts": 0.0, "fz": -0.5186, "nota": 5.3, "arco": 5.0, "pocos": true, "rol": "M"}, "MatiP": {"id": "MatiP", "nombre": "MatiP", "PJ": 1, "G": 0, "A": 1, "W": 0, "D": 1, "L": 0, "ga": 1.0, "win": 0.5, "pts": 1.0, "fz": -0.081, "nota": 5.9, "arco": 0.0, "pocos": true, "rol": "M"}, "Natos": {"id": "Natos", "nombre": "Natos", "PJ": 9, "G": 4, "A": 1, "W": 4, "D": 2, "L": 3, "ga": 0.56, "win": 0.556, "pts": 1.56, "fz": 0.0061, "nota": 6.0, "arco": 38.0, "pocos": false, "rol": "D"}, "Nico": {"id": "Nico", "nombre": "Nico", "PJ": 26, "G": 6, "A": 10, "W": 13, "D": 4, "L": 9, "ga": 0.62, "win": 0.577, "pts": 1.65, "fz": 0.2027, "nota": 6.3, "arco": 117.0, "pocos": false, "rol": "M"}, "NicoF": {"id": "NicoF", "nombre": "NicoF", "PJ": 1, "G": 1, "A": 2, "W": 1, "D": 0, "L": 0, "ga": 3.0, "win": 1.0, "pts": 3.0, "fz": 0.7253, "nota": 7.0, "arco": 0.0, "pocos": true, "rol": "A"}, "NicoP": {"id": "NicoP", "nombre": "NicoP", "PJ": 28, "G": 9, "A": 13, "W": 13, "D": 4, "L": 11, "ga": 0.79, "win": 0.536, "pts": 1.54, "fz": 0.0576, "nota": 6.1, "arco": 116.0, "pocos": false, "rol": "M"}, "Pato": {"id": "Pato", "nombre": "Pato", "PJ": 1, "G": 0, "A": 0, "W": 1, "D": 0, "L": 0, "ga": 0.0, "win": 1.0, "pts": 3.0, "fz": 0.4328, "nota": 6.6, "arco": 39.0, "pocos": true, "rol": "D"}, "Pei": {"id": "Pei", "nombre": "Pei", "PJ": 1, "G": 0, "A": 1, "W": 0, "D": 0, "L": 1, "ga": 1.0, "win": 0.0, "pts": 0.0, "fz": -0.5186, "nota": 5.3, "arco": 0.0, "pocos": true, "rol": "M"}, "Poni": {"id": "Poni", "nombre": "Poni", "PJ": 1, "G": 4, "A": 1, "W": 1, "D": 0, "L": 0, "ga": 5.0, "win": 1.0, "pts": 3.0, "fz": 0.9204, "nota": 7.3, "arco": 0.0, "pocos": true, "rol": "A"}, "Raña": {"id": "Raña", "nombre": "Raña", "PJ": 3, "G": 2, "A": 1, "W": 1, "D": 0, "L": 2, "ga": 1.0, "win": 0.333, "pts": 1.0, "fz": -0.3943, "nota": 5.4, "arco": 13.0, "pocos": true, "rol": "M"}, "Rodri": {"id": "Rodri", "nombre": "Rodri", "PJ": 14, "G": 17, "A": 7, "W": 5, "D": 2, "L": 7, "ga": 1.71, "win": 0.429, "pts": 1.21, "fz": -0.0581, "nota": 5.9, "arco": 30.0, "pocos": false, "rol": "A"}, "SantiV": {"id": "SantiV", "nombre": "SantiV", "PJ": 4, "G": 0, "A": 0, "W": 0, "D": 1, "L": 3, "ga": 0.0, "win": 0.125, "pts": 0.25, "fz": -1.4189, "nota": 4.0, "arco": 27.0, "pocos": true, "rol": "D"}, "Tin": {"id": "Tin", "nombre": "Tin", "PJ": 4, "G": 4, "A": 5, "W": 1, "D": 2, "L": 1, "ga": 2.25, "win": 0.5, "pts": 1.25, "fz": 0.236, "nota": 6.3, "arco": 2.0, "pocos": true, "rol": "A"}, "TomiL": {"id": "TomiL", "nombre": "TomiL", "PJ": 22, "G": 21, "A": 23, "W": 10, "D": 2, "L": 10, "ga": 2.0, "win": 0.5, "pts": 1.45, "fz": 0.525, "nota": 6.7, "arco": 67.0, "pocos": false, "rol": "A"}, "Vic": {"id": "Vic", "nombre": "Vic", "PJ": 20, "G": 10, "A": 13, "W": 8, "D": 5, "L": 7, "ga": 1.15, "win": 0.525, "pts": 1.45, "fz": 0.1344, "nota": 6.2, "arco": 42.0, "pocos": false, "rol": "A"}}, "chem": {"Berar|Fer": {"g": 20, "res": 0.375, "asis": 2, "chem": -0.0696}, "Berar|J": {"g": 15, "res": 0.367, "asis": 4, "chem": -0.0005}, "Berar|Julo": {"g": 16, "res": 0.594, "asis": 1, "chem": 0.0431}, "Berar|Lunge": {"g": 15, "res": 0.5, "asis": 6, "chem": 0.1173}, "Berar|Nico": {"g": 17, "res": 0.529, "asis": 0, "chem": -0.0293}, "Fer|J": {"g": 17, "res": 0.412, "asis": 2, "chem": -0.0239}, "Fer|Julo": {"g": 14, "res": 0.536, "asis": 1, "chem": -0.0073}, "Fer|Lunge": {"g": 21, "res": 0.5, "asis": 2, "chem": -0.0107}, "Fer|Nico": {"g": 17, "res": 0.529, "asis": 0, "chem": -0.0301}, "J|Julo": {"g": 17, "res": 0.471, "asis": 1, "chem": -0.0661}, "J|Lunge": {"g": 19, "res": 0.474, "asis": 2, "chem": -0.0267}, "J|Nico": {"g": 16, "res": 0.406, "asis": 2, "chem": -0.0831}, "Julo|Lunge": {"g": 17, "res": 0.618, "asis": 2, "chem": 0.0348}, "Julo|Nico": {"g": 15, "res": 0.533, "asis": 1, "chem": -0.0673}, "Lunge|Nico": {"g": 19, "res": 0.579, "asis": 6, "chem": 0.1011}, "Alejo|Godo": {"g": 8, "res": 0.625, "asis": 1, "chem": 0.0342}, "Alejo|Gordo": {"g": 8, "res": 0.562, "asis": 1, "chem": 0.0141}, "Alejo|Jorge": {"g": 8, "res": 0.625, "asis": 0, "chem": -0.002}, "Alejo|Lea": {"g": 7, "res": 0.429, "asis": 1, "chem": -0.0504}, "Alejo|NicoP": {"g": 12, "res": 0.542, "asis": 1, "chem": -0.0582}, "Alejo|Vic": {"g": 10, "res": 0.6, "asis": 1, "chem": 0.0001}, "Godo|Gordo": {"g": 2, "res": 0.0, "asis": 0, "chem": -0.2192}, "Godo|Jorge": {"g": 11, "res": 0.409, "asis": 0, "chem": -0.1105}, "Godo|Lea": {"g": 12, "res": 0.375, "asis": 0, "chem": -0.087}, "Godo|NicoP": {"g": 17, "res": 0.471, "asis": 0, "chem": -0.0878}, "Godo|Vic": {"g": 10, "res": 0.4, "asis": 0, "chem": -0.1353}, "Gordo|Jorge": {"g": 11, "res": 0.364, "asis": 0, "chem": -0.1185}, "Gordo|Lea": {"g": 7, "res": 0.214, "asis": 1, "chem": -0.1214}, "Gordo|NicoP": {"g": 7, "res": 0.286, "asis": 1, "chem": -0.1368}, "Gordo|Vic": {"g": 6, "res": 0.5, "asis": 0, "chem": -0.029}, "Jorge|Lea": {"g": 11, "res": 0.318, "asis": 0, "chem": -0.1236}, "Jorge|NicoP": {"g": 14, "res": 0.5, "asis": 0, "chem": -0.0504}, "Jorge|Vic": {"g": 9, "res": 0.444, "asis": 0, "chem": -0.0889}, "Lea|NicoP": {"g": 13, "res": 0.385, "asis": 0, "chem": -0.0949}, "Lea|Vic": {"g": 10, "res": 0.35, "asis": 0, "chem": -0.1152}, "NicoP|Vic": {"g": 11, "res": 0.5, "asis": 1, "chem": -0.034}, "Alejo|J": {"g": 8, "res": 0.625, "asis": 2, "chem": 0.1016}, "Alejo|Lunge": {"g": 10, "res": 0.75, "asis": 11, "chem": 0.487}, "Alejo|Nico": {"g": 9, "res": 0.667, "asis": 1, "chem": 0.0346}, "Gordo|J": {"g": 5, "res": 0.6, "asis": 0, "chem": 0.0591}, "Gordo|Lunge": {"g": 9, "res": 0.611, "asis": 3, "chem": 0.167}, "Gordo|Nico": {"g": 9, "res": 0.611, "asis": 0, "chem": 0.0399}, "J|NicoP": {"g": 5, "res": 0.4, "asis": 0, "chem": -0.0997}, "Jorge|Lunge": {"g": 5, "res": 0.8, "asis": 0, "chem": 0.1287}, "Jorge|Nico": {"g": 4, "res": 0.625, "asis": 0, "chem": 0.0105}, "Lunge|NicoP": {"g": 4, "res": 0.75, "asis": 0, "chem": 0.0667}, "Nico|NicoP": {"g": 8, "res": 0.625, "asis": 1, "chem": 0.0517}, "Ale|Berar": {"g": 3, "res": 1.0, "asis": 2, "chem": 0.3226}, "Ale|Godo": {"g": 6, "res": 0.5, "asis": 0, "chem": -0.1011}, "Ale|Julo": {"g": 4, "res": 1.0, "asis": 0, "chem": 0.1608}, "Ale|Lea": {"g": 4, "res": 0.5, "asis": 0, "chem": -0.0494}, "Ale|TomiL": {"g": 4, "res": 0.5, "asis": 2, "chem": 0.0427}, "Ale|Vic": {"g": 4, "res": 0.5, "asis": 0, "chem": -0.0987}, "Berar|Godo": {"g": 6, "res": 0.5, "asis": 1, "chem": 0.0265}, "Berar|Lea": {"g": 5, "res": 0.3, "asis": 1, "chem": -0.0471}, "Berar|TomiL": {"g": 11, "res": 0.409, "asis": 7, "chem": 0.1523}, "Berar|Vic": {"g": 5, "res": 0.5, "asis": 1, "chem": 0.0234}, "Godo|Julo": {"g": 7, "res": 0.571, "asis": 0, "chem": -0.0308}, "Godo|TomiL": {"g": 14, "res": 0.536, "asis": 1, "chem": 0.0165}, "Julo|Lea": {"g": 2, "res": 0.5, "asis": 0, "chem": -0.0361}, "Julo|TomiL": {"g": 7, "res": 0.714, "asis": 4, "chem": 0.2671}, "Julo|Vic": {"g": 5, "res": 0.5, "asis": 0, "chem": -0.0851}, "Lea|TomiL": {"g": 8, "res": 0.375, "asis": 3, "chem": 0.0521}, "TomiL|Vic": {"g": 6, "res": 0.75, "asis": 2, "chem": 0.2234}, "Berar|Gordo": {"g": 11, "res": 0.5, "asis": 1, "chem": 0.042}, "Berar|Rodri": {"g": 10, "res": 0.3, "asis": 2, "chem": -0.0794}, "Berar|Tin": {"g": 3, "res": 0.5, "asis": 1, "chem": 0.0446}, "Gordo|Julo": {"g": 5, "res": 0.9, "asis": 0, "chem": 0.1956}, "Gordo|Rodri": {"g": 7, "res": 0.429, "asis": 1, "chem": 0.0042}, "Gordo|Tin": {"g": 2, "res": 0.5, "asis": 0, "chem": -0.0313}, "J|Rodri": {"g": 4, "res": 0.25, "asis": 1, "chem": -0.0814}, "J|Tin": {"g": 3, "res": 0.667, "asis": 2, "chem": 0.2038}, "Julo|Rodri": {"g": 4, "res": 0.5, "asis": 1, "chem": 0.0132}, "Julo|Tin": {"g": 3, "res": 0.667, "asis": 1, "chem": 0.0874}, "Lunge|Rodri": {"g": 4, "res": 0.5, "asis": 1, "chem": 0.0232}, "Lunge|Tin": {"g": 3, "res": 0.667, "asis": 1, "chem": 0.0959}, "Rodri|Tin": {"g": 2, "res": 0.5, "asis": 0, "chem": -0.0313}, "Bernny|DaroP": {"g": 2, "res": 0.5, "asis": 0, "chem": -0.0134}, "Bernny|NicoP": {"g": 2, "res": 0.5, "asis": 0, "chem": -0.0514}, "Bernny|Vic": {"g": 2, "res": 0.5, "asis": 0, "chem": -0.0494}, "DaroP|NicoP": {"g": 2, "res": 0.5, "asis": 0, "chem": -0.0201}, "DaroP|Vic": {"g": 2, "res": 0.5, "asis": 0, "chem": -0.0181}, "Diego|NicoP": {"g": 3, "res": 0.167, "asis": 0, "chem": -0.1338}, "Berar|Mario": {"g": 2, "res": 0.25, "asis": 0, "chem": -0.1289}, "Fer|Mario": {"g": 3, "res": 0.5, "asis": 1, "chem": 0.0441}, "J|Mario": {"g": 3, "res": 0.667, "asis": 1, "chem": 0.1271}, "Julo|Mario": {"g": 2, "res": 0.5, "asis": 0, "chem": -0.0643}, "Lunge|Mario": {"g": 3, "res": 0.333, "asis": 0, "chem": -0.1419}, "Jorge|TomiL": {"g": 11, "res": 0.409, "asis": 0, "chem": -0.1105}, "NicoP|TomiL": {"g": 11, "res": 0.545, "asis": 4, "chem": 0.1214}, "J|Luki": {"g": 3, "res": 0.333, "asis": 0, "chem": -0.0705}, "J|Natos": {"g": 2, "res": 0.25, "asis": 0, "chem": -0.1378}, "J|Vic": {"g": 6, "res": 0.5, "asis": 2, "chem": 0.0746}, "Julo|Luki": {"g": 2, "res": 0.5, "asis": 0, "chem": -0.0329}, "Julo|Natos": {"g": 2, "res": 0.25, "asis": 0, "chem": -0.1687}, "Luki|Lunge": {"g": 3, "res": 0.333, "asis": 0, "chem": -0.1016}, "Luki|Vic": {"g": 2, "res": 0.5, "asis": 0, "chem": -0.0181}, "Lunge|Natos": {"g": 4, "res": 0.375, "asis": 1, "chem": -0.0831}, "Lunge|Vic": {"g": 5, "res": 0.7, "asis": 3, "chem": 0.2302}, "Mario|Vic": {"g": 2, "res": 0.75, "asis": 2, "chem": 0.2237}, "Berar|NicoP": {"g": 5, "res": 0.6, "asis": 0, "chem": 0.023}, "Fer|Gordo": {"g": 13, "res": 0.5, "asis": 0, "chem": 0.0077}, "Fer|Lea": {"g": 4, "res": 0.375, "asis": 1, "chem": 0.0084}, "Fer|NicoP": {"g": 3, "res": 0.5, "asis": 0, "chem": -0.0412}, "Fer|TomiL": {"g": 7, "res": 0.357, "asis": 1, "chem": -0.0804}, "Gordo|TomiL": {"g": 6, "res": 0.25, "asis": 0, "chem": -0.1896}, "Lea|Nico": {"g": 2, "res": 0.25, "asis": 0, "chem": -0.1249}, "Nico|TomiL": {"g": 8, "res": 0.562, "asis": 1, "chem": 0.0181}, "DaroP|Fede": {"g": 2, "res": 0.5, "asis": 0, "chem": -0.0192}, "Fede|Fer": {"g": 5, "res": 0.2, "asis": 2, "chem": -0.1073}, "Fede|Gordo": {"g": 4, "res": 0.0, "asis": 0, "chem": -0.3152}, "Fede|JoacoF": {"g": 11, "res": 0.5, "asis": 3, "chem": 0.0774}, "Fede|Lunge": {"g": 4, "res": 0.5, "asis": 0, "chem": -0.0729}, "Fede|Natos": {"g": 6, "res": 0.583, "asis": 0, "chem": -0.0177}, "Fer|JoacoF": {"g": 5, "res": 0.0, "asis": 0, "chem": -0.3213}, "Fer|Natos": {"g": 3, "res": 0.333, "asis": 0, "chem": -0.1266}, "Gordo|JoacoF": {"g": 3, "res": 0.0, "asis": 0, "chem": -0.2529}, "Gordo|Natos": {"g": 2, "res": 0.5, "asis": 0, "chem": -0.0417}, "JoacoF|Lunge": {"g": 4, "res": 0.25, "asis": 2, "chem": -0.0519}, "JoacoF|Natos": {"g": 5, "res": 0.7, "asis": 2, "chem": 0.2034}, "Ale|Nico": {"g": 2, "res": 1.0, "asis": 0, "chem": 0.0974}, "Ale|NicoP": {"g": 6, "res": 0.5, "asis": 1, "chem": -0.0594}, "Ale|Rodri": {"g": 2, "res": 1.0, "asis": 0, "chem": 0.1253}, "Julo|NicoP": {"g": 5, "res": 0.6, "asis": 1, "chem": 0.0338}, "Nico|Rodri": {"g": 5, "res": 0.5, "asis": 1, "chem": 0.0133}, "NicoP|Rodri": {"g": 6, "res": 0.75, "asis": 5, "chem": 0.4051}, "Berar|JoacoF": {"g": 4, "res": 0.25, "asis": 1, "chem": -0.0851}, "JoacoF|Lea": {"g": 6, "res": 0.5, "asis": 0, "chem": 0.0286}, "Lea|Lunge": {"g": 3, "res": 0.333, "asis": 0, "chem": -0.1056}, "Fede|Nico": {"g": 2, "res": 0.5, "asis": 0, "chem": -0.065}, "Fede|NicoP": {"g": 10, "res": 0.65, "asis": 2, "chem": 0.1259}, "Fede|TomiL": {"g": 7, "res": 0.571, "asis": 6, "chem": 0.2884}, "Fede|Vic": {"g": 2, "res": 1.0, "asis": 1, "chem": 0.2222}, "Nico|Vic": {"g": 3, "res": 0.833, "asis": 0, "chem": 0.0917}, "JoacoF|TomiL": {"g": 5, "res": 0.6, "asis": 2, "chem": 0.1582}, "Godo|Lunge": {"g": 7, "res": 0.714, "asis": 1, "chem": 0.1331}, "Godo|Nico": {"g": 7, "res": 0.643, "asis": 0, "chem": 0.0302}, "Godo|Rodri": {"g": 4, "res": 0.5, "asis": 0, "chem": -0.0246}, "Jorge|Rodri": {"g": 7, "res": 0.429, "asis": 0, "chem": -0.0622}, "Fer|Luki": {"g": 2, "res": 0.25, "asis": 0, "chem": -0.0979}, "Fede|Godo": {"g": 8, "res": 0.562, "asis": 0, "chem": -0.0095}, "Fede|Jorge": {"g": 6, "res": 0.667, "asis": 0, "chem": 0.0652}, "Fede|Lea": {"g": 7, "res": 0.571, "asis": 2, "chem": 0.1468}, "Fer|Godo": {"g": 4, "res": 0.375, "asis": 0, "chem": -0.1011}, "Fer|Raña": {"g": 2, "res": 0.0, "asis": 0, "chem": -0.1919}, "Fer|Rodri": {"g": 5, "res": 0.1, "asis": 0, "chem": -0.2572}, "Fer|Vic": {"g": 7, "res": 0.643, "asis": 1, "chem": 0.1156}, "Godo|J": {"g": 8, "res": 0.375, "asis": 0, "chem": -0.1161}, "Raña|Rodri": {"g": 2, "res": 0.5, "asis": 1, "chem": 0.0896}, "Raña|Vic": {"g": 2, "res": 0.5, "asis": 0, "chem": -0.0181}, "Rodri|Vic": {"g": 4, "res": 0.375, "asis": 1, "chem": -0.0349}, "Fede|Julo": {"g": 2, "res": 1.0, "asis": 0, "chem": 0.1178}, "JoacoF|Jorge": {"g": 6, "res": 0.667, "asis": 0, "chem": 0.0983}, "JoacoF|Julo": {"g": 2, "res": 1.0, "asis": 0, "chem": 0.1362}, "JoacoF|NicoP": {"g": 10, "res": 0.55, "asis": 0, "chem": 0.008}, "Jorge|Julo": {"g": 2, "res": 1.0, "asis": 0, "chem": 0.1279}, "Lunge|TomiL": {"g": 4, "res": 0.75, "asis": 2, "chem": 0.2111}, "Godo|SantiV": {"g": 2, "res": 0.25, "asis": 0, "chem": -0.0682}, "J|SantiV": {"g": 2, "res": 0.25, "asis": 0, "chem": -0.0569}, "Julo|SantiV": {"g": 2, "res": 0.25, "asis": 0, "chem": -0.0878}, "Nico|SantiV": {"g": 2, "res": 0.25, "asis": 0, "chem": -0.0826}, "Alejo|Berar": {"g": 5, "res": 0.6, "asis": 2, "chem": 0.1037}, "Alejo|Fer": {"g": 10, "res": 0.8, "asis": 1, "chem": 0.1913}, "Alejo|Rodri": {"g": 4, "res": 0.5, "asis": 3, "chem": 0.1321}, "Berar|Jorge": {"g": 7, "res": 0.429, "asis": 0, "chem": -0.0692}, "Fer|Jorge": {"g": 4, "res": 0.625, "asis": 0, "chem": 0.0463}, "Berar|SantiV": {"g": 2, "res": 0.0, "asis": 0, "chem": -0.1524}, "Fer|SantiV": {"g": 2, "res": 0.0, "asis": 0, "chem": -0.1527}, "Gordo|SantiV": {"g": 2, "res": 0.0, "asis": 0, "chem": -0.1487}, "Jorge|SantiV": {"g": 2, "res": 0.0, "asis": 0, "chem": -0.1579}, "Rodri|TomiL": {"g": 2, "res": 0.0, "asis": 1, "chem": -0.1296}, "SantiV|TomiL": {"g": 3, "res": 0.0, "asis": 0, "chem": -0.1957}, "J|TomiL": {"g": 5, "res": 0.4, "asis": 0, "chem": -0.0885}, "Ale|Alejo": {"g": 3, "res": 1.0, "asis": 0, "chem": 0.1182}, "Ale|Fer": {"g": 2, "res": 1.0, "asis": 0, "chem": 0.1213}, "Ale|Lunge": {"g": 2, "res": 1.0, "asis": 1, "chem": 0.1885}, "Alejo|Julo": {"g": 6, "res": 0.583, "asis": 0, "chem": -0.0774}, "Gordo|Raña": {"g": 2, "res": 0.5, "asis": 0, "chem": 0.0}, "NicoP|Raña": {"g": 2, "res": 0.5, "asis": 0, "chem": -0.0201}, "Diego|Fede": {"g": 2, "res": 0.25, "asis": 0, "chem": -0.0819}, "Diego|JoacoF": {"g": 2, "res": 0.25, "asis": 0, "chem": -0.0635}, "Alejo|TomiL": {"g": 3, "res": 1.0, "asis": 0, "chem": 0.1585}, "Lea|Rodri": {"g": 4, "res": 0.25, "asis": 0, "chem": -0.1232}, "Fede|J": {"g": 2, "res": 0.5, "asis": 3, "chem": 0.2294}, "J|Lea": {"g": 2, "res": 0.0, "asis": 0, "chem": -0.1931}, "Godo|JoacoF": {"g": 8, "res": 0.562, "asis": 0, "chem": 0.0273}, "Ale|JoacoF": {"g": 3, "res": 0.333, "asis": 1, "chem": -0.0726}, "Ale|Jorge": {"g": 3, "res": 0.0, "asis": 0, "chem": -0.321}, "Alejo|Fede": {"g": 5, "res": 0.8, "asis": 1, "chem": 0.1433}, "Alejo|JoacoF": {"g": 4, "res": 0.75, "asis": 1, "chem": 0.1373}, "Fede|Rodri": {"g": 2, "res": 0.5, "asis": 1, "chem": 0.0524}, "JoacoF|Rodri": {"g": 2, "res": 0.5, "asis": 1, "chem": 0.0708}, "Berar|Natos": {"g": 2, "res": 0.5, "asis": 0, "chem": -0.0454}, "Natos|Nico": {"g": 2, "res": 0.5, "asis": 0, "chem": -0.0696}, "Ale|Fede": {"g": 3, "res": 0.667, "asis": 0, "chem": -0.012}, "Alejo|Natos": {"g": 3, "res": 1.0, "asis": 1, "chem": 0.2218}, "Godo|Natos": {"g": 4, "res": 0.625, "asis": 0, "chem": 0.0101}, "Lea|Natos": {"g": 3, "res": 0.667, "asis": 0, "chem": 0.0587}, "Natos|NicoP": {"g": 3, "res": 0.833, "asis": 0, "chem": 0.0943}, "Jorge|Natos": {"g": 4, "res": 0.75, "asis": 0, "chem": 0.087}, "Natos|TomiL": {"g": 2, "res": 0.5, "asis": 0, "chem": -0.0551}}, "rivalry": {"Fer|Jorge": {"n": 17, "adv": 0.0238}, "Fer|NicoP": {"n": 23, "adv": -0.0741}, "Fer|Gordo": {"n": 6, "adv": 0.15}, "Fer|Vic": {"n": 11, "adv": 0.0333}, "Fer|Lea": {"n": 14, "adv": 0.1389}, "Fer|Godo": {"n": 21, "adv": 0.0}, "Alejo|Fer": {"n": 10, "adv": 0.1071}, "Berar|Jorge": {"n": 13, "adv": -0.0588}, "Berar|NicoP": {"n": 20, "adv": -0.0208}, "Berar|Gordo": {"n": 8, "adv": 0.1667}, "Berar|Vic": {"n": 12, "adv": -0.0313}, "Berar|Lea": {"n": 13, "adv": 0.0588}, "Berar|Godo": {"n": 17, "adv": -0.0476}, "Alejo|Berar": {"n": 14, "adv": 0.1111}, "Jorge|Nico": {"n": 13, "adv": -0.0588}, "Nico|NicoP": {"n": 15, "adv": 0.0526}, "Gordo|Nico": {"n": 10, "adv": -0.1786}, "Nico|Vic": {"n": 12, "adv": 0.0312}, "Lea|Nico": {"n": 13, "adv": -0.0882}, "Godo|Nico": {"n": 15, "adv": -0.0263}, "Alejo|Nico": {"n": 10, "adv": 0.1071}, "Jorge|Julo": {"n": 13, "adv": -0.0588}, "Julo|NicoP": {"n": 16, "adv": 0.1}, "Gordo|Julo": {"n": 12, "adv": -0.1562}, "Julo|Vic": {"n": 9, "adv": 0.1154}, "Julo|Lea": {"n": 14, "adv": 0.1111}, "Godo|Julo": {"n": 12, "adv": -0.0625}, "Alejo|Julo": {"n": 11, "adv": 0.0333}, "J|Jorge": {"n": 17, "adv": -0.0476}, "J|NicoP": {"n": 17, "adv": -0.0476}, "Gordo|J": {"n": 10, "adv": -0.0357}, "J|Vic": {"n": 10, "adv": -0.0714}, "J|Lea": {"n": 14, "adv": 0.0}, "Godo|J": {"n": 13, "adv": 0.0588}, "Alejo|J": {"n": 11, "adv": 0.1}, "Jorge|Lunge": {"n": 16, "adv": -0.075}, "Lunge|NicoP": {"n": 21, "adv": 0.02}, "Gordo|Lunge": {"n": 11, "adv": -0.2}, "Lunge|Vic": {"n": 14, "adv": 0.0556}, "Lea|Lunge": {"n": 14, "adv": -0.1111}, "Godo|Lunge": {"n": 16, "adv": -0.05}, "Alejo|Lunge": {"n": 9, "adv": 0.0385}, "Jorge|Vic": {"n": 6, "adv": -0.05}, "Ale|Jorge": {"n": 3, "adv": 0.2143}, "Jorge|Lea": {"n": 3, "adv": 0.0714}, "Jorge|TomiL": {"n": 5, "adv": 0.0556}, "Godo|Jorge": {"n": 9, "adv": -0.0385}, "NicoP|Vic": {"n": 7, "adv": -0.0909}, "Lea|NicoP": {"n": 5, "adv": -0.0556}, "NicoP|TomiL": {"n": 8, "adv": 0.0833}, "Godo|NicoP": {"n": 6, "adv": -0.05}, "Berar|Nico": {"n": 7, "adv": -0.0909}, "Ale|Nico": {"n": 6, "adv": 0.0}, "Julo|Nico": {"n": 5, "adv": 0.0556}, "Nico|TomiL": {"n": 9, "adv": 0.0385}, "Gordo|Vic": {"n": 7, "adv": 0.1364}, "Ale|Gordo": {"n": 6, "adv": 0.1}, "Gordo|Lea": {"n": 6, "adv": 0.2}, "Gordo|TomiL": {"n": 7, "adv": -0.0455}, "Godo|Gordo": {"n": 15, "adv": 0.0}, "Berar|J": {"n": 8, "adv": 0.0417}, "Ale|J": {"n": 5, "adv": 0.0556}, "J|Julo": {"n": 3, "adv": -0.2143}, "J|TomiL": {"n": 12, "adv": -0.0625}, "Alejo|Vic": {"n": 4, "adv": 0.0625}, "Ale|Alejo": {"n": 4, "adv": 0.0}, "Alejo|Lea": {"n": 7, "adv": 0.1364}, "Alejo|TomiL": {"n": 10, "adv": 0.2143}, "Alejo|Godo": {"n": 11, "adv": 0.1333}, "Berar|Lunge": {"n": 12, "adv": -0.0938}, "Ale|Lunge": {"n": 7, "adv": 0.0455}, "Julo|Lunge": {"n": 5, "adv": 0.0556}, "Lunge|TomiL": {"n": 15, "adv": 0.0263}, "Berar|DaroP": {"n": 3, "adv": 0.0714}, "Gordo|NicoP": {"n": 11, "adv": 0.0667}, "Alejo|Gordo": {"n": 7, "adv": 0.0455}, "Tin|Vic": {"n": 3, "adv": 0.0714}, "Alejo|Tin": {"n": 3, "adv": 0.0}, "Diego|Julo": {"n": 3, "adv": -0.1429}, "NicoP|Rodri": {"n": 4, "adv": 0.125}, "Alejo|Rodri": {"n": 7, "adv": 0.1364}, "Diego|Lunge": {"n": 3, "adv": -0.1429}, "Fer|TomiL": {"n": 14, "adv": -0.0278}, "Mario|NicoP": {"n": 3, "adv": -0.0714}, "Lea|Mario": {"n": 3, "adv": -0.0714}, "Mario|TomiL": {"n": 4, "adv": 0.0}, "Berar|TomiL": {"n": 10, "adv": -0.1071}, "Julo|TomiL": {"n": 7, "adv": 0.0455}, "Luki|NicoP": {"n": 3, "adv": -0.0714}, "Lea|Vic": {"n": 3, "adv": -0.1429}, "TomiL|Vic": {"n": 7, "adv": -0.0909}, "Fer|Julo": {"n": 8, "adv": -0.0833}, "Berar|Julo": {"n": 6, "adv": -0.05}, "Fer|J": {"n": 6, "adv": 0.0}, "J|Nico": {"n": 3, "adv": -0.0714}, "Fer|Natos": {"n": 6, "adv": -0.1}, "Natos|NicoP": {"n": 5, "adv": -0.1111}, "Berar|Natos": {"n": 5, "adv": -0.1111}, "Natos|Nico": {"n": 6, "adv": 0.1}, "Natos|TomiL": {"n": 3, "adv": 0.0}, "Fer|Lunge": {"n": 6, "adv": -0.2}, "Lunge|Nico": {"n": 5, "adv": -0.0556}, "Berar|Fer": {"n": 7, "adv": 0.0}, "Fer|Nico": {"n": 8, "adv": -0.1667}, "Ale|Fer": {"n": 6, "adv": 0.0}, "Fer|Rodri": {"n": 8, "adv": -0.0417}, "JoacoF|NicoP": {"n": 4, "adv": -0.25}, "Berar|JoacoF": {"n": 9, "adv": -0.0385}, "JoacoF|Nico": {"n": 13, "adv": -0.0588}, "JoacoF|Julo": {"n": 9, "adv": 0.0}, "JoacoF|Rodri": {"n": 5, "adv": 0.0556}, "Gordo|Rodri": {"n": 3, "adv": -0.0714}, "Julo|Natos": {"n": 6, "adv": -0.15}, "Natos|Rodri": {"n": 3, "adv": 0.0714}, "Fede|NicoP": {"n": 4, "adv": -0.25}, "Berar|Fede": {"n": 13, "adv": -0.0882}, "Fede|Nico": {"n": 10, "adv": -0.0357}, "Fede|Julo": {"n": 9, "adv": 0.0}, "Fede|Rodri": {"n": 6, "adv": 0.1}, "Lunge|Rodri": {"n": 9, "adv": 0.0385}, "Fede|Fer": {"n": 11, "adv": 0.1333}, "JoacoF|Vic": {"n": 5, "adv": -0.1111}, "JoacoF|TomiL": {"n": 5, "adv": -0.1667}, "Fede|JoacoF": {"n": 3, "adv": 0.0714}, "Lea|TomiL": {"n": 6, "adv": -0.1}, "Fede|Lunge": {"n": 9, "adv": 0.0769}, "Berar|Rodri": {"n": 4, "adv": -0.125}, "Godo|JoacoF": {"n": 4, "adv": 0.125}, "JoacoF|Lunge": {"n": 9, "adv": 0.0}, "Gordo|Jorge": {"n": 4, "adv": 0.0}, "Godo|TomiL": {"n": 5, "adv": 0.0556}, "Rodri|TomiL": {"n": 6, "adv": -0.1}, "Fede|Jorge": {"n": 3, "adv": -0.0714}, "Fede|Godo": {"n": 4, "adv": -0.125}, "Fede|J": {"n": 10, "adv": 0.0714}, "Fer|JoacoF": {"n": 10, "adv": -0.1071}, "Raña|TomiL": {"n": 3, "adv": -0.0714}, "Lunge|Raña": {"n": 3, "adv": 0.0714}, "Fede|Vic": {"n": 4, "adv": -0.0625}, "Jorge|Rodri": {"n": 3, "adv": 0.2143}, "Julo|Rodri": {"n": 6, "adv": 0.1}, "J|JoacoF": {"n": 10, "adv": -0.0714}, "J|Lunge": {"n": 3, "adv": -0.2143}, "Nico|Rodri": {"n": 6, "adv": 0.05}, "Alejo|SantiV": {"n": 4, "adv": 0.1875}, "Godo|Vic": {"n": 7, "adv": -0.1364}, "Godo|Rodri": {"n": 6, "adv": 0.1}, "J|Rodri": {"n": 7, "adv": 0.0455}, "Jorge|NicoP": {"n": 4, "adv": 0.0}, "Alejo|Jorge": {"n": 8, "adv": 0.25}, "Alejo|NicoP": {"n": 6, "adv": 0.15}, "Godo|Lea": {"n": 3, "adv": 0.0714}, "Fede|TomiL": {"n": 5, "adv": -0.0556}, "Gordo|JoacoF": {"n": 4, "adv": 0.0625}, "Ale|Julo": {"n": 4, "adv": 0.0}, "Alejo|JoacoF": {"n": 4, "adv": 0.0625}, "Fede|Gordo": {"n": 3, "adv": 0.0}, "Ale|Berar": {"n": 5, "adv": 0.0556}, "Natos|Vic": {"n": 4, "adv": -0.0625}, "Alejo|Natos": {"n": 4, "adv": 0.0625}, "Alejo|Fede": {"n": 4, "adv": 0.0625}, "J|Natos": {"n": 5, "adv": -0.1667}, "Lunge|Natos": {"n": 3, "adv": -0.1429}}};
+/* ---------- ponedores del mes (editable) ---------- */
+const PONEDORES = { mes:'Septiembre 2026',
+  ids:['Jorge','Lea','Julo','Alejo','Lunge','Godo','J','TomiL','NicoP','Berar','Nico','Fer','Gordo'],
+  arquero:'Jorge' };
+const TARGET = 14; // jugadores para armar (7 y 7)
+/* ---------- estado ---------- */
+const P = {};           // id -> {id,nombre,nota(base),notaEff,PJ,pocos,nuevo}
+Object.values(DATA.players).forEach(p=>{ P[p.id]={...p, notaEff:p.nota, roles:(p.rol?[p.rol]:['M'])}; });
+const RIV = DATA.rivalry||{};
+const ROLES=['D','M','A']; const ROLE_NM={D:'Defensivo',M:'Mixto',A:'Delantero'};
+let selected = new Set();
+let gkIds = [];   // 0, 1 o 2 arqueros
+let filterPJ = true;   // ocultar de la lista a los de <5 PJ (activo por defecto)
+let manualMode = false;
+let manual = {};       // id -> 'A' | 'B' (asignación manual)
+let constraints = [];   // {a,b,type:'juntos'|'sep'}
+let lastSplits = [];    // alternativas
+let altIndex = 0;
+
+const $ = s=>document.querySelector(s);
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e;};
+
+/* ---------- tema ---------- */
+(function(){ let th=null; try{th=localStorage.getItem('armador-theme');}catch(e){}
+  if(th) document.documentElement.setAttribute('data-theme',th);
+  $('#themeBtn').onclick=()=>{const cur=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',cur); try{localStorage.setItem('armador-theme',cur);}catch(e){}};
+})();
+$('#sub').textContent = 'temporada '+DATA.meta.temporada+' · '+DATA.meta.nPartidos+' partidos';
+
+/* ---------- lista de jugadores ---------- */
+function playerArr(){
+  let a=Object.values(P);
+  if(filterPJ) a=a.filter(p=> (p.PJ||0)>=5 || selected.has(p.id));  // oculta <5 PJ salvo los ya elegidos
+  const q=$('#search').value.trim().toLowerCase();
+  if(q) a=a.filter(p=>p.nombre.toLowerCase().includes(q)||p.id.toLowerCase().includes(q));
+  const by=$('#sortBy').value;
+  a.sort((x,y)=> by==='nombre'? x.nombre.localeCompare(y.nombre)
+      : by==='pj'? (y.PJ||0)-(x.PJ||0)
+      : (y.notaEff)-(x.notaEff));
+  return a;
+}
+function renderList(){
+  const box=$('#plist'); box.innerHTML='';
+  playerArr().forEach(p=>{
+    const d=el('div','pl'+(selected.has(p.id)?' sel':''));
+    d.onclick=()=>toggle(p.id);
+    const dot=el('div','dot',selected.has(p.id)?'✓':''); d.appendChild(dot);
+    const nm=el('div','nm',p.nombre); if(gkIds.includes(p.id)) nm.appendChild(el('span','gk',' 🧤')); d.appendChild(nm);
+    if(p.pocos) d.appendChild(el('span','pocos','pocos datos'));
+    else if(!p.nuevo) d.appendChild(el('span','muted','PJ '+p.PJ));
+    d.appendChild(el('div','nota',(p.notaEff).toFixed(1)));
+    box.appendChild(d);
+  });
+}
+function rmGk(id){ gkIds=gkIds.filter(g=>g!==id); }
+function toggle(id){ if(selected.has(id)){selected.delete(id); rmGk(id);} else selected.add(id); refresh(); }
+
+/* ---------- chips de elegidos ---------- */
+function renderChips(){
+  const wrap=$('#selChips'); wrap.innerHTML='';
+  const arr=[...selected].map(id=>P[id]).sort((a,b)=>b.notaEff-a.notaEff);
+  $('#selbarWrap').style.display = arr.length? 'block':'none';
+  arr.forEach(p=>{
+    const isGk=gkIds.includes(p.id);
+    const c=el('div','chip'+(isGk?' gk':''));
+    if(manualMode){
+      const tt=manual[p.id]||'';
+      const tb=el('span','teamtog'+(tt?' '+tt:''), tt==='A'?'Azul':tt==='B'?'Rojo':'—');
+      tb.title='Asignar a un equipo';
+      tb.onclick=(e)=>{ e.stopPropagation(); manual[p.id]= manual[p.id]==='A'?'B':(manual[p.id]==='B'?'':'A'); refresh(); };
+      c.appendChild(tb);
+    }
+    const gk=el('span','gkbtn','🧤'); gk.title='Marcar como arquero (0 a 2)';
+    gk.onclick=()=>{
+      if(isGk){ rmGk(p.id); }
+      else if(gkIds.length<2){ gkIds.push(p.id); }
+      else { gkIds=[gkIds[1], p.id]; }   // ya hay 2: reemplaza el más viejo
+      refresh();
+    };
+    c.appendChild(gk);
+    c.appendChild(el('span','nm2',p.nombre));
+    const rt=el('span','roltog');
+    ROLES.forEach(R=>{
+      const bb=el('b',(p.roles.includes(R)?'on':''),R); bb.title=ROLE_NM[R];
+      bb.onclick=(e)=>{ e.stopPropagation();
+        const has=P[p.id].roles.includes(R);
+        if(has){ if(P[p.id].roles.length>1) P[p.id].roles=P[p.id].roles.filter(x=>x!==R); }
+        else P[p.id].roles=P[p.id].roles.concat(R);
+        refresh();
+      };
+      rt.appendChild(bb);
+    });
+    c.appendChild(rt);
+    const inp=el('input'); inp.value=p.notaEff.toFixed(1); inp.title='Nota';
+    inp.onchange=()=>{ let v=parseFloat(inp.value.replace(',','.')); if(isNaN(v))v=p.notaEff; v=Math.max(1,Math.min(10,v)); P[p.id].notaEff=v; refresh(); };
+    inp.onclick=e=>e.stopPropagation();
+    c.appendChild(inp);
+    const x=el('span','x','✕'); x.onclick=()=>{selected.delete(p.id); rmGk(p.id); refresh();};
+    c.appendChild(x);
+    wrap.appendChild(c);
+  });
+  const n=arr.length;
+  const sc=$('#selCount');
+  sc.textContent = n+' / '+TARGET+' elegidos';
+  sc.style.color = n===TARGET ? 'var(--good)' : (n>TARGET ? 'var(--bad)' : 'var(--muted)');
+  sc.style.fontWeight = n===TARGET ? '700' : '600';
+  const gh=$('#gkHint'); if(gh){
+    const g=gkIds.filter(id=>selected.has(id));
+    gh.textContent = g.length===0 ? '(sin arquero → sin compensación)'
+      : g.length===1 ? '(1 arquero: '+P[g[0]].nombre+' → el otro equipo recibe más ataque)'
+      : '(2 arqueros: '+g.map(id=>P[id].nombre).join(' y ')+' → van separados)';
+  }
+}
+
+/* ---------- selects de constraints ---------- */
+function fillConstraintSelects(){
+  const arr=[...selected].map(id=>P[id]).sort((a,b)=>a.nombre.localeCompare(b.nombre));
+  [ '#cA','#cB'].forEach(sel=>{
+    const cur=$(sel).value; $(sel).innerHTML='';
+    arr.forEach(p=>{const o=el('option',null,p.nombre);o.value=p.id;$(sel).appendChild(o);});
+    if(cur) $(sel).value=cur;
+  });
+}
+function renderConstraints(){
+  const box=$('#clist'); box.innerHTML='';
+  constraints.forEach((c,i)=>{
+    const chip=el('div','chip');
+    chip.appendChild(el('span',null,(P[c.a]?P[c.a].nombre:c.a)+(c.type==='juntos'?' + ':' ✕ ')+(P[c.b]?P[c.b].nombre:c.b)));
+    const x=el('span','x','✕'); x.onclick=()=>{constraints.splice(i,1);renderConstraints();}; chip.appendChild(x);
+    chip.style.borderColor = c.type==='juntos'? 'var(--good)':'var(--bad)';
+    box.appendChild(chip);
+  });
+}
+
+/* ---------- química ---------- */
+function chemBetween(a,b,minG){
+  const k1=a+'|'+b, k2=b+'|'+a;
+  const c=DATA.chem[k1]||DATA.chem[k2];
+  if(!c) return 0;
+  if(c.g < minG) return 0;
+  return c.chem;
+}
+const K_WIN = DATA.meta.k || 0.35;   // pendiente logística calibrada con los 32 partidos
+function winPct(effA, effB){ let p=100/(1+Math.exp(-K_WIN*(effA-effB))); return Math.max(2,Math.min(98,p)); }
+const CHEM_UNIT=6.0;  // química → puntos de nota
+const ROLE_UNIT=1.1;  // desbalance de posiciones → puntos de nota
+const RIVAL_UNIT=2.2; // ventaja de enfrentamiento → puntos de nota
+
+/* roles: un versátil reparte su peso entre sus roles */
+function roleCounts(ids){
+  const c={D:0,A:0};
+  ids.forEach(id=>{ const rs=(P[id].roles||['M']); const w=1/rs.length;
+    rs.forEach(R=>{ if(R==='D')c.D+=w; else if(R==='A')c.A+=w; }); });
+  return c;
+}
+function crossRivalry(A,B){ // ventaja neta de A sobre B en mano a mano
+  let s=0;
+  for(const a of A) for(const b of B){
+    if(a===b) continue;
+    const k = a<b ? a+'|'+b : b+'|'+a;
+    const r=RIV[k]; if(!r) continue;
+    s += (a<b) ? r.adv : -r.adv;   // adv es del primero del par
+  }
+  return s;
+}
+
+/* ---------- optimizador ---------- */
+function combinations(arr,k){
+  const res=[]; const n=arr.length;
+  (function go(start,cur){ if(cur.length===k){res.push(cur.slice());return;}
+    for(let i=start;i<n;i++){cur.push(arr[i]);go(i+1,cur);cur.pop();}
+  })(0,[]);
+  return res;
+}
+function teamChem(ids,minG){
+  let s=0; for(let i=0;i<ids.length;i++)for(let j=i+1;j<ids.length;j++)s+=chemBetween(ids[i],ids[j],minG); return s;
+}
+function evalSplit(A,B,cfg){
+  const sumA=A.reduce((s,id)=>s+P[id].notaEff,0);
+  const sumB=B.reduce((s,id)=>s+P[id].notaEff,0);
+  // bonus defensivo al equipo del arquero — solo con 1 arquero (con 2, cada equipo tiene el suyo)
+  let baseA=sumA, baseB=sumB;
+  if(cfg.gks.length===1){ const g=cfg.gks[0]; if(A.includes(g)) baseA+=cfg.gkComp; else if(B.includes(g)) baseB+=cfg.gkComp; }
+  const chA=teamChem(A,cfg.minG), chB=teamChem(B,cfg.minG);
+  let obj;
+  if(cfg.chemW<=0 || cfg.mode==='none'){
+    obj=Math.abs(baseA-baseB);
+  } else if(cfg.mode==='equil'){
+    const adjA=baseA+cfg.chemW*CHEM_UNIT*chA, adjB=baseB+cfg.chemW*CHEM_UNIT*chB;
+    obj=Math.abs(adjA-adjB);
+  } else if(cfg.mode==='cortar'){
+    obj=Math.abs(baseA-baseB) + cfg.chemW*CHEM_UNIT*(chA+chB);
+  } else { // respetar
+    obj=Math.abs(baseA-baseB) - cfg.chemW*CHEM_UNIT*(chA+chB);
+  }
+  // posiciones: penaliza desbalance de Def y Delantero
+  let rolePen=0;
+  if(cfg.roleW>0){ const cA=roleCounts(A), cB=roleCounts(B); rolePen=Math.abs(cA.D-cB.D)+Math.abs(cA.A-cB.A); obj+=cfg.roleW*ROLE_UNIT*rolePen; }
+  // rivalidad: penaliza ventaja neta de mano a mano de un equipo sobre el otro
+  let riv=0;
+  if(cfg.rivW>0){ riv=crossRivalry(A,B); obj+=cfg.rivW*RIVAL_UNIT*Math.abs(riv); }
+  // fuerza efectiva para prob de ganar = suma de notas (+ ventaja de arquero). Modelo calibrado con los 32 partidos.
+  return {A,B,sumA,sumB,baseA,baseB,effA:baseA,effB:baseB,chA,chB,rolePen,riv,obj,diff:Math.abs(sumA-sumB)};
+}
+function feasible(A,B,cfg){
+  for(const c of cfg.cons){
+    const aA=A.includes(c.a), bA=A.includes(c.b);
+    if(c.type==='juntos' && (aA!==bA)) return false;
+    if(c.type==='sep' && (aA===bA)) return false;
+  }
+  return true;
+}
+function optimize(cfg){
+  const ids=[...selected];
+  const n=ids.length;
+  const kA = Math.floor(n/2);           // equipo A el más chico si impar
+  // fijar arqueros: 1→ A; 2→ uno en cada equipo (separados); 0→ ancla anti-espejo
+  let pool=ids.slice(), fixedA=[], fixedB=[];
+  if(cfg.gks.length===1){ fixedA=[cfg.gks[0]]; }
+  else if(cfg.gks.length>=2){ fixedA=[cfg.gks[0]]; fixedB=[cfg.gks[1]]; }
+  else { fixedA=[ids[0]]; }
+  pool=pool.filter(x=>!fixedA.includes(x) && !fixedB.includes(x));
+  const needA=kA-fixedA.length;
+  const results=[];
+  const combos = (needA>=0 && needA<=pool.length) ? combinations(pool,needA) : [];
+  for(const c of combos){
+    const A=fixedA.concat(c);
+    const setA=new Set(A);
+    const B=ids.filter(x=>!setA.has(x));
+    if(!feasible(A,B,cfg)) continue;
+    results.push(evalSplit(A,B,cfg));
+  }
+  results.sort((x,y)=>x.obj-y.obj);
+  const seen=new Set(), uniq=[];
+  for(const r of results){ const key=[...r.A].sort().join(','); if(seen.has(key))continue; seen.add(key); uniq.push(r); if(uniq.length>=10)break; }
+  uniq.total = results.length;   // total de repartos posibles evaluados
+  return uniq;
+}
+
+/* ---------- render resultado ---------- */
+function pill(winA){
+  const d=Math.abs(winA-50);
+  if(d<=6) return '<span class="pill good">muy parejo</span>';
+  if(d<=14) return '<span class="pill mid">parejo</span>';
+  return '<span class="pill bad">desparejo</span>';
+}
+let forceBuild=false;
+function renderResult(){
+  const body=$('#resBody');
+  if(selected.size<4){ body.innerHTML='<div class="empty"><div class="big">🙋</div>Elegí al menos 4 jugadores.</div>'; $('#resMeta').textContent=''; return; }
+  if(selected.size!==TARGET && !forceBuild){
+    const n=selected.size, faltan=TARGET-n;
+    const msg = n<TARGET ? `Elegiste <b>${n}</b>. Faltan <b>${faltan}</b> para llegar a ${TARGET} (7 y 7).`
+                         : `Elegiste <b>${n}</b>, son <b>${n-TARGET}</b> de más para ${TARGET} (7 y 7).`;
+    body.innerHTML=`<div class="empty"><div class="big">👥</div>${msg}<br><span class="muted">Completá ${TARGET} jugadores para el armado parejo…</span><br><br><button class="btn" id="buildAnyway">Armar igual con ${n}</button></div>`;
+    $('#resMeta').textContent=`${n} / ${TARGET}`;
+    $('#buildAnyway').onclick=()=>{ forceBuild=true; renderResult(); };
+    return;
+  }
+  const cfg=getCfg();
+  if(manualMode){ return renderManual(cfg); }
+  lastSplits=optimize(cfg); altIndex=Math.min(altIndex,Math.max(0,lastSplits.length-1));
+  if(!lastSplits.length){ body.innerHTML='<div class="empty"><div class="big">🤔</div>No hay reparto posible con esas restricciones. Sacá alguna condición de fijar/separar.</div>'; return; }
+  const r=lastSplits[altIndex];
+  const gks=cfg.gks;
+  html_render(body, r, cfg, gks, {total:lastSplits.total, idx:altIndex, count:lastSplits.length});
+}
+function html_render(body, r, cfg, gks, alt){
+  const arrA=r.A.map(id=>P[id]).sort((a,b)=>b.notaEff-a.notaEff);
+  const arrB=r.B.map(id=>P[id]).sort((a,b)=>b.notaEff-a.notaEff);
+  const teamHtml=(cls,name,arr,sum,hasGk,wp)=>{
+    let li=arr.map(p=>`<li><span class="nm">${p.nombre}${gkIds.includes(p.id)?' <span class="gk">🧤</span>':''}</span><span class="n">${p.notaEff.toFixed(1)}</span></li>`).join('');
+    return `<div class="team ${cls}"><div class="th">${name}${hasGk?' <span style="opacity:.85">🧤</span>':''}<span class="tot">${wp}% · Σ ${sum.toFixed(1)}</span></div><ul>${li}</ul></div>`;
+  };
+  const aHasGk=gks.some(g=>r.A.includes(g)), bHasGk=gks.some(g=>r.B.includes(g));
+  const totA=r.sumA, totB=r.sumB;
+  const winA=Math.round(winPct(r.effA,r.effB)), winB=100-winA;
+  let html=`<div class="teams">${teamHtml('a','🔵 Azul',arrA,totA,aHasGk,winA)}${teamHtml('b','🔴 Rojo',arrB,totB,bHasGk,winB)}</div>`;
+  html+=`<div class="balancebox"><div class="balbar"><div class="a" style="width:${winA}%"></div><div class="b" style="width:${winB}%"></div></div>
+    <div class="ballabels"><span>🔵 Azul ${winA}%</span><span>${winB}% Rojo 🔴</span></div></div>`;
+  html+=`<div class="verdict">Prob. de ganar &nbsp; ${pill(winA)}<br><span class="muted" style="font-weight:600;font-size:13px">Diferencia de nota (Σ): ${r.diff.toFixed(1)}</span></div>`;
+  let ctx=[];
+  if(gks.length===1){ const g=gks[0]; const t=r.A.includes(g)?'A':'B'; ctx.push(`🧤 ${P[g].nombre} va al equipo ${t}; al otro se le sumó +${cfg.gkComp.toFixed(1)} de ataque para compensar.`); }
+  else if(gks.length===2){ const ga=r.A.includes(gks[0])?gks[0]:gks[1], gb=(ga===gks[0]?gks[1]:gks[0]); ctx.push(`🧤 Dos arqueros separados: ${P[ga].nombre} (A) y ${P[gb].nombre} (B). Sin compensación (cada equipo tiene el suyo).`); }
+  if(cfg.roleW>0){ const cA=roleCounts(r.A), cB=roleCounts(r.B); const nf=v=>v.toFixed(v%1?1:0);
+    ctx.push(`Posiciones (${$('#roleW').value}%) — A: ${nf(cA.D)} def / ${nf(cA.A)} del · B: ${nf(cB.D)} def / ${nf(cB.A)} del (los Mixto reparten).`); }
+  if(cfg.rivW>0){ const t=r.riv>0?'A':'B'; const mag=Math.abs(r.riv);
+    ctx.push(`Rivalidad 1-vs-1 (${$('#rivW').value}%) — ventaja neta de mano a mano: ${mag<0.15?'prácticamente pareja':'leve para el equipo '+t} (${r.riv>=0?'+':''}${r.riv.toFixed(2)}).`); }
+  if(cfg.chemW>0){ ctx.push(`Química activa (${Math.round(cfg.chemW*100)}%, modo «${({equil:'equilibrar',cortar:'cortar duplas',respetar:'respetar duplas'})[cfg.mode]}», mín. ${cfg.minG} partidos juntos). Química interna: A ${r.chA>=0?'+':''}${(r.chA).toFixed(2)} · B ${r.chB>=0?'+':''}${(r.chB).toFixed(2)}.`); }
+  if(ctx.length) html+=`<div class="notes">${ctx.map(c=>'• '+c).join('<br>')}</div>`;
+  if(alt){
+    html+=`<div class="altbtns"><button class="btn" id="altPrev">‹ Anterior</button>
+       <span class="muted" style="align-self:center">Opción ${alt.idx+1} de ${alt.count}${alt.total>alt.count?` · ${alt.total} repartos posibles`:''}</span>
+       <button class="btn" id="altNext">Otra opción ›</button>
+       <button class="btn" id="copyBtn" style="margin-left:auto">📋 Copiar</button></div>`;
+  } else {
+    html+=`<div class="altbtns"><span class="muted" style="align-self:center">Equipos armados a mano</span><button class="btn" id="copyBtn" style="margin-left:auto">📋 Copiar</button></div>`;
+  }
+  body.innerHTML=html;
+  $('#resMeta').textContent=`${selected.size} jugadores`;
+  if(alt){
+    $('#altPrev').onclick=()=>{altIndex=(altIndex-1+lastSplits.length)%lastSplits.length;renderResult();};
+    $('#altNext').onclick=()=>{altIndex=(altIndex+1)%lastSplits.length;renderResult();};
+  }
+  $('#copyBtn').onclick=()=>copyTeams(arrA,arrB,totA,totB,r.diff,winA);
+}
+function renderManual(cfg){
+  const body=$('#resBody');
+  const A=[...selected].filter(id=>manual[id]==='A');
+  const B=[...selected].filter(id=>manual[id]==='B');
+  const sinAsig=[...selected].filter(id=>!manual[id]);
+  if(A.length===0 || B.length===0){
+    body.innerHTML=`<div class="empty"><div class="big">✋</div>Asigná los jugadores a <b style="color:var(--t1)">Azul</b> o <b style="color:var(--t2)">Rojo</b> tocando el botón de equipo en cada chip.<br><span class="muted">${sinAsig.length} sin asignar.</span></div>`;
+    $('#resMeta').textContent='a mano';
+    return;
+  }
+  const r=evalSplit(A,B,cfg);
+  html_render(body, r, cfg, cfg.gks, null);
+  if(sinAsig.length){ const note=el('div','notes'); note.style.color='var(--bad)';
+    note.textContent='⚠ '+sinAsig.length+' jugador'+(sinAsig.length>1?'es':'')+' sin asignar: '+sinAsig.map(id=>P[id].nombre).join(', ');
+    body.appendChild(note);
+  }
+}
+function copyTeams(arrA,arrB,totA,totB,diff,winA){
+  const f=(arr)=>arr.map(p=>`  ${p.nombre}${gkIds.includes(p.id)?' (arq)':''} — ${p.notaEff.toFixed(1)}`).join('\n');
+  const txt=`⚽ Equipos del domingo\n\n🔵 AZUL (${winA}% · Σ ${totA.toFixed(1)})\n${f(arrA)}\n\n🔴 ROJO (${100-winA}% · Σ ${totB.toFixed(1)})\n${f(arrB)}\n\nDiferencia de nota: ${diff.toFixed(1)}`;
+  try{navigator.clipboard.writeText(txt);$('#copyBtn').textContent='✓ Copiado';setTimeout(()=>$('#copyBtn').textContent='📋 Copiar',1400);}catch(e){alert(txt);}
+}
+
+/* ---------- config actual ---------- */
+let chemMode='equil';
+function getCfg(){
+  const chemW=parseInt($('#chemW').value,10)/100;
+  return { gks: gkIds.filter(id=>selected.has(id)), gkComp:parseInt($('#gkComp').value,10)/10, chemW,
+           mode: chemW<=0?'none':chemMode, minG:parseInt($('#minG').value,10),
+           roleW:parseInt($('#roleW').value,10)/100, rivW:parseInt($('#rivW').value,10)/100,
+           cons:constraints };
+}
+
+/* ---------- refresh global ---------- */
+function refresh(){ forceBuild=false; renderList(); renderChips(); fillConstraintSelects(); }
+
+/* ---------- ponedores ---------- */
+function selectPonedores(){
+  PONEDORES.ids.forEach(id=>{ if(P[id]) selected.add(id); });
+  gkIds = (PONEDORES.arquero && P[PONEDORES.arquero] && selected.has(PONEDORES.arquero)) ? [PONEDORES.arquero] : [];
+  refresh();
+}
+
+/* ---------- eventos ---------- */
+$('#search').oninput=renderList;
+$('#sortBy').onchange=renderList;
+$('#selPon').onclick=selectPonedores;
+$('#filtPJ').onclick=()=>{ filterPJ=!filterPJ; $('#filtPJ').classList.toggle('on',filterPJ); renderList(); };
+$('#selClear').onclick=()=>{ selected.clear(); gkIds=[]; refresh(); $('#resBody').innerHTML='<div class="empty"><div class="big">⚽</div>Elegí a los que van a jugar y tocá <b>Armar equipos</b>.</div>'; };
+$('#addNew').onclick=()=>{
+  const nm=$('#newName').value.trim(); if(!nm)return;
+  let id=nm; let i=2; while(P[id]){id=nm+'_'+i;i++;}
+  let nota=parseFloat(($('#newNota').value||'6').replace(',','.')); if(isNaN(nota))nota=6; nota=Math.max(1,Math.min(10,nota));
+  P[id]={id,nombre:nm,nota,notaEff:nota,PJ:0,pocos:true,nuevo:true};
+  selected.add(id); $('#newName').value='';$('#newNota').value=''; refresh();
+};
+$('#gkComp').oninput=()=>$('#gkVal').textContent=(parseInt($('#gkComp').value,10)/10).toFixed(1);
+$('#roleW').oninput=()=>$('#roleVal').textContent=$('#roleW').value+'%';
+$('#rivW').oninput=()=>$('#rivVal').textContent=$('#rivW').value+'%';
+$('#minG').oninput=()=>$('#minGVal').textContent=$('#minG').value;
+$('#chemW').oninput=()=>{ const v=parseInt($('#chemW').value,10); $('#chemVal').textContent=v+'%';
+  $('#chemModeBlock').classList.toggle('disabledblock', v<=0); };
+const chemHints={equil:'Reparte para que ningún equipo junte el talento y las buenas duplas a la vez.',cortar:'Separa a propósito las parejas que más ganan juntas. Partidos más picantes.',respetar:'Mantiene juntas las parejas que funcionan bien.'};
+$('#chemModeHint').textContent=chemHints.equil;
+document.querySelectorAll('#chemMode button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#chemMode button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); chemMode=b.dataset.m; $('#chemModeHint').textContent=chemHints[chemMode];
+});
+document.querySelectorAll('#modeSeg button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#modeSeg button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); manualMode=(b.dataset.mode==='manual');
+  $('#modeHint').textContent = manualMode
+    ? 'Asigná cada jugador a Azul o Rojo en los chips y calculo la probabilidad.'
+    : 'El armador propone los equipos más parejos.';
+  $('#build').innerHTML = manualMode ? '📊 Calcular probabilidad' : '⚖️ Armar equipos';
+  if(manualMode && Object.keys(manual).filter(id=>selected.has(id)&&manual[id]).length===0 && lastSplits && lastSplits.length){
+    manual={}; lastSplits[altIndex].A.forEach(id=>manual[id]='A'); lastSplits[altIndex].B.forEach(id=>manual[id]='B');
+  }
+  refresh();
+});
+let consType='juntos';
+$('#cJuntos').onclick=()=>{consType='juntos';$('#cJuntos').classList.add('on');$('#cSep').classList.remove('on');};
+$('#cSep').onclick=()=>{consType='sep';$('#cSep').classList.add('on');$('#cJuntos').classList.remove('on');};
+$('#addC').onclick=()=>{ const a=$('#cA').value,b=$('#cB').value; if(!a||!b||a===b)return;
+  if(constraints.some(c=>(c.a===a&&c.b===b)||(c.a===b&&c.b===a)))return;
+  constraints.push({a,b,type:consType}); renderConstraints(); };
+$('#build').onclick=()=>{ forceBuild=false; renderResult(); };
+
+/* ---------- init ---------- */
+$('#chemModeBlock').classList.add('disabledblock');
+$('#filtPJ').classList.toggle('on', filterPJ);   // filtro ≥5 PJ activo por defecto
+$('#selPon').title='Cargar los ponedores de '+PONEDORES.mes;
+selectPonedores();  // arranca con los ponedores del mes + arquero fijo
+</script>
+</body>
+</html>
