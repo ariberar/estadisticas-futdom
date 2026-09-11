@@ -1,0 +1,663 @@
+{
+  "temporada": "2026",
+  "torneo": "dominguero",
+  "formato": "F7",
+  "descripcion": "Registro maestro de jugadores. El id es el apodo usado en las anotaciones. 'nombre' es solo para mostrar; editalo si querés el nombre real. Marcá en 'aliasDe' si dos apodos son la misma persona.",
+  "jugadores": [
+    {
+      "id": "Ale",
+      "nombre": "Ale",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 18.0,
+        "Goles": 5.0,
+        "Asis": 2.0,
+        "PJ": 9.0,
+        "Gano": 6.0,
+        "Empato": 0.0,
+        "Perdio": 3.0
+      }
+    },
+    {
+      "id": "AleC",
+      "nombre": "AleC",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 3.0,
+        "Goles": 1.0,
+        "Asis": 1.0,
+        "PJ": 1.0,
+        "Gano": 1.0,
+        "Empato": 0.0,
+        "Perdio": 0.0
+      }
+    },
+    {
+      "id": "Alejo",
+      "nombre": "Alejo",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 42.0,
+        "Goles": 17.0,
+        "Asis": 14.0,
+        "PJ": 22.0,
+        "Gano": 13.0,
+        "Empato": 3.0,
+        "Perdio": 6.0
+      }
+    },
+    {
+      "id": "Berar",
+      "nombre": "Berar",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 37.0,
+        "Goles": 27.0,
+        "Asis": 9.0,
+        "PJ": 29.0,
+        "Gano": 11.0,
+        "Empato": 4.0,
+        "Perdio": 14.0
+      }
+    },
+    {
+      "id": "Bernny",
+      "nombre": "Bernny",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 3.0,
+        "Goles": 0.0,
+        "Asis": 0.0,
+        "PJ": 2.0,
+        "Gano": 1.0,
+        "Empato": 0.0,
+        "Perdio": 1.0
+      }
+    },
+    {
+      "id": "Chancha",
+      "nombre": "Chancha",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 3.0,
+        "Goles": 1.0,
+        "Asis": 1.0,
+        "PJ": 1.0,
+        "Gano": 1.0,
+        "Empato": 0.0,
+        "Perdio": 0.0
+      }
+    },
+    {
+      "id": "DaroP",
+      "nombre": "DaroP",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 3.0,
+        "Goles": 0.0,
+        "Asis": 0.0,
+        "PJ": 3.0,
+        "Gano": 1.0,
+        "Empato": 0.0,
+        "Perdio": 2.0
+      }
+    },
+    {
+      "id": "Diego",
+      "nombre": "Diego",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 1.0,
+        "Goles": 4.0,
+        "Asis": 1.0,
+        "PJ": 3.0,
+        "Gano": 0.0,
+        "Empato": 1.0,
+        "Perdio": 2.0
+      }
+    },
+    {
+      "id": "Druca",
+      "nombre": "Druca",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 1.0,
+        "Goles": 0.0,
+        "Asis": 0.0,
+        "PJ": 1.0,
+        "Gano": 0.0,
+        "Empato": 1.0,
+        "Perdio": 0.0
+      }
+    },
+    {
+      "id": "Dubi",
+      "nombre": "Dubi",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 0.0,
+        "Goles": 0.0,
+        "Asis": 1.0,
+        "PJ": 1.0,
+        "Gano": 0.0,
+        "Empato": 0.0,
+        "Perdio": 1.0
+      }
+    },
+    {
+      "id": "Fede",
+      "nombre": "Fede",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 25.0,
+        "Goles": 25.0,
+        "Asis": 5.0,
+        "PJ": 16.0,
+        "Gano": 8.0,
+        "Empato": 1.0,
+        "Perdio": 7.0
+      }
+    },
+    {
+      "id": "FedeF",
+      "nombre": "FedeF",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 3.0,
+        "Goles": 1.0,
+        "Asis": 0.0,
+        "PJ": 1.0,
+        "Gano": 1.0,
+        "Empato": 0.0,
+        "Perdio": 0.0
+      }
+    },
+    {
+      "id": "FedeN",
+      "nombre": "FedeN",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 3.0,
+        "Goles": 1.0,
+        "Asis": 0.0,
+        "PJ": 1.0,
+        "Gano": 1.0,
+        "Empato": 0.0,
+        "Perdio": 0.0
+      }
+    },
+    {
+      "id": "Fer",
+      "nombre": "Fer",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 38.0,
+        "Goles": 3.0,
+        "Asis": 12.0,
+        "PJ": 30.0,
+        "Gano": 11.0,
+        "Empato": 5.0,
+        "Perdio": 14.0
+      }
+    },
+    {
+      "id": "Godo",
+      "nombre": "Godo",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 37.0,
+        "Goles": 2.0,
+        "Asis": 4.0,
+        "PJ": 26.0,
+        "Gano": 11.0,
+        "Empato": 4.0,
+        "Perdio": 11.0
+      }
+    },
+    {
+      "id": "Gordo",
+      "nombre": "Gordo",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 25.0,
+        "Goles": 2.0,
+        "Asis": 7.0,
+        "PJ": 21.0,
+        "Gano": 7.0,
+        "Empato": 4.0,
+        "Perdio": 10.0
+      }
+    },
+    {
+      "id": "Guido",
+      "nombre": "Guido",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 0.0,
+        "Goles": 0.0,
+        "Asis": 0.0,
+        "PJ": 1.0,
+        "Gano": 0.0,
+        "Empato": 0.0,
+        "Perdio": 1.0
+      }
+    },
+    {
+      "id": "J",
+      "nombre": "J",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 31.0,
+        "Goles": 12.0,
+        "Asis": 12.0,
+        "PJ": 25.0,
+        "Gano": 9.0,
+        "Empato": 4.0,
+        "Perdio": 12.0
+      }
+    },
+    {
+      "id": "JoacoF",
+      "nombre": "JoacoF",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 19.0,
+        "Goles": 8.0,
+        "Asis": 7.0,
+        "PJ": 15.0,
+        "Gano": 6.0,
+        "Empato": 1.0,
+        "Perdio": 8.0
+      }
+    },
+    {
+      "id": "Joc",
+      "nombre": "Joc",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 3.0,
+        "Goles": 0.0,
+        "Asis": 0.0,
+        "PJ": 1.0,
+        "Gano": 1.0,
+        "Empato": 0.0,
+        "Perdio": 0.0
+      }
+    },
+    {
+      "id": "Jorge",
+      "nombre": "Jorge",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 30.0,
+        "Goles": 0.0,
+        "Asis": 0.0,
+        "PJ": 22.0,
+        "Gano": 9.0,
+        "Empato": 3.0,
+        "Perdio": 10.0
+      }
+    },
+    {
+      "id": "Juancito",
+      "nombre": "Juancito",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 0.0,
+        "Goles": 1.0,
+        "Asis": 0.0,
+        "PJ": 1.0,
+        "Gano": 0.0,
+        "Empato": 0.0,
+        "Perdio": 1.0
+      }
+    },
+    {
+      "id": "Julo",
+      "nombre": "Julo",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 41.0,
+        "Goles": 8.0,
+        "Asis": 5.0,
+        "PJ": 24.0,
+        "Gano": 12.0,
+        "Empato": 5.0,
+        "Perdio": 7.0
+      }
+    },
+    {
+      "id": "Lea",
+      "nombre": "Lea",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 20.0,
+        "Goles": 6.0,
+        "Asis": 5.0,
+        "PJ": 20.0,
+        "Gano": 6.0,
+        "Empato": 2.0,
+        "Perdio": 12.0
+      }
+    },
+    {
+      "id": "Luki",
+      "nombre": "Luki",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 2.0,
+        "Goles": 0.0,
+        "Asis": 0.0,
+        "PJ": 3.0,
+        "Gano": 0.0,
+        "Empato": 2.0,
+        "Perdio": 1.0
+      }
+    },
+    {
+      "id": "Lunge",
+      "nombre": "Lunge",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 47.0,
+        "Goles": 33.0,
+        "Asis": 25.0,
+        "PJ": 29.0,
+        "Gano": 14.0,
+        "Empato": 5.0,
+        "Perdio": 10.0
+      }
+    },
+    {
+      "id": "Mario",
+      "nombre": "Mario",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 5.0,
+        "Goles": 5.0,
+        "Asis": 1.0,
+        "PJ": 4.0,
+        "Gano": 1.0,
+        "Empato": 2.0,
+        "Perdio": 1.0
+      }
+    },
+    {
+      "id": "Martin",
+      "nombre": "Martin",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 0.0,
+        "Goles": 1.0,
+        "Asis": 0.0,
+        "PJ": 1.0,
+        "Gano": 0.0,
+        "Empato": 0.0,
+        "Perdio": 1.0
+      }
+    },
+    {
+      "id": "MatiP",
+      "nombre": "MatiP",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 1.0,
+        "Goles": 0.0,
+        "Asis": 1.0,
+        "PJ": 1.0,
+        "Gano": 0.0,
+        "Empato": 1.0,
+        "Perdio": 0.0
+      }
+    },
+    {
+      "id": "Natos",
+      "nombre": "Natos",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 14.0,
+        "Goles": 4.0,
+        "Asis": 1.0,
+        "PJ": 9.0,
+        "Gano": 4.0,
+        "Empato": 2.0,
+        "Perdio": 3.0
+      }
+    },
+    {
+      "id": "Nico",
+      "nombre": "Nico",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 43.0,
+        "Goles": 6.0,
+        "Asis": 10.0,
+        "PJ": 26.0,
+        "Gano": 13.0,
+        "Empato": 4.0,
+        "Perdio": 9.0
+      }
+    },
+    {
+      "id": "NicoF",
+      "nombre": "NicoF",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 3.0,
+        "Goles": 1.0,
+        "Asis": 2.0,
+        "PJ": 1.0,
+        "Gano": 1.0,
+        "Empato": 0.0,
+        "Perdio": 0.0
+      }
+    },
+    {
+      "id": "NicoP",
+      "nombre": "NicoP",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 43.0,
+        "Goles": 9.0,
+        "Asis": 13.0,
+        "PJ": 28.0,
+        "Gano": 13.0,
+        "Empato": 4.0,
+        "Perdio": 11.0
+      }
+    },
+    {
+      "id": "Pato",
+      "nombre": "Pato",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 3.0,
+        "Goles": 0.0,
+        "Asis": 0.0,
+        "PJ": 1.0,
+        "Gano": 1.0,
+        "Empato": 0.0,
+        "Perdio": 0.0
+      }
+    },
+    {
+      "id": "Pei",
+      "nombre": "Pei",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 0.0,
+        "Goles": 0.0,
+        "Asis": 1.0,
+        "PJ": 1.0,
+        "Gano": 0.0,
+        "Empato": 0.0,
+        "Perdio": 1.0
+      }
+    },
+    {
+      "id": "Poni",
+      "nombre": "Poni",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 3.0,
+        "Goles": 4.0,
+        "Asis": 1.0,
+        "PJ": 1.0,
+        "Gano": 1.0,
+        "Empato": 0.0,
+        "Perdio": 0.0
+      }
+    },
+    {
+      "id": "Raña",
+      "nombre": "Raña",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 3.0,
+        "Goles": 2.0,
+        "Asis": 1.0,
+        "PJ": 3.0,
+        "Gano": 1.0,
+        "Empato": 0.0,
+        "Perdio": 2.0
+      }
+    },
+    {
+      "id": "Rodri",
+      "nombre": "Rodri",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 17.0,
+        "Goles": 17.0,
+        "Asis": 7.0,
+        "PJ": 14.0,
+        "Gano": 5.0,
+        "Empato": 2.0,
+        "Perdio": 7.0
+      }
+    },
+    {
+      "id": "SantiV",
+      "nombre": "SantiV",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 1.0,
+        "Goles": 0.0,
+        "Asis": 0.0,
+        "PJ": 4.0,
+        "Gano": 0.0,
+        "Empato": 1.0,
+        "Perdio": 3.0
+      }
+    },
+    {
+      "id": "Tin",
+      "nombre": "Tin",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 5.0,
+        "Goles": 4.0,
+        "Asis": 5.0,
+        "PJ": 4.0,
+        "Gano": 1.0,
+        "Empato": 2.0,
+        "Perdio": 1.0
+      }
+    },
+    {
+      "id": "TomiL",
+      "nombre": "TomiL",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 32.0,
+        "Goles": 21.0,
+        "Asis": 23.0,
+        "PJ": 22.0,
+        "Gano": 10.0,
+        "Empato": 2.0,
+        "Perdio": 10.0
+      }
+    },
+    {
+      "id": "Vic",
+      "nombre": "Vic",
+      "aliasDe": null,
+      "activo": true,
+      "planilla": {
+        "Pts": 29.0,
+        "Goles": 10.0,
+        "Asis": 13.0,
+        "PJ": 20.0,
+        "Gano": 8.0,
+        "Empato": 5.0,
+        "Perdio": 7.0
+      }
+    }
+  ],
+  "revisar_apodos_parecidos": {
+    "ale": [
+      "Ale",
+      "AleC",
+      "Alejo"
+    ],
+    "ber": [
+      "Berar",
+      "Bernny"
+    ],
+    "fed": [
+      "Fede",
+      "FedeF",
+      "FedeN"
+    ],
+    "mar": [
+      "Mario",
+      "Martin"
+    ],
+    "nic": [
+      "Nico",
+      "NicoF",
+      "NicoP"
+    ]
+  }
+}

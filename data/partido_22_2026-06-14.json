@@ -1,0 +1,252 @@
+{
+  "id": "22",
+  "fecha": "2026-06-14",
+  "torneo": "dominguero",
+  "formato": "F7",
+  "t1": "Paredón",
+  "t2": "Canchita",
+  "offset": null,
+  "minutos": 59,
+  "golesEquipo": {
+    "1": 3,
+    "2": 5
+  },
+  "ganador": 2,
+  "players": {
+    "1": [
+      "Lunge",
+      "Berar",
+      "Julo",
+      "Fer",
+      "Nico",
+      "J",
+      "Alejo"
+    ],
+    "2": [
+      "Ale",
+      "Godo",
+      "NicoP",
+      "Rodri",
+      "Fede",
+      "JoacoF",
+      "Lea"
+    ]
+  },
+  "gk": {
+    "1": "Lunge",
+    "2": "Ale"
+  },
+  "events": [
+    {
+      "type": "gol",
+      "team": 1,
+      "p1": "J",
+      "p2": "Fer",
+      "minuto": 5,
+      "tSec": null,
+      "tipo": "dentro del area",
+      "gk": "Ale",
+      "enContra": false,
+      "id": 167
+    },
+    {
+      "type": "gol",
+      "team": 2,
+      "p1": "Rodri",
+      "p2": "NicoP",
+      "minuto": 17,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": "Alejo",
+      "enContra": false,
+      "id": 168
+    },
+    {
+      "type": "gol",
+      "team": 2,
+      "p1": "JoacoF",
+      "p2": "Rodri",
+      "minuto": 21,
+      "tSec": null,
+      "tipo": "dentro del area",
+      "gk": "Julo",
+      "enContra": false,
+      "id": 169
+    },
+    {
+      "type": "gol",
+      "team": 1,
+      "p1": "Fer",
+      "p2": "Alejo",
+      "minuto": 41,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": "Ale",
+      "enContra": false,
+      "id": 170
+    },
+    {
+      "type": "gol",
+      "team": 2,
+      "p1": "Julo",
+      "p2": "Lea",
+      "minuto": 46,
+      "tSec": null,
+      "tipo": "contra",
+      "gk": "Berar",
+      "enContra": true,
+      "id": 171
+    },
+    {
+      "type": "gol",
+      "team": 2,
+      "p1": "Rodri",
+      "p2": "NicoP",
+      "minuto": 47,
+      "tSec": null,
+      "tipo": "dentro del area",
+      "gk": "Nico",
+      "enContra": false,
+      "id": 172
+    },
+    {
+      "type": "gol",
+      "team": 1,
+      "p1": "Alejo",
+      "p2": "Lunge",
+      "minuto": 49,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": "Godo",
+      "enContra": false,
+      "id": 173
+    },
+    {
+      "type": "gol",
+      "team": 2,
+      "p1": "Lea",
+      "p2": null,
+      "minuto": 56,
+      "tSec": null,
+      "tipo": "dentro del area",
+      "gk": "Nico",
+      "enContra": false,
+      "id": 174
+    }
+  ],
+  "resumenJugadores": [
+    {
+      "equipo": 1,
+      "jugador": "Lunge",
+      "minutosArco": 17.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 1.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "Berar",
+      "minutosArco": 8.0,
+      "golesArcoMin": 0.13,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "Julo",
+      "minutosArco": 4.0,
+      "golesArcoMin": 0.25,
+      "goles": 1.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "Fer",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 1.0,
+      "asistencias": 1.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "Nico",
+      "minutosArco": 10.0,
+      "golesArcoMin": 0.2,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "J",
+      "minutosArco": 3.0,
+      "golesArcoMin": 0.0,
+      "goles": 1.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "Alejo",
+      "minutosArco": 17.0,
+      "golesArcoMin": 0.06,
+      "goles": 1.0,
+      "asistencias": 1.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "Ale",
+      "minutosArco": 41.0,
+      "golesArcoMin": 0.05,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "Godo",
+      "minutosArco": 8.0,
+      "golesArcoMin": 0.13,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "NicoP",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 2.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "Rodri",
+      "minutosArco": 10.0,
+      "golesArcoMin": 0.0,
+      "goles": 2.0,
+      "asistencias": 1.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "Fede",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "JoacoF",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 1.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "Lea",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 1.0,
+      "asistencias": 1.0
+    }
+  ],
+  "origen": "planilla_2026"
+}

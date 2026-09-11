@@ -1,0 +1,180 @@
+{
+  "id": "30",
+  "fecha": "2026-08-23",
+  "torneo": "dominguero",
+  "formato": "F7",
+  "t1": "Paredón",
+  "t2": "Canchita",
+  "offset": null,
+  "minutos": 53,
+  "golesEquipo": {
+    "1": 0,
+    "2": 2
+  },
+  "ganador": 2,
+  "players": {
+    "1": [
+      "J",
+      "NicoP",
+      "Godo",
+      "Vic",
+      "Alejo",
+      "Lea",
+      "Julo"
+    ],
+    "2": [
+      "Jorge",
+      "Fer",
+      "Gordo",
+      "Nico",
+      "Berar",
+      "Natos",
+      "Lunge"
+    ]
+  },
+  "gk": {
+    "1": "Alejo",
+    "2": "Jorge"
+  },
+  "events": [
+    {
+      "type": "gol",
+      "team": 2,
+      "p1": "Lunge",
+      "p2": "Gordo",
+      "minuto": 5,
+      "tSec": null,
+      "tipo": "dentro del area",
+      "gk": "Alejo",
+      "enContra": false,
+      "id": 227
+    },
+    {
+      "type": "gol",
+      "team": 2,
+      "p1": "Lunge",
+      "p2": "Fer",
+      "minuto": 37,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": "NicoP",
+      "enContra": false,
+      "id": 228
+    }
+  ],
+  "resumenJugadores": [
+    {
+      "equipo": 1,
+      "jugador": "J",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "NicoP",
+      "minutosArco": 5.0,
+      "golesArcoMin": 0.2,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "Godo",
+      "minutosArco": 16.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "Vic",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "Alejo",
+      "minutosArco": 32.0,
+      "golesArcoMin": 0.03,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "Lea",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "Julo",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "Jorge",
+      "minutosArco": 56.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "Fer",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 1.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "Gordo",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 1.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "Nico",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "Berar",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "Natos",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "Lunge",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 2.0,
+      "asistencias": 0.0
+    }
+  ],
+  "origen": "planilla_2026"
+}

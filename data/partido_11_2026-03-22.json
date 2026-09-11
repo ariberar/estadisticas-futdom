@@ -1,0 +1,710 @@
+{
+  "id": "11",
+  "fecha": "2026-03-22",
+  "torneo": "dominguero",
+  "formato": "F7",
+  "t1": "Paredón",
+  "t2": "Canchita",
+  "offset": null,
+  "minutos": 57,
+  "golesEquipo": {
+    "1": 2,
+    "2": 2
+  },
+  "ganador": 0,
+  "players": {
+    "1": [
+      "Nico",
+      "J",
+      "SantiV",
+      "Lunge",
+      "Julo",
+      "Tin",
+      "Godo"
+    ],
+    "2": [
+      "Jorge",
+      "Fer",
+      "Gordo",
+      "Vic",
+      "Berar",
+      "Alejo",
+      "Rodri"
+    ]
+  },
+  "gk": {
+    "1": "SantiV",
+    "2": "Jorge"
+  },
+  "events": [
+    {
+      "type": "tiro",
+      "team": null,
+      "p1": "Martin",
+      "p2": "NicoP",
+      "minuto": 2,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 308
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Fer",
+      "p2": "Chompi",
+      "minuto": 3,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 567
+    },
+    {
+      "type": "tiro",
+      "team": null,
+      "p1": "NicoP",
+      "p2": "Martin",
+      "minuto": 4,
+      "tSec": null,
+      "tipo": "cabeza",
+      "gk": null,
+      "id": 309
+    },
+    {
+      "type": "tiro",
+      "team": 1,
+      "p1": "J",
+      "p2": null,
+      "minuto": 8,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 310
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Fer",
+      "p2": "Chompi",
+      "minuto": 11,
+      "tSec": null,
+      "tipo": "dentro del area",
+      "gk": null,
+      "id": 568
+    },
+    {
+      "type": "tiro",
+      "team": null,
+      "p1": "Martin",
+      "p2": "Chompi",
+      "minuto": 12,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 311
+    },
+    {
+      "type": "tiro",
+      "team": 1,
+      "p1": "J",
+      "p2": "Alejo",
+      "minuto": 12,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 312
+    },
+    {
+      "type": "gol",
+      "team": 1,
+      "p1": "J",
+      "p2": "Tin",
+      "minuto": 15,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": "Jorge",
+      "enContra": false,
+      "id": 91
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Fer",
+      "p2": "Martin",
+      "minuto": 15,
+      "tSec": null,
+      "tipo": "mano a mano",
+      "gk": null,
+      "id": 569
+    },
+    {
+      "type": "tiro",
+      "team": 1,
+      "p1": "Godo",
+      "p2": "Joaco",
+      "minuto": 17,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 313
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Fer",
+      "p2": "Chompi",
+      "minuto": 17,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 570
+    },
+    {
+      "type": "tiro",
+      "team": 2,
+      "p1": "Vic",
+      "p2": "Berar",
+      "minuto": 18,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 314
+    },
+    {
+      "type": "gol",
+      "team": 1,
+      "p1": "Tin",
+      "p2": null,
+      "minuto": 20,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": "Jorge",
+      "enContra": false,
+      "id": 92
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Jorge",
+      "p2": "Berar",
+      "minuto": 20,
+      "tSec": null,
+      "tipo": "cabeza",
+      "gk": null,
+      "id": 571
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Fer",
+      "p2": "Chompi",
+      "minuto": 22,
+      "tSec": null,
+      "tipo": "dentro del area",
+      "gk": null,
+      "id": 572
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Fer",
+      "p2": "Martin",
+      "minuto": 23,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 573
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Fer",
+      "p2": "NicoP",
+      "minuto": 23,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 574
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Fer",
+      "p2": "Martin",
+      "minuto": 29,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 575
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Fer",
+      "p2": "Joaco",
+      "minuto": 29,
+      "tSec": null,
+      "tipo": "mano a mano",
+      "gk": null,
+      "id": 576
+    },
+    {
+      "type": "tiro",
+      "team": null,
+      "p1": "Ale",
+      "p2": "Chompi",
+      "minuto": 30,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 315
+    },
+    {
+      "type": "tiro",
+      "team": 1,
+      "p1": "J",
+      "p2": "Berar",
+      "minuto": 31,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 316
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Jorge",
+      "p2": "Mono",
+      "minuto": 31,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 577
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Jorge",
+      "p2": "J",
+      "minuto": 34,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 578
+    },
+    {
+      "type": "tiro",
+      "team": 2,
+      "p1": "Vic",
+      "p2": "J",
+      "minuto": 38,
+      "tSec": null,
+      "tipo": "cabeza",
+      "gk": null,
+      "id": 317
+    },
+    {
+      "type": "gol",
+      "team": 2,
+      "p1": "Rodri",
+      "p2": "Alejo",
+      "minuto": 40,
+      "tSec": null,
+      "tipo": "cabeza",
+      "gk": "Lunge",
+      "enContra": false,
+      "id": 93
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Berar",
+      "p2": "Chompi",
+      "minuto": 40,
+      "tSec": null,
+      "tipo": "dentro del area",
+      "gk": null,
+      "id": 579
+    },
+    {
+      "type": "gol",
+      "team": 2,
+      "p1": "Rodri",
+      "p2": "Vic",
+      "minuto": 41,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": "J",
+      "enContra": false,
+      "id": 94
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Berar",
+      "p2": "Godo",
+      "minuto": 41,
+      "tSec": null,
+      "tipo": "dentro del area",
+      "gk": null,
+      "id": 580
+    },
+    {
+      "type": "tiro",
+      "team": 1,
+      "p1": "Godo",
+      "p2": "Chompi",
+      "minuto": 43,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 318
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Jorge",
+      "p2": "Gordo",
+      "minuto": 44,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 581
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Jorge",
+      "p2": "Gordo",
+      "minuto": 44,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 582
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Jorge",
+      "p2": "Berar",
+      "minuto": 46,
+      "tSec": null,
+      "tipo": "dentro del area",
+      "gk": null,
+      "id": 583
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Alejo",
+      "p2": "Martin",
+      "minuto": 47,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 584
+    },
+    {
+      "type": "tiro",
+      "team": 1,
+      "p1": "Godo",
+      "p2": "Joaco",
+      "minuto": 48,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 319
+    },
+    {
+      "type": "tiro",
+      "team": null,
+      "p1": "Chompi",
+      "p2": null,
+      "minuto": 48,
+      "tSec": null,
+      "tipo": "travesaño",
+      "gk": null,
+      "id": 320
+    },
+    {
+      "type": "tiro",
+      "team": 1,
+      "p1": "J",
+      "p2": null,
+      "minuto": 49,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 321
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Jorge",
+      "p2": "J",
+      "minuto": 49,
+      "tSec": null,
+      "tipo": "dentro del area",
+      "gk": null,
+      "id": 585
+    },
+    {
+      "type": "tiro",
+      "team": null,
+      "p1": "Joaco",
+      "p2": "Martin",
+      "minuto": 50,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 322
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Alejo",
+      "p2": "Joaco",
+      "minuto": 53,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 586
+    },
+    {
+      "type": "tiro",
+      "team": 1,
+      "p1": "J",
+      "p2": "Berar",
+      "minuto": 57,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 323
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Jorge",
+      "p2": "Vic",
+      "minuto": 57,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 587
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Gordo",
+      "p2": "Chompi",
+      "minuto": 57,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 588
+    },
+    {
+      "type": "tiro",
+      "team": null,
+      "p1": "Chompi",
+      "p2": "Martin",
+      "minuto": 59,
+      "tSec": null,
+      "tipo": "travesaño",
+      "gk": null,
+      "id": 324
+    },
+    {
+      "type": "tiro",
+      "team": 1,
+      "p1": "J",
+      "p2": "Vic",
+      "minuto": 59,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 325
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Gordo",
+      "p2": "Chompi",
+      "minuto": 59,
+      "tSec": null,
+      "tipo": "dentro del area",
+      "gk": null,
+      "id": 589
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Gordo",
+      "p2": "Martin",
+      "minuto": 59,
+      "tSec": null,
+      "tipo": "mano a mano",
+      "gk": null,
+      "id": 590
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Gordo",
+      "p2": "Chompi",
+      "minuto": 60,
+      "tSec": null,
+      "tipo": "dentro del area",
+      "gk": null,
+      "id": 591
+    },
+    {
+      "type": "tiro",
+      "team": null,
+      "p1": "Joaco",
+      "p2": "Godo",
+      "minuto": 62,
+      "tSec": null,
+      "tipo": "dentro del area",
+      "gk": null,
+      "id": 326
+    },
+    {
+      "type": "tiro",
+      "team": null,
+      "p1": "Mono",
+      "p2": "Alejo",
+      "minuto": 62,
+      "tSec": null,
+      "tipo": "dentro del area",
+      "gk": null,
+      "id": 327
+    },
+    {
+      "type": "tiro",
+      "team": null,
+      "p1": "Martin",
+      "p2": "Ale",
+      "minuto": 64,
+      "tSec": null,
+      "tipo": "cabeza",
+      "gk": null,
+      "id": 328
+    }
+  ],
+  "resumenJugadores": [
+    {
+      "equipo": 1,
+      "jugador": "Nico",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "J",
+      "minutosArco": 17.0,
+      "golesArcoMin": 0.06,
+      "goles": 1.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "SantiV",
+      "minutosArco": 27.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "Lunge",
+      "minutosArco": 13.0,
+      "golesArcoMin": 0.08,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "Julo",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "Tin",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 1.0,
+      "asistencias": 1.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "Godo",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "Jorge",
+      "minutosArco": 57.0,
+      "golesArcoMin": 0.04,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "Fer",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "Gordo",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "Vic",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 1.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "Berar",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "Alejo",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 1.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "Rodri",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 2.0,
+      "asistencias": 0.0
+    }
+  ],
+  "origen": "planilla_2026"
+}

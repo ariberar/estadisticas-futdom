@@ -1,0 +1,426 @@
+{
+  "id": "4",
+  "fecha": "2026-01-25",
+  "torneo": "dominguero",
+  "formato": "F7",
+  "t1": "Paredón",
+  "t2": "Canchita",
+  "offset": null,
+  "minutos": 64,
+  "golesEquipo": {
+    "1": 3,
+    "2": 3
+  },
+  "ganador": 0,
+  "players": {
+    "1": [
+      "Lunge",
+      "Berar",
+      "Mario",
+      "Fer",
+      "J",
+      "Julo",
+      "Tin"
+    ],
+    "2": [
+      "Jorge",
+      "Godo",
+      "NicoP",
+      "Vic",
+      "Lea",
+      "TomiL",
+      "MatiP"
+    ]
+  },
+  "gk": {
+    "1": "Julo",
+    "2": "Jorge"
+  },
+  "events": [
+    {
+      "type": "gol",
+      "team": 2,
+      "p1": "Vic",
+      "p2": null,
+      "minuto": 11,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": "Lunge",
+      "enContra": false,
+      "id": 33
+    },
+    {
+      "type": "atajada",
+      "team": 1,
+      "p1": "Lunge",
+      "p2": "Diego",
+      "minuto": 14,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 409
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Jorge",
+      "p2": "DaroP",
+      "minuto": 14,
+      "tSec": null,
+      "tipo": "mano a mano",
+      "gk": null,
+      "id": 410
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Jorge",
+      "p2": "J",
+      "minuto": 17,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 411
+    },
+    {
+      "type": "atajada",
+      "team": 1,
+      "p1": "Lunge",
+      "p2": "Diego",
+      "minuto": 17,
+      "tSec": null,
+      "tipo": "dentro del area",
+      "gk": null,
+      "id": 412
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Jorge",
+      "p2": "J",
+      "minuto": 18,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 413
+    },
+    {
+      "type": "gol",
+      "team": 2,
+      "p1": "TomiL",
+      "p2": "Lea",
+      "minuto": 20,
+      "tSec": null,
+      "tipo": "dentro del area",
+      "gk": "Mario",
+      "enContra": false,
+      "id": 34
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Jorge",
+      "p2": "J",
+      "minuto": 21,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 414
+    },
+    {
+      "type": "atajada",
+      "team": 1,
+      "p1": "Lunge",
+      "p2": "Diego",
+      "minuto": 30,
+      "tSec": null,
+      "tipo": "mano a mano",
+      "gk": null,
+      "id": 415
+    },
+    {
+      "type": "atajada",
+      "team": 1,
+      "p1": "Lunge",
+      "p2": "Fer",
+      "minuto": 36,
+      "tSec": null,
+      "tipo": "mano a mano",
+      "gk": null,
+      "id": 416
+    },
+    {
+      "type": "gol",
+      "team": 2,
+      "p1": "Vic",
+      "p2": "MatiP",
+      "minuto": 38,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": "Julo",
+      "enContra": false,
+      "id": 35
+    },
+    {
+      "type": "atajada",
+      "team": 1,
+      "p1": "Lunge",
+      "p2": "NicoP",
+      "minuto": 38,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 417
+    },
+    {
+      "type": "atajada",
+      "team": 1,
+      "p1": "Lunge",
+      "p2": "Fer",
+      "minuto": 39,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 418
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Jorge",
+      "p2": "Alejo",
+      "minuto": 40,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 419
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Jorge",
+      "p2": "Lunge",
+      "minuto": 40,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 420
+    },
+    {
+      "type": "gol",
+      "team": 1,
+      "p1": "Lunge",
+      "p2": "Tin",
+      "minuto": 41,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": "Jorge",
+      "enContra": false,
+      "id": 36
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Jorge",
+      "p2": "Alejo",
+      "minuto": 48,
+      "tSec": null,
+      "tipo": "mano a mano",
+      "gk": null,
+      "id": 421
+    },
+    {
+      "type": "gol",
+      "team": 1,
+      "p1": "Lunge",
+      "p2": "Fer",
+      "minuto": 51,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": "Jorge",
+      "enContra": false,
+      "id": 37
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Jorge",
+      "p2": "Gordo",
+      "minuto": 55,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 422
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Jorge",
+      "p2": "J",
+      "minuto": 55,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 423
+    },
+    {
+      "type": "gol",
+      "team": 1,
+      "p1": "Berar",
+      "p2": null,
+      "minuto": 57,
+      "tSec": null,
+      "tipo": "dentro del area",
+      "gk": "Jorge",
+      "enContra": false,
+      "id": 38
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Jorge",
+      "p2": "J",
+      "minuto": 57,
+      "tSec": null,
+      "tipo": "tiro fuera del area",
+      "gk": null,
+      "id": 424
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Jorge",
+      "p2": "Joc",
+      "minuto": 58,
+      "tSec": null,
+      "tipo": "mano a mano",
+      "gk": null,
+      "id": 425
+    },
+    {
+      "type": "atajada",
+      "team": 2,
+      "p1": "Jorge",
+      "p2": "Alejo",
+      "minuto": 59,
+      "tSec": null,
+      "tipo": "dentro del area",
+      "gk": null,
+      "id": 426
+    }
+  ],
+  "resumenJugadores": [
+    {
+      "equipo": 1,
+      "jugador": "Lunge",
+      "minutosArco": 11.0,
+      "golesArcoMin": 0.09,
+      "goles": 2.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "Berar",
+      "minutosArco": 15.0,
+      "golesArcoMin": 0.0,
+      "goles": 1.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "Mario",
+      "minutosArco": 9.0,
+      "golesArcoMin": 0.11,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "Fer",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 1.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "J",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "Julo",
+      "minutosArco": 29.0,
+      "golesArcoMin": 0.03,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 1,
+      "jugador": "Tin",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 1.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "Jorge",
+      "minutosArco": 64.0,
+      "golesArcoMin": 0.05,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "Godo",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "NicoP",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "Vic",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 2.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "Lea",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 1.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "TomiL",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 1.0,
+      "asistencias": 0.0
+    },
+    {
+      "equipo": 2,
+      "jugador": "MatiP",
+      "minutosArco": 0.0,
+      "golesArcoMin": 0.0,
+      "goles": 0.0,
+      "asistencias": 1.0
+    }
+  ],
+  "origen": "planilla_2026"
+}
