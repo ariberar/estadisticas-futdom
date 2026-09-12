@@ -10,8 +10,8 @@
     {
       "id": "Ale",
       "apodo": "Ale",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Alejandro",
+      "apellido": "Kancepolsky",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -27,8 +27,8 @@
     {
       "id": "AleC",
       "apodo": "AleC",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Ale",
+      "apellido": "C (Nico)",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -44,8 +44,8 @@
     {
       "id": "Alejo",
       "apodo": "Alejo",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Alejo",
+      "apellido": "Barbuzza",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -61,8 +61,8 @@
     {
       "id": "Berar",
       "apodo": "Berar",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Bruno",
+      "apellido": "Berardino",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -78,8 +78,8 @@
     {
       "id": "Bernny",
       "apodo": "Bernny",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Bernnie",
+      "apellido": "Chicoma",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -95,8 +95,8 @@
     {
       "id": "Chancha",
       "apodo": "Chancha",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Lucas",
+      "apellido": "De Rito",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -112,8 +112,8 @@
     {
       "id": "DaroP",
       "apodo": "DaroP",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Dario",
+      "apellido": "Pampa",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -129,8 +129,8 @@
     {
       "id": "Diego",
       "apodo": "Diego",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Diego",
+      "apellido": "Alvarez",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -146,8 +146,8 @@
     {
       "id": "Druca",
       "apodo": "Druca",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Martin",
+      "apellido": "Natos",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -163,8 +163,8 @@
     {
       "id": "Dubi",
       "apodo": "Dubi",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Nicolas",
+      "apellido": "Dubiansky",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -180,8 +180,8 @@
     {
       "id": "Fede",
       "apodo": "Fede",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Federico",
+      "apellido": "Schumerini",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -197,8 +197,8 @@
     {
       "id": "FedeF",
       "apodo": "FedeF",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Federico",
+      "apellido": "Fontenla",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -214,8 +214,8 @@
     {
       "id": "FedeN",
       "apodo": "FedeN",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Federico",
+      "apellido": "Natos",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -231,8 +231,8 @@
     {
       "id": "Fer",
       "apodo": "Fer",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Fernando",
+      "apellido": "Fontenla",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -248,8 +248,8 @@
     {
       "id": "Godo",
       "apodo": "Godo",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Claudio",
+      "apellido": "Saade",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -265,8 +265,8 @@
     {
       "id": "Gordo",
       "apodo": "Gordo",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Ezequiel",
+      "apellido": "Horseman",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -282,8 +282,8 @@
     {
       "id": "Guido",
       "apodo": "Guido",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Guido",
+      "apellido": "Maffezini",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -299,8 +299,8 @@
     {
       "id": "J",
       "apodo": "J",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Guido",
+      "apellido": "Laviana",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -316,8 +316,8 @@
     {
       "id": "JoacoF",
       "apodo": "JoacoF",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Joaquin",
+      "apellido": "Fileni",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -333,8 +333,8 @@
     {
       "id": "Joc",
       "apodo": "Joc",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Joaquin",
+      "apellido": "Malamud",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -350,8 +350,8 @@
     {
       "id": "Jorge",
       "apodo": "Jorge",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Jorge",
+      "apellido": "Saade",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -367,8 +367,8 @@
     {
       "id": "Juancito",
       "apodo": "Juancito",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Juan",
+      "apellido": "Cerrutti",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -384,8 +384,8 @@
     {
       "id": "Julo",
       "apodo": "Julo",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Julian",
+      "apellido": "Ganc",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -401,8 +401,8 @@
     {
       "id": "Lea",
       "apodo": "Lea",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Leandro",
+      "apellido": "Lopez",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -418,8 +418,8 @@
     {
       "id": "Luki",
       "apodo": "Luki",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Lucas",
+      "apellido": "Laviana",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -435,8 +435,8 @@
     {
       "id": "Lunge",
       "apodo": "Lunge",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Ariel",
+      "apellido": "Berardino",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -452,8 +452,8 @@
     {
       "id": "Mario",
       "apodo": "Mario",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Mario",
+      "apellido": "Fer",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -469,8 +469,8 @@
     {
       "id": "Martin",
       "apodo": "Martin",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Martin",
+      "apellido": "Debarnot",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -486,8 +486,8 @@
     {
       "id": "MatiP",
       "apodo": "MatiP",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Matias",
+      "apellido": "Pampa",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -503,8 +503,8 @@
     {
       "id": "Natos",
       "apodo": "Natos",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Natan",
+      "apellido": "Rajchenberg",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -520,8 +520,8 @@
     {
       "id": "Nico",
       "apodo": "Nico",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Nicolas",
+      "apellido": "Resnik",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -537,8 +537,8 @@
     {
       "id": "NicoF",
       "apodo": "NicoF",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Nico",
+      "apellido": "F (Nico)",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -554,8 +554,8 @@
     {
       "id": "NicoP",
       "apodo": "NicoP",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Nicolas",
+      "apellido": "Tufenjian",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -571,8 +571,8 @@
     {
       "id": "Pato",
       "apodo": "Pato",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Leandro",
+      "apellido": "Bullor",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -588,8 +588,8 @@
     {
       "id": "Pei",
       "apodo": "Pei",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Pei",
+      "apellido": "TomiL",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -605,8 +605,8 @@
     {
       "id": "Poni",
       "apodo": "Poni",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Poni",
+      "apellido": "Ocho",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -622,8 +622,8 @@
     {
       "id": "Raña",
       "apodo": "Raña",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Cristian",
+      "apellido": "Raña",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -639,8 +639,8 @@
     {
       "id": "Rodri",
       "apodo": "Rodri",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Rodrigo",
+      "apellido": "Pico",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -656,8 +656,8 @@
     {
       "id": "SantiV",
       "apodo": "SantiV",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Santiago",
+      "apellido": "Vazquez",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -673,8 +673,8 @@
     {
       "id": "Tin",
       "apodo": "Tin",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Martin",
+      "apellido": "Birman",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -690,8 +690,8 @@
     {
       "id": "TomiL",
       "apodo": "TomiL",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Tomas",
+      "apellido": "Landi",
       "aliasDe": null,
       "activo": true,
       "planilla": {
@@ -707,8 +707,8 @@
     {
       "id": "Vic",
       "apodo": "Vic",
-      "nombre": "",
-      "apellido": "",
+      "nombre": "Victor",
+      "apellido": "Da Rosa",
       "aliasDe": null,
       "activo": true,
       "planilla": {
