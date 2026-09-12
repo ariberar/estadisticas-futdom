@@ -9,7 +9,28 @@
 <body>
 <header>
   <div class="hbar">
-    <div class="brand"><b>⚽ Estadísticas F7</b><span class="badge" id="seasonBadge">temporada</span></div>
+   <div class="brand">
+  <b>⚽ Estadísticas F7</b>
+  <span class="badge" id="seasonBadge">temporada</span>
+  <a href="https://github.com/ariberar"
+     target="_blank"
+     rel="noopener noreferrer"
+     class="github-link">
+    <svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
+      <path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38
+      0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13
+      -.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66
+      .07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95
+      0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12
+      0 0 .67-.21 2.2.82a7.65 7.65 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82
+      .44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15
+      0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48
+      0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8
+      c0-4.42-3.58-8-8-8z"/>
+    </svg>
+    ariberar
+  </a>
+</div>
     <div class="spacer"></div>
     <input class="search" id="search" placeholder="Buscar jugador…" autocomplete="off" list="playerList">
     <datalist id="playerList"></datalist>
@@ -334,7 +355,10 @@ function renderPerfil(id){
       ${recCard(R.streakW,'Racha ganadora','victorias seguidas')}
       ${recCard(R.streakUnbeaten,'Racha sin perder','ganando o empatando')}
     </div></div>`;
-  h+=`<div class="card"><h3>Goles + asistencias por partido</h3><div class="sub">a lo largo de la temporada · verde ganó, rojo perdió, gris empató</div>${evoSVG(id)}</div>`;
+  h+=`<div class="card"><h3>Goles + asistencias por partido</h3><div class="sub">a lo largo de la temporada · verde ganó, rojo perdió, gris empató</div>${evoSVG(id)}     <div class="legend" style="justify-content:center;margin-top:8px">
+      <span><span class="sw" style="background:var(--s1)"></span> Goles</span>
+      <span><span class="sw" style="background:var(--s2)"></span> Asistencias</span>
+    </div> </div>`;
   h+=`<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px" id="pcols">
     <div class="card"><h3>Compañeros más frecuentes</h3><div class="sub">partidos jugados en el mismo equipo</div>${teammatesList(id)}</div>
     <div class="card"><h3>Mejores duplas</h3><div class="sub">win% jugando juntos (≥4 partidos)</div>${duosList(id)}</div>
@@ -348,14 +372,143 @@ function recCard(v,k,d){ return `<div class="rec"><div class="rv">${v||0}</div><
 function recMulti(v,label,ms){ ms=ms||[]; const many=ms.length>1;
   const vis = v?(many? ('P'+ms[0]+' +'+(ms.length-1)) : ('partido '+ms[0])) : '';
   return `<div class="rec ${many?'hpt':''}" ${many?`data-tip="Partidos: ${ms.map(x=>'P'+x).join(', ')}"`:''}><div class="rv">${v||0}</div><div class="rk">${label}</div><div class="rd">${vis}</div></div>`; }
-function evoSVG(id){ const d=STATS.P[id].byMatch; if(!d.length)return '<p class="muted">Sin partidos.</p>';
-  const W=640,H=170,pad=26,bw=Math.max(4,(W-2*pad)/d.length-3), max=Math.max(3,...d.map(x=>x.ga));
-  const x=i=>pad+i*(W-2*pad)/d.length, y=v=>H-pad-v/max*(H-2*pad-6);
+function evoSVG(id){
+  const d = STATS.P[id].byMatch;
+  if(!d.length) return '<p class="muted">Sin partidos.</p>';
+
+  const W=640,H=190,pad=26;
+  const bw=Math.max(4,(W-2*pad)/d.length-3);
+
+  const max=Math.max(
+    3,
+    ...d.map(x => (x.g||0)+(x.a||0))
+  );
+
+  const x=i=>pad+i*(W-2*pad)/d.length;
+  const y=v=>H-pad-18-v/max*(H-2*pad-24);
+
   let g='';
-  [0,max].forEach(v=>{ g+=`<line x1="${pad}" y1="${y(v)}" x2="${W-pad}" y2="${y(v)}" stroke="var(--grid)"/><text x="${pad-6}" y="${y(v)+3}" font-size="10" text-anchor="end">${v}</text>`; });
-  d.forEach((p,i)=>{ const col=p.res==='w'?'var(--good)':p.res==='l'?'var(--bad)':'var(--muted)'; const hh=H-pad-y(p.ga);
-    g+=`<rect class="hpt" data-tip="P${p.id} · ${p.fecha||''}<br><b>${p.g} goles · ${p.a} asist.</b>" x="${x(i)}" y="${y(p.ga)}" width="${bw}" height="${Math.max(0,hh)}" rx="2" fill="${col}" fill-opacity="0.85"/>`; });
-  return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="170" preserveAspectRatio="xMidYMid meet">${g}</svg>`;
+
+  // líneas horizontales
+  [0,max].forEach(v=>{
+    g += `
+      <line
+        x1="${pad}"
+        y1="${y(v)}"
+        x2="${W-pad}"
+        y2="${y(v)}"
+        stroke="var(--grid)"
+      />
+      <text
+        x="${pad-6}"
+        y="${y(v)+3}"
+        font-size="10"
+        text-anchor="end">
+        ${v}
+      </text>
+    `;
+  });
+
+  d.forEach((p,i)=>{
+
+    const goals = p.g || 0;
+    const assists = p.a || 0;
+    const total = goals + assists;
+
+    const xx = x(i);
+
+    // NO jugó
+    if(
+      p.res == null ||
+      p.res === '-' ||
+      p.res === ''
+    ){
+      g += `
+        <text
+          x="${xx+bw/2}"
+          y="${H-6}"
+          text-anchor="middle"
+          font-size="11"
+          font-weight="700"
+          fill="var(--warn)">
+          -
+        </text>
+      `;
+      return;
+    }
+
+    const totalH = H-pad-18-y(total);
+
+    const goalH =
+      total>0 ? totalH*(goals/total) : 0;
+
+    const assistH =
+      total>0 ? totalH*(assists/total) : 0;
+
+    // asistencias (parte inferior)
+    if(assistH>0){
+      g += `
+        <rect
+          class="hpt"
+          data-tip="P${p.id} · ${p.fecha||''}<br><b>${goals} goles · ${assists} asist.</b>"
+          x="${xx}"
+          y="${y(total)} + ${goalH}"
+          width="${bw}"
+          height="${assistH}"
+          fill="var(--s2)"
+          fill-opacity="0.9"
+        />
+      `;
+    }
+
+    // goles (parte superior)
+    if(goalH>0){
+      g += `
+        <rect
+          class="hpt"
+          data-tip="P${p.id} · ${p.fecha||''}<br><b>${goals} goles · ${assists} asist.</b>"
+          x="${xx}"
+          y="${y(total)}"
+          width="${bw}"
+          height="${goalH}"
+          fill="var(--s1)"
+          fill-opacity="0.95"
+        />
+      `;
+    }
+
+    const letter =
+      p.res==='w' ? 'G' :
+      p.res==='l' ? 'P' :
+      'E';
+
+    const letterColor =
+      p.res==='w' ? 'var(--good)' :
+      p.res==='l' ? 'var(--bad)' :
+      'var(--muted)';
+
+    g += `
+      <text
+        x="${xx+bw/2}"
+        y="${H-6}"
+        text-anchor="middle"
+        font-size="11"
+        font-weight="700"
+        fill="${letterColor}">
+        ${letter}
+      </text>
+    `;
+  });
+
+  return `
+    <svg
+      viewBox="0 0 ${W} ${H}"
+      width="100%"
+      height="190"
+      preserveAspectRatio="xMidYMid meet">
+      ${g}
+    </svg>
+  `;
 }
 function teammatesList(id){ const out=[];
   Object.entries(STATS.pair).forEach(([k,v])=>{ const ps=k.split('|'); if(!ps.includes(id))return; const o=ps[0]===id?ps[1]:ps[0]; out.push({o,g:v.together}); });
