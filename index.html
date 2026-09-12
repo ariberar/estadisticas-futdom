@@ -323,7 +323,8 @@ const HOVER = !!(window.matchMedia && matchMedia('(hover: hover)').matches);
 function showTT(html,x,y){ if(!HOVER)return; tt.innerHTML=html; tt.style.opacity=1; let l=x+14,t=y+14; if(l>innerWidth-270)l=x-tt.offsetWidth-14; tt.style.left=l+'px'; tt.style.top=t+'px'; }
 function hideTT(){ tt.style.opacity=0; }
 function colorFor(id){ const idx=[...PLAYERS.keys()].sort().indexOf(id); return `var(${PAL[(idx<0?0:idx)%PAL.length]})`; }
-function nm(id){ return PLAYERS.get(id)?.nombre||id; }
+function nm(id){ return id; }   /* apodo (id): se muestra en tablas, rankings, química, partidos, buscador */
+function fullName(id){ const p=PLAYERS.get(id)||{}; const n=(p.nombre&&p.nombre!==id)?p.nombre:''; return n ? (n+(p.apellido?' '+p.apellido:'')) : id; }   /* nombre real: solo en el Perfil */
 function pct(n){ return (n==null||isNaN(n))?'–':(n*100).toFixed(0)+'%'; }
 function fmt(n,d=0){ return (n==null||isNaN(n))?'–':Number(n).toFixed(d); }
 
@@ -405,7 +406,12 @@ function tile(v,k,extra){ return `<div class="tile"><div class="v">${v}${extra?'
 function renderPerfil(id){
   const a=STATS.P[id]; if(!a){ $('#perfilBody').innerHTML='<p class="muted">Sin datos.</p>'; return; }
   const R=a.records;
-  let h=`<div class="tiles">
+  let h=`<div style="display:flex;align-items:center;gap:10px;margin:0 0 2px">
+    <span class="dot" style="background:${colorFor(id)}"></span>
+    <span style="font-size:22px;font-weight:800;letter-spacing:-.01em">${fullName(id)}</span>
+    <span class="muted" style="font-size:13px;font-weight:600">${id}</span>
+  </div>
+  <div class="tiles">
     ${tile(a.pj,'Partidos')}
     ${tile(a.pts,'Puntos')}
     ${tile(a.g,'Goles','('+fmt(a.gpp,2)+'/P)')}
@@ -638,10 +644,12 @@ function selectTab(name){ $$('#tabs button').forEach(b=>b.setAttribute('aria-sel
 
 function fillPlayerSelect(){ const arr=Object.values(STATS.P).sort((a,b)=>b.pj-a.pj);
   $('#playerSel').innerHTML=arr.map(a=>`<option value="${a.id}">${nm(a.id)} (${a.pj} PJ)</option>`).join('');
-  $('#playerList').innerHTML=[...PLAYERS.keys()].sort().map(id=>`<option value="${nm(id)}">`).join(''); }
+  $('#playerList').innerHTML=[...PLAYERS.keys()].sort().map(id=>{ const fn=fullName(id); return `<option value="${nm(id)}">`+(fn!==nm(id)?`<option value="${fn}">`:''); }).join(''); }
 function refresh(){ compute(); fillPlayerSelect(); renderTable(); const cur=$$('#tabs button').find(b=>b.getAttribute('aria-selected')==='true'); if(cur)selectTab(cur.dataset.tab); }
 
-function resolveName(q){ q=q.trim().toLowerCase(); if(!q)return null; return [...PLAYERS.keys()].find(id=>nm(id).toLowerCase()===q)||[...PLAYERS.keys()].find(id=>nm(id).toLowerCase().startsWith(q))||[...PLAYERS.keys()].find(id=>nm(id).toLowerCase().includes(q)); }
+function resolveName(q){ q=q.trim().toLowerCase(); if(!q)return null; const ks=[...PLAYERS.keys()];
+  const by=f=> ks.find(id=>f(id).toLowerCase()===q)||ks.find(id=>f(id).toLowerCase().startsWith(q))||ks.find(id=>f(id).toLowerCase().includes(q));
+  return by(nm)||by(fullName); }
 
 function boot(){
   ingest(RAW,true);
@@ -657,7 +665,7 @@ function boot(){
   $('#quimMode').onclick=e=>{ const b=e.target.closest('button'); if(!b)return; quimMode=b.dataset.q; $$('#quimMode button').forEach(x=>x.setAttribute('aria-pressed',x===b)); renderQuim(); };
   $('#themeBtn').onclick=()=>{ const cur=document.documentElement.getAttribute('data-theme'); const dark=cur?cur==='dark':matchMedia('(prefers-color-scheme:dark)').matches; document.documentElement.setAttribute('data-theme',dark?'light':'dark'); const t=$$('#tabs button').find(b=>b.getAttribute('aria-selected')==='true'); if(t)selectTab(t.dataset.tab); };
   $('#search').onkeydown=e=>{ if(e.key==='Enter'){ const id=resolveName(e.target.value); if(id){gotoPlayer(id); e.target.value='';} } };
-  $('#search').onchange=e=>{ const id=resolveName(e.target.value); if(id&&[...PLAYERS.keys()].some(x=>nm(x)===e.target.value)){ gotoPlayer(id); e.target.value=''; } };
+  $('#search').onchange=e=>{ const id=resolveName(e.target.value); if(id){ gotoPlayer(id); e.target.value=''; } };
   const pf=$('#partFilterInput');
   const addPart=()=>{ const id=resolveName(pf.value); if(id&&!partSel.includes(id)){ partSel.push(id); pf.value=''; renderPartidos(); } };
   pf.onkeydown=e=>{ if(e.key==='Enter'){e.preventDefault(); addPart();} };
