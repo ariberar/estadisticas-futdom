@@ -237,7 +237,7 @@ function renderPerfil(id){
       ${recCard(R.streakW,'Racha ganadora','victorias seguidas')}
       ${recCard(R.streakUnbeaten,'Racha sin perder','ganando o empatando')}
     </div></div>`;
-  h+=`<div class="card"><h3>Goles + asistencias por partido</h3><div class="sub">a lo largo de la temporada · verde ganó, rojo perdió, gris empató</div>${evoSVG(id)}</div>`;
+  h+=`<div class="card"><h3>Goles + asistencias por partido</h3><div class="sub">a lo largo de la temporada · barras: goles y asistencias · letra abajo: resultado (G/E/P/−)</div>${evoSVG(id)}</div>`;
   h+=`<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px" id="pcols">
     <div class="card"><h3>Compañeros más frecuentes</h3><div class="sub">partidos jugados en el mismo equipo</div>${teammatesList(id)}</div>
     <div class="card"><h3>Mejores duplas</h3><div class="sub">win% jugando juntos (≥4 partidos)</div>${duosList(id)}</div>
@@ -251,14 +251,23 @@ function recCard(v,k,d){ return `<div class="rec"><div class="rv">${v||0}</div><
 function recMulti(v,label,ms){ ms=ms||[]; const many=ms.length>1;
   const vis = v?(many? ('P'+ms[0]+' +'+(ms.length-1)) : ('partido '+ms[0])) : '';
   return `<div class="rec ${many?'hpt':''}" ${many?`data-tip="Partidos: ${ms.map(x=>'P'+x).join(', ')}"`:''}><div class="rv">${v||0}</div><div class="rk">${label}</div><div class="rd">${vis}</div></div>`; }
-function evoSVG(id){ const d=STATS.P[id].byMatch; if(!d.length)return '<p class="muted">Sin partidos.</p>';
-  const W=640,H=170,pad=26,bw=Math.max(4,(W-2*pad)/d.length-3), max=Math.max(3,...d.map(x=>x.ga));
-  const x=i=>pad+i*(W-2*pad)/d.length, y=v=>H-pad-v/max*(H-2*pad-6);
+function evoSVG(id){
+  const P=STATS.P[id];
+  const byId={}; P.byMatch.forEach(x=>byId[x.id]=x);
+  const d=STATS.matches.map(m=>byId[m.id]||{id:m.id,fecha:m.fecha,res:null,g:0,a:0,ga:0});
+  if(!d.length)return '<p class="muted">Sin partidos.</p>';
+  const W=640,H=190,padT=26,padB=34,pad=26,bw=Math.max(4,(W-2*pad)/d.length-3), max=Math.max(3,...d.map(x=>x.ga));
+  const x=i=>pad+i*(W-2*pad)/d.length, y0=H-padB, sc=v=>v/max*(H-padT-padB);
+  const letterFor={w:['G','var(--good)'],l:['P','var(--bad)'],d:['E','var(--muted)']};
   let g='';
-  [0,max].forEach(v=>{ g+=`<line x1="${pad}" y1="${y(v)}" x2="${W-pad}" y2="${y(v)}" stroke="var(--grid)"/><text x="${pad-6}" y="${y(v)+3}" font-size="10" text-anchor="end">${v}</text>`; });
-  d.forEach((p,i)=>{ const col=p.res==='w'?'var(--good)':p.res==='l'?'var(--bad)':'var(--muted)'; const hh=H-pad-y(p.ga);
-    g+=`<rect class="hpt" data-tip="P${p.id} · ${p.fecha||''}<br><b>${p.g} goles · ${p.a} asist.</b>" x="${x(i)}" y="${y(p.ga)}" width="${bw}" height="${Math.max(0,hh)}" rx="2" fill="${col}" fill-opacity="0.85"/>`; });
-  return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="170" preserveAspectRatio="xMidYMid meet">${g}</svg>`;
+  [0,max].forEach(v=>{ const yy=y0-sc(v); g+=`<line x1="${pad}" y1="${yy}" x2="${W-pad}" y2="${yy}" stroke="var(--grid)"/><text x="${pad-6}" y="${yy+3}" font-size="10" text-anchor="end">${v}</text>`; });
+  d.forEach((p,i)=>{ const bx=x(i), gh=sc(p.g), ah=sc(p.a);
+    if(gh>0) g+=`<rect class="hpt" data-tip="P${p.id} · ${p.fecha||''}<br><b>${p.g} goles</b>" x="${bx}" y="${(y0-gh).toFixed(1)}" width="${bw}" height="${gh.toFixed(1)}" rx="2" fill="#3b82f6"/>`;
+    if(ah>0) g+=`<rect class="hpt" data-tip="P${p.id} · ${p.fecha||''}<br><b>${p.a} asist.</b>" x="${bx}" y="${(y0-gh-ah).toFixed(1)}" width="${bw}" height="${ah.toFixed(1)}" rx="2" fill="#f2994a"/>`;
+    const [lt,col]=letterFor[p.res]||['−','var(--warn)'];
+    g+=`<text x="${(bx+bw/2).toFixed(1)}" y="${(y0+14).toFixed(1)}" font-size="11" font-weight="700" text-anchor="middle" style="fill:${col}">${lt}</text>`; });
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="190" preserveAspectRatio="xMidYMid meet">${g}</svg>
+    <div class="legend"><span><span class="sw" style="background:#3b82f6"></span>Goles</span><span><span class="sw" style="background:#f2994a"></span>Asistencias</span></div>`;
 }
 function teammatesList(id){ const out=[];
   Object.entries(STATS.pair).forEach(([k,v])=>{ const ps=k.split('|'); if(!ps.includes(id))return; const o=ps[0]===id?ps[1]:ps[0]; out.push({o,g:v.together}); });
