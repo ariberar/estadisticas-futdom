@@ -1,5 +1,6 @@
 "use strict";
-const RAW = JSON.parse(document.getElementById('bundle').textContent);
+
+let RAW = null;
 const PAL = ['--s1','--s2','--s3','--s4','--s5','--s6','--s7','--s8'];
 // Partidos que tienen timeline del anotador con links a YouTube (id -> ruta). Agregar acá los nuevos.
 const TIMELINES = {"32":"timelines/20260906_timeline.html"};
@@ -536,4 +537,15 @@ async function loadRemote(){
 function loadFiles(files){ let n=0;
   Promise.all(files.map(f=>f.text().then(txt=>{ try{ const j=JSON.parse(txt); if(j.partidos){ingest(j,true);n+=j.partidos.length;} else if(j.events||j.players){ingestMatch(j,true);n++;} }catch(err){ console.warn('json inválido',f.name,err); } }))).then(()=>{ refresh(); alert(n+' partido(s) cargado(s)/actualizado(s). Total: '+MATCHES.size+' partidos.'); });
 }
-boot();
+// Carga el bundle inicial desde datos.json (antes venía embebido en el HTML) y recién ahí arranca la página
+async function iniciar(){
+  try{
+    const res = await fetch('datos.json', {cache:'no-store'});
+    RAW = await res.json();
+  }catch(e){
+    console.error('No se pudo cargar datos.json', e);
+    RAW = {jugadores:[], partidos:[]};
+  }
+  boot();
+}
+iniciar();
