@@ -3,7 +3,7 @@
 let RAW = null;
 const PAL = ['--s1','--s2','--s3','--s4','--s5','--s6','--s7','--s8'];
 // Partidos que tienen timeline del anotador con links a YouTube (id -> ruta). Agregar acá los nuevos.
-const TIMELINES = {"32":"timelines/20260906_timeline.html"};
+const TIMELINES = {"32":"timelines/20260906_timeline.html","33":"timelines/20260913"};
 
 let MATCHES = new Map(), PLAYERS = new Map(), STATS = null;
 
