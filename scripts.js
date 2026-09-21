@@ -4,8 +4,8 @@ let RAW = null;
 const PAL = ['--s1','--s2','--s3','--s4','--s5','--s6','--s7','--s8'];
 // Partidos que tienen timeline del anotador con links a YouTube (id -> ruta). Agregar acá los nuevos.
 const TIMELINES = {"32":"timelines/20260906_timeline.html","33":"timelines/20260913_timeline.html","34":"timelines/20260920_timeline.html"};
-// Partidos anotados con OTRO criterio de "ocasiones" → NO cuentan para Ocasiones generadas/P (inflaban el promedio). Agregar/quitar ids acá.
-const OCG_EXCLUDE = new Set(['5','6']);
+// Partidos anotados con OTRO criterio de "ocasiones" → NO cuentan para Ocasiones generadas/P. Vacío: ya se limpiaron las ocasiones mal anotadas (P5/P6). Agregar ids acá si vuelve a pasar.
+const OCG_EXCLUDE = new Set([]);
 
 let MATCHES = new Map(), PLAYERS = new Map(), STATS = null;
 
@@ -464,10 +464,12 @@ function matchResumen(m){
   const per={}; [1,2].forEach(t=>(m.players?.[t]||[]).forEach(p=>per[p]={g:0,a:0,sh:0,sv:0,q:0,oc:0,t}));
   (m.events||[]).forEach(e=>{
     if(e.type==='gol'){ if(!e.enContra&&e.p1&&per[e.p1])per[e.p1].g++; if(e.p2&&per[e.p2])per[e.p2].a++; }
-    else if(e.type==='tiro'){ if(e.p1&&per[e.p1])per[e.p1].sh++; }
-    else if(e.type==='atajada'){ const k=e.gk||e.p1; if(k&&per[k])per[k].sv++; }   // arquero que atajó (gk formato nuevo / p1 formato viejo)
+    else if(e.type==='tiro'){ if(e.p1&&per[e.p1])per[e.p1].sh++;
+      if(e.p2&&per[e.p2])per[e.p2].oc++; }                                          // pase a remate = ocasión generada
+    else if(e.type==='atajada'){ const k=e.gk||e.p1; if(k&&per[k])per[k].sv++;      // arquero que atajó (gk formato nuevo / p1 formato viejo)
+      if(e.p2&&per[e.p2])per[e.p2].oc++; }                                          // pase a remate atajado = ocasión generada
     else if(e.type==='quite'){ if(e.p1&&per[e.p1])per[e.p1].q++; }
-    else if(e.type==='ocasion'){ if(e.p1&&per[e.p1])per[e.p1].oc++; }
+    else if(e.type==='ocasion'){ if(e.p1&&per[e.p1])per[e.p1].oc++; }               // ocasión donde fue el pasador
   });
   const xtra=v=>{ const p=[]; if(v.sh)p.push(v.sh+' T'); if(v.sv)p.push(v.sv+' 🧤'); if(v.q)p.push(v.q+' Q'); if(v.oc)p.push(v.oc+' Oc'); return p.length?`<span class="resx">${p.join(' · ')}</span>`:''; };
   const col=t=>{ const arr=Object.entries(per).filter(([p,v])=>v.t===t&&(v.g||v.a||v.sh||v.sv||v.q||v.oc))
@@ -480,7 +482,7 @@ function matchResumen(m){
   const lm=leadMinutes(m); let chips='';
   if(lm)chips=`<div class="reschips"><span class="rchip t1">${m.t1||'Paredón'} ganó ${lm[1]}'</span><span class="rchip d">Empatados ${lm[0]}'</span><span class="rchip t2">${m.t2||'Canchita'} ganó ${lm[2]}'</span></div>`;
   const hasX=(m.events||[]).some(e=>e.type==='tiro'||e.type==='atajada'||e.type==='quite'||e.type==='ocasion');
-  const leg=hasX?`<div class="reslegend">G goles · A asist. · T tiros · 🧤 atajadas · Q quites · Oc ocasiones</div>`:'';
+  const leg=hasX?`<div class="reslegend">G goles · A asist. · T tiros · 🧤 atajadas · Q quites · Oc ocasiones generadas</div>`:'';
   return `<div class="resumen">${chips}${leg}<div class="rescols">${col(1)}${col(2)}</div></div>`;
 }
 // MODAL: timeline completo filtrable por tipo de jugada
