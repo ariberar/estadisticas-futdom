@@ -4,6 +4,8 @@ let RAW = null;
 const PAL = ['--s1','--s2','--s3','--s4','--s5','--s6','--s7','--s8'];
 // Partidos que tienen timeline del anotador con links a YouTube (id -> ruta). Agregar acá los nuevos.
 const TIMELINES = {"32":"timelines/20260906_timeline.html","33":"timelines/20260913_timeline.html","34":"timelines/20260920_timeline.html"};
+// Partidos anotados con OTRO criterio de "ocasiones" → NO cuentan para Ocasiones generadas/P (inflaban el promedio). Agregar/quitar ids acá.
+const OCG_EXCLUDE = new Set(['5','6']);
 
 let MATCHES = new Map(), PLAYERS = new Map(), STATS = null;
 
@@ -45,6 +47,7 @@ function compute(){
     const per={}; [1,2].forEach(t=>roster[t].forEach(p=>{per[p]={g:0,a:0,oc:0,at:0,q:0,sh:0,sv:0,ocg:0,team:t};ensure(p);}));
     const hasQuite=(m.events||[]).some(e=>e.type==='quite');                          // ¿este partido tiene quites registrados?
     const hasOcg=(m.events||[]).some(e=>e.type==='ocasion'||isMano(e));               // ¿tiene ocasiones / mano a mano registrados?
+    const ocgOK=!OCG_EXCLUDE.has(String(m.id));                                       // ¿este partido cuenta para ocasiones gen./P? (criterio homogéneo)
     (m.events||[]).forEach(e=>{ const {type,p1,p2}=e;
       if(type==='gol'){
         if(!e.enContra && p1 && per[p1]) per[p1].g++;              // gol: no cuenta si es en contra
@@ -59,9 +62,10 @@ function compute(){
       else if(type==='quite'){ if(p1&&per[p1])per[p1].q++; }
     });
     [1,2].forEach(t=>{ roster[t].forEach(p=>{ const c=per[p],a=ensure(p); a.pj++;
-      a.g+=c.g;a.a+=c.a;a.oc+=c.oc;a.at+=c.at;a.q+=c.q;a.sh+=c.sh;a.sv+=c.sv;a.ocg+=c.ocg;
+      a.g+=c.g;a.a+=c.a;a.oc+=c.oc;a.at+=c.at;a.q+=c.q;a.sh+=c.sh;a.sv+=c.sv;
+      if(ocgOK) a.ocg+=c.ocg;                                                         // numerador ocasiones gen. (excluye partidos con otro criterio)
       if(hasQuite) a.qN++;                                                            // denom. quites/P: partidos con quites
-      if(hasOcg)   a.ocgN++;                                                          // denom. ocasiones gen./P: partidos con el dato
+      if(hasOcg && ocgOK) a.ocgN++;                                                   // denom. ocasiones gen./P: partidos con el dato y criterio homogéneo
       const rr2=resumenOf(m,p);   // minutos al arco / goles-por-min según la pestaña equipos
       if(rr2){ if(rr2.minutosArco!=null){ a.minArcoSum+=rr2.minutosArco; a.minArcoN++;   // denominador: partidos con dato (D<>"")
           if(rr2.minutosArco>0) a.golArcoN++; }                                          // denominador goles/min: D>0
