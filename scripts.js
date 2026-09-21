@@ -31,8 +31,6 @@ function teamOf(m,p){ if((m.players?.[1]||[]).includes(p))return 1; if((m.player
 function keepersOf(m,team){ const s=new Set(); (m.resumenJugadores||[]).forEach(r=>{ if(r.equipo===team&&(r.minutosArco||0)>0&&r.jugador)s.add(r.jugador); }); if(m.gk&&m.gk[team])s.add(m.gk[team]); return s; }
 function resumenOf(m,p){ return (m.resumenJugadores||[]).find(r=>r.jugador===p)||null; }
 function present(m){ return new Set((m.events||[]).map(e=>e.type)); }
-// pase "mano a mano" en un remate/atajada (el asistidor p2 dejó al rival mano a mano)
-function isMano(e){ return (e.type==='tiro'||e.type==='atajada') && e.tipo && e.tipo.indexOf('mano a mano')>=0; }
 
 function compute(){
   const P={};
@@ -46,7 +44,7 @@ function compute(){
     const res=matchResult(m); const roster={1:(m.players?.[1]||[]),2:(m.players?.[2]||[])};
     const per={}; [1,2].forEach(t=>roster[t].forEach(p=>{per[p]={g:0,a:0,oc:0,at:0,q:0,sh:0,sv:0,ocg:0,team:t};ensure(p);}));
     const hasQuite=(m.events||[]).some(e=>e.type==='quite');                          // ¿este partido tiene quites registrados?
-    const hasOcg=(m.events||[]).some(e=>e.type==='ocasion'||isMano(e));               // ¿tiene ocasiones / mano a mano registrados?
+    const hasOcg=(m.events||[]).some(e=>e.type==='ocasion'||((e.type==='tiro'||e.type==='atajada')&&e.p2)); // ¿tiene ocasiones / pases a remate registrados?
     const ocgOK=!OCG_EXCLUDE.has(String(m.id));                                       // ¿este partido cuenta para ocasiones gen./P? (criterio homogéneo)
     (m.events||[]).forEach(e=>{ const {type,p1,p2}=e;
       if(type==='gol'){
@@ -54,10 +52,10 @@ function compute(){
         if(p2 && per[p2]) per[p2].a++;                             // asistencia: cuenta siempre (incl. en contra)
         if(!e.enContra && p1 && p2 && per[p1] && per[p2]){ const k=p2+'→'+p1; assistEdge[k]=(assistEdge[k]||0)+1; } }
       else if(type==='tiro'){ if(p1&&per[p1])per[p1].sh++;
-        if(isMano(e)&&p2&&per[p2])per[p2].ocg++; }                 // pase mano a mano que terminó en remate
+        if(p2&&per[p2])per[p2].ocg++; }                           // pase que terminó en remate (cualquier tiro asistido)
       else if(type==='atajada'){ if(p1&&per[p1])per[p1].at++;
         const kp=e.gk||p1; if(kp&&per[kp])per[kp].sv++;            // atajada acreditada al arquero (gk formato nuevo / p1 viejo)
-        if(isMano(e)&&p2&&per[p2])per[p2].ocg++; }                 // pase mano a mano que terminó en atajada
+        if(p2&&per[p2])per[p2].ocg++; }                           // pase que terminó en atajada (cualquier atajada asistida)
       else if(type==='ocasion'){ if(p1&&per[p1]){per[p1].oc++;per[p1].ocg++;} }  // el pasador dejó a alguien mano a mano
       else if(type==='quite'){ if(p1&&per[p1])per[p1].q++; }
     });
@@ -138,7 +136,7 @@ const COLS=[
   {k:'ptsPP',t:'Pts/P',v:r=>fmt(r.ptsPP,2),tip:'Puntos esperados por partido (Pts ÷ PJ). 3 ganar · 1 empatar · 0 perder'},
   {k:'qPP',t:'Q/P',v:r=>r.qPP==null?'–':fmt(r.qPP,2),tip:'Quites por partido, contando solo los partidos con quites registrados'},
   {k:'atPP',t:'🧤/P',v:r=>r.atPP==null?'–':fmt(r.atPP,2),tip:'Atajadas por partido atajado (solo partidos en que fue arquero)'},
-  {k:'ocgPP',t:'OcG/P',v:r=>r.ocgPP==null?'–':fmt(r.ocgPP,2),tip:'Ocasiones generadas por partido: pases de ocasión + mano a mano en tiros/atajadas (solo partidos con el dato)'},
+  {k:'ocgPP',t:'OcG/P',v:r=>r.ocgPP==null?'–':fmt(r.ocgPP,2),tip:'Ocasiones generadas por partido: pases de ocasión + pases que terminaron en tiro o atajada (solo partidos con el dato)'},
 ];
 function rows(){
   let arr=Object.values(STATS.P).map(a=>Object.assign({},a,{nombre:nm(a.id)}));
@@ -179,23 +177,25 @@ function barsHist(data,color){
   return `<div style="overflow-x:auto"><svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" preserveAspectRatio="xMidYMid meet" style="min-width:${Math.min(W,520)}px">${g}</svg></div>`;
 }
 function renderRank(){
-  const perMatch = rankAvgMode && (rankKey==='goles'||rankKey==='asis');   // toggle total/promedio (solo goles y asist.)
-  // métricas nuevas (siempre promedio por partido): puntos esperados, quites, atajadas, ocasiones generadas
-  const NEW={ptsPP:{t:'Puntos esperados por partido',s:'Puntos esperados por partido jugado (Pts ÷ PJ). ',f:a=>a.ptsPP||0},
-             quites:{t:'Quites por partido',s:'Quites por partido, sobre los partidos con quites registrados. ',f:a=>a.qPP||0},
-             atajadas:{t:'Atajadas por partido',s:'Atajadas por partido atajado (solo partidos en que fue arquero). ',f:a=>a.atPP||0},
-             ocasiones:{t:'Ocasiones generadas por partido',s:'Pases de ocasión + mano a mano en tiros/atajadas, sobre los partidos con el dato. ',f:a=>a.ocgPP||0}};
+  // métricas nuevas: TOTAL por defecto; PROMEDIO por partido al tildar "Promedio por partido"
+  const NEW={
+    ptsPP:    {t:'Puntos',              tot:a=>a.pts, avg:a=>a.ptsPP||0, s:'Puntos totales de la temporada (3 ganar · 1 empatar · 0 perder). ', sa:'Puntos esperados por partido jugado (Pts ÷ PJ). '},
+    quites:   {t:'Quites',              tot:a=>a.q,   avg:a=>a.qPP||0,   s:'Quites totales de la temporada. ',                                  sa:'Quites por partido, sobre los partidos con quites registrados. '},
+    atajadas: {t:'Atajadas',            tot:a=>a.sv,  avg:a=>a.atPP||0,  s:'Atajadas totales de la temporada. ',                                sa:'Atajadas por partido atajado (solo partidos en que fue arquero). '},
+    ocasiones:{t:'Ocasiones generadas', tot:a=>a.ocg, avg:a=>a.ocgPP||0, s:'Ocasiones generadas totales: pases de ocasión + pases que terminaron en tiro o atajada. ', sa:'Ocasiones generadas por partido, sobre los partidos con el dato. '}
+  };
   const isNew=!!NEW[rankKey];
+  const perMatch = rankAvgMode && (rankKey==='goles'||rankKey==='asis'||isNew);   // toggle total/promedio (goles, asist. y métricas nuevas)
   const titles={goles:'Goleadores',asis:'Asistencias',impacto:'Impacto (G+A por partido)',winpct:'Win %'};
   $('#rankTitle').textContent=(isNew?NEW[rankKey].t:titles[rankKey])+(perMatch?' · promedio por partido':'');
-  const avg=(rankKey==='winpct'||rankKey==='impacto'||perMatch||isNew);
-  $('#rankSub').textContent=(isNew?NEW[rankKey].s:rankKey==='impacto'?'(Goles+Asistencias) / partidos jugados. ':rankKey==='winpct'?'Porcentaje de victorias. ':perMatch?'Promedio por partido jugado. ':'Total de la temporada. ')+(avg?(rankMinPj?'Mínimo 5 PJ.':'Sin mínimo de PJ.'):'');
-  const getv=a=>isNew?NEW[rankKey].f(a):rankKey==='goles'?(perMatch?(a.pj?a.g/a.pj:0):a.g):rankKey==='asis'?(perMatch?(a.pj?a.a/a.pj:0):a.a):rankKey==='impacto'?(a.pj?a.ga/a.pj:0):a.winpct;
+  const subFor=isNew?(perMatch?NEW[rankKey].sa:NEW[rankKey].s):rankKey==='impacto'?'(Goles+Asistencias) / partidos jugados. ':rankKey==='winpct'?'Porcentaje de victorias. ':perMatch?'Promedio por partido jugado. ':'Total de la temporada. ';
+  $('#rankSub').textContent=subFor+(rankMinPj?'Mínimo 5 PJ.':'Sin mínimo de PJ.');   // el ≥5 PJ aplica a TODOS los rankings (también goles/asist.)
+  const getv=a=>isNew?(perMatch?NEW[rankKey].avg(a):NEW[rankKey].tot(a)):rankKey==='goles'?(perMatch?(a.pj?a.g/a.pj:0):a.g):rankKey==='asis'?(perMatch?(a.pj?a.a/a.pj:0):a.a):rankKey==='impacto'?(a.pj?a.ga/a.pj:0):a.winpct;
   let arr=Object.values(STATS.P).map(a=>({id:a.id,val:getv(a),pj:a.pj}));
   if(rankMinPj)arr=arr.filter(r=>r.pj>=5);   // el ≥5 PJ filtra siempre (también en totales)
   arr=arr.filter(r=>r.val>0).sort((a,b)=>b.val-a.val);   // todos los que tienen el dato (sin tope)
   const max=Math.max(0.0001,...arr.map(r=>r.val));
-  const fv=v=>rankKey==='winpct'?(v*100).toFixed(0)+'%':(rankKey==='impacto'||perMatch||isNew)?v.toFixed(2):String(v);
+  const fv=v=>rankKey==='winpct'?(v*100).toFixed(0)+'%':(rankKey==='impacto'||perMatch)?v.toFixed(2):String(v);
   $('#rankBars').innerHTML=arr.map(r=>`<div class="brow" data-p="${r.id}" style="cursor:pointer">
     <span class="nm">${nm(r.id)}</span><span class="btrk"><span class="bfil" style="width:${(r.val/max*100).toFixed(1)}%;background:${colorFor(r.id)}"></span></span>
     <span class="vv">${fv(r.val)}</span></div>`).join('')||'<p class="muted">Sin datos.</p>';
