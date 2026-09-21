@@ -2424,6 +2424,18 @@
       "minuto": 74
     },
     {
+      "id": 1790005952562.707,
+      "type": "quite",
+      "tSec": 4712.967451,
+      "minOverride": null,
+      "team": 1,
+      "p1": "J",
+      "p2": null,
+      "tipo": "normal",
+      "gk": null,
+      "minuto": 74
+    },
+    {
       "id": 1789969534226.57,
       "type": "atajada",
       "tSec": 4716.845244,
@@ -2511,7 +2523,7 @@
       "asistencias": 1,
       "tiros": 10,
       "atajadas": 0,
-      "quites": 6
+      "quites": 7
     },
     {
       "equipo": 1,

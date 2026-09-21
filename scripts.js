@@ -29,33 +29,44 @@ function teamOf(m,p){ if((m.players?.[1]||[]).includes(p))return 1; if((m.player
 function keepersOf(m,team){ const s=new Set(); (m.resumenJugadores||[]).forEach(r=>{ if(r.equipo===team&&(r.minutosArco||0)>0&&r.jugador)s.add(r.jugador); }); if(m.gk&&m.gk[team])s.add(m.gk[team]); return s; }
 function resumenOf(m,p){ return (m.resumenJugadores||[]).find(r=>r.jugador===p)||null; }
 function present(m){ return new Set((m.events||[]).map(e=>e.type)); }
+// pase "mano a mano" en un remate/atajada (el asistidor p2 dejó al rival mano a mano)
+function isMano(e){ return (e.type==='tiro'||e.type==='atajada') && e.tipo && e.tipo.indexOf('mano a mano')>=0; }
 
 function compute(){
   const P={};
   const ensure=id=>{ if(!P[id])P[id]={id,pj:0,g:0,a:0,oc:0,at:0,q:0,sh:0,w:0,d:0,l:0,
+    sv:0,svN:0,ocg:0,ocgN:0,qN:0,
     minArcoSum:0,minArcoN:0,golArcoSum:0,golArcoN:0,byMatch:[]}; return P[id]; };
   const pair={}, rival={}, assistEdge={}, coEdge={};
   const matches=[...MATCHES.values()].sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||'')||(+a.id-+b.id));
   const ORDER=matches.map(m=>String(m.id));   // orden cronológico de la temporada (para rachas de partidos seguidos)
   matches.forEach(m=>{
     const res=matchResult(m); const roster={1:(m.players?.[1]||[]),2:(m.players?.[2]||[])};
-    const per={}; [1,2].forEach(t=>roster[t].forEach(p=>{per[p]={g:0,a:0,oc:0,at:0,q:0,sh:0,team:t};ensure(p);}));
+    const per={}; [1,2].forEach(t=>roster[t].forEach(p=>{per[p]={g:0,a:0,oc:0,at:0,q:0,sh:0,sv:0,ocg:0,team:t};ensure(p);}));
+    const hasQuite=(m.events||[]).some(e=>e.type==='quite');                          // ¿este partido tiene quites registrados?
+    const hasOcg=(m.events||[]).some(e=>e.type==='ocasion'||isMano(e));               // ¿tiene ocasiones / mano a mano registrados?
     (m.events||[]).forEach(e=>{ const {type,p1,p2}=e;
       if(type==='gol'){
         if(!e.enContra && p1 && per[p1]) per[p1].g++;              // gol: no cuenta si es en contra
         if(p2 && per[p2]) per[p2].a++;                             // asistencia: cuenta siempre (incl. en contra)
         if(!e.enContra && p1 && p2 && per[p1] && per[p2]){ const k=p2+'→'+p1; assistEdge[k]=(assistEdge[k]||0)+1; } }
-      else if(type==='tiro'){ if(p1&&per[p1])per[p1].sh++; }
-      else if(type==='atajada'){ if(p1&&per[p1])per[p1].at++; }
-      else if(type==='ocasion'){ if(p1&&per[p1])per[p1].oc++; }
+      else if(type==='tiro'){ if(p1&&per[p1])per[p1].sh++;
+        if(isMano(e)&&p2&&per[p2])per[p2].ocg++; }                 // pase mano a mano que terminó en remate
+      else if(type==='atajada'){ if(p1&&per[p1])per[p1].at++;
+        const kp=e.gk||p1; if(kp&&per[kp])per[kp].sv++;            // atajada acreditada al arquero (gk formato nuevo / p1 viejo)
+        if(isMano(e)&&p2&&per[p2])per[p2].ocg++; }                 // pase mano a mano que terminó en atajada
+      else if(type==='ocasion'){ if(p1&&per[p1]){per[p1].oc++;per[p1].ocg++;} }  // el pasador dejó a alguien mano a mano
       else if(type==='quite'){ if(p1&&per[p1])per[p1].q++; }
     });
     [1,2].forEach(t=>{ roster[t].forEach(p=>{ const c=per[p],a=ensure(p); a.pj++;
-      a.g+=c.g;a.a+=c.a;a.oc+=c.oc;a.at+=c.at;a.q+=c.q;a.sh+=c.sh;
+      a.g+=c.g;a.a+=c.a;a.oc+=c.oc;a.at+=c.at;a.q+=c.q;a.sh+=c.sh;a.sv+=c.sv;a.ocg+=c.ocg;
+      if(hasQuite) a.qN++;                                                            // denom. quites/P: partidos con quites
+      if(hasOcg)   a.ocgN++;                                                          // denom. ocasiones gen./P: partidos con el dato
       const rr2=resumenOf(m,p);   // minutos al arco / goles-por-min según la pestaña equipos
       if(rr2){ if(rr2.minutosArco!=null){ a.minArcoSum+=rr2.minutosArco; a.minArcoN++;   // denominador: partidos con dato (D<>"")
           if(rr2.minutosArco>0) a.golArcoN++; }                                          // denominador goles/min: D>0
         if(rr2.golesArcoMin!=null) a.golArcoSum+=rr2.golesArcoMin; }
+      if((rr2&&rr2.minutosArco>0)||c.sv>0) a.svN++;                                   // denom. atajadas/P: partidos que atajó (fue arquero)
       let rr=res==null?null:(res===0?'d':(res===t?'w':'l')); if(rr==='w')a.w++;else if(rr==='l')a.l++;else if(rr==='d')a.d++;
       a.byMatch.push({id:m.id,fecha:m.fecha,team:t,res:rr,g:c.g,a:c.a,ga:c.g+c.a,oc:c.oc,at:c.at,q:c.q}); });
       const rs=roster[t];
@@ -68,6 +79,10 @@ function compute(){
     a.winpct=(a.w+a.l+a.d)?a.w/(a.w+a.l+a.d):0; a.gpp=a.pj?a.g/a.pj:0; a.app=a.pj?a.a/a.pj:0;
     a.minArcoPP = a.minArcoN? a.minArcoSum/a.minArcoN : null;   // prom. sobre partidos con dato de arco
     a.golMin    = a.golArcoN? a.golArcoSum/a.golArcoN : null;   // goles/min en el arco (partidos con D>0)
+    a.ptsPP = a.pj?  a.pts/a.pj  : 0;                           // puntos esperados por partido (Pts / PJ)
+    a.qPP   = a.qN?  a.q  /a.qN  : null;                        // quites por partido (partidos con quites)
+    a.atPP  = a.svN? a.sv /a.svN : null;                        // atajadas por partido atajado (fue arquero)
+    a.ocgPP = a.ocgN? a.ocg/a.ocgN : null;                      // ocasiones generadas por partido
     a.records=playerRecords(a, ORDER); });
   STATS={P,pair,rival,assistEdge,coEdge,matches,season:seasonRecords(P)};
   return STATS;
@@ -116,6 +131,10 @@ const COLS=[
   {k:'winpct',t:'Win%',v:r=>pct(r.winpct),tip:'Porcentaje de partidos ganados'},
   {k:'minArcoPP',t:'Min.arco/P',v:r=>r.minArcoPP==null?'–':r.minArcoPP.toFixed(1),tip:'Minutos promedio en el arco por partido'},
   {k:'golMin',t:'GA/min',v:r=>r.golMin==null?'–':r.golMin.toFixed(2),tip:'Goles recibidos por minuto en el arco'},
+  {k:'ptsPP',t:'Pts/P',v:r=>fmt(r.ptsPP,2),tip:'Puntos esperados por partido (Pts ÷ PJ). 3 ganar · 1 empatar · 0 perder'},
+  {k:'qPP',t:'Q/P',v:r=>r.qPP==null?'–':fmt(r.qPP,2),tip:'Quites por partido, contando solo los partidos con quites registrados'},
+  {k:'atPP',t:'🧤/P',v:r=>r.atPP==null?'–':fmt(r.atPP,2),tip:'Atajadas por partido atajado (solo partidos en que fue arquero)'},
+  {k:'ocgPP',t:'OcG/P',v:r=>r.ocgPP==null?'–':fmt(r.ocgPP,2),tip:'Ocasiones generadas por partido: pases de ocasión + mano a mano en tiros/atajadas (solo partidos con el dato)'},
 ];
 function rows(){
   let arr=Object.values(STATS.P).map(a=>Object.assign({},a,{nombre:nm(a.id)}));
@@ -157,16 +176,22 @@ function barsHist(data,color){
 }
 function renderRank(){
   const perMatch = rankAvgMode && (rankKey==='goles'||rankKey==='asis');   // toggle total/promedio (solo goles y asist.)
+  // métricas nuevas (siempre promedio por partido): puntos esperados, quites, atajadas, ocasiones generadas
+  const NEW={ptsPP:{t:'Puntos esperados por partido',s:'Puntos esperados por partido jugado (Pts ÷ PJ). ',f:a=>a.ptsPP||0},
+             quites:{t:'Quites por partido',s:'Quites por partido, sobre los partidos con quites registrados. ',f:a=>a.qPP||0},
+             atajadas:{t:'Atajadas por partido',s:'Atajadas por partido atajado (solo partidos en que fue arquero). ',f:a=>a.atPP||0},
+             ocasiones:{t:'Ocasiones generadas por partido',s:'Pases de ocasión + mano a mano en tiros/atajadas, sobre los partidos con el dato. ',f:a=>a.ocgPP||0}};
+  const isNew=!!NEW[rankKey];
   const titles={goles:'Goleadores',asis:'Asistencias',impacto:'Impacto (G+A por partido)',winpct:'Win %'};
-  $('#rankTitle').textContent=titles[rankKey]+(perMatch?' · promedio por partido':'');
-  const avg=(rankKey==='winpct'||rankKey==='impacto'||perMatch);
-  $('#rankSub').textContent=(rankKey==='impacto'?'(Goles+Asistencias) / partidos jugados. ':rankKey==='winpct'?'Porcentaje de victorias. ':perMatch?'Promedio por partido jugado. ':'Total de la temporada. ')+(avg?(rankMinPj?'Mínimo 5 PJ.':'Sin mínimo de PJ.'):'');
-  const getv=a=>rankKey==='goles'?(perMatch?(a.pj?a.g/a.pj:0):a.g):rankKey==='asis'?(perMatch?(a.pj?a.a/a.pj:0):a.a):rankKey==='impacto'?(a.pj?a.ga/a.pj:0):a.winpct;
+  $('#rankTitle').textContent=(isNew?NEW[rankKey].t:titles[rankKey])+(perMatch?' · promedio por partido':'');
+  const avg=(rankKey==='winpct'||rankKey==='impacto'||perMatch||isNew);
+  $('#rankSub').textContent=(isNew?NEW[rankKey].s:rankKey==='impacto'?'(Goles+Asistencias) / partidos jugados. ':rankKey==='winpct'?'Porcentaje de victorias. ':perMatch?'Promedio por partido jugado. ':'Total de la temporada. ')+(avg?(rankMinPj?'Mínimo 5 PJ.':'Sin mínimo de PJ.'):'');
+  const getv=a=>isNew?NEW[rankKey].f(a):rankKey==='goles'?(perMatch?(a.pj?a.g/a.pj:0):a.g):rankKey==='asis'?(perMatch?(a.pj?a.a/a.pj:0):a.a):rankKey==='impacto'?(a.pj?a.ga/a.pj:0):a.winpct;
   let arr=Object.values(STATS.P).map(a=>({id:a.id,val:getv(a),pj:a.pj}));
   if(rankMinPj)arr=arr.filter(r=>r.pj>=5);   // el ≥5 PJ filtra siempre (también en totales)
   arr=arr.filter(r=>r.val>0).sort((a,b)=>b.val-a.val);   // todos los que tienen el dato (sin tope)
   const max=Math.max(0.0001,...arr.map(r=>r.val));
-  const fv=v=>rankKey==='winpct'?(v*100).toFixed(0)+'%':(rankKey==='impacto'||perMatch)?v.toFixed(2):String(v);
+  const fv=v=>rankKey==='winpct'?(v*100).toFixed(0)+'%':(rankKey==='impacto'||perMatch||isNew)?v.toFixed(2):String(v);
   $('#rankBars').innerHTML=arr.map(r=>`<div class="brow" data-p="${r.id}" style="cursor:pointer">
     <span class="nm">${nm(r.id)}</span><span class="btrk"><span class="bfil" style="width:${(r.val/max*100).toFixed(1)}%;background:${colorFor(r.id)}"></span></span>
     <span class="vv">${fv(r.val)}</span></div>`).join('')||'<p class="muted">Sin datos.</p>';
@@ -221,8 +246,12 @@ function renderPerfil(id){
   h+=`<div class="tiles">
     ${tile(a.pj,'Partidos')}
     ${tile(a.pts,'Puntos','(#'+rk+')')}
+    ${tile(fmt(a.ptsPP,2),'Pts esperados/P')}
     ${tile(a.g,'Goles','('+fmt(a.gpp,2)+'/P)')}
     ${tile(a.a,'Asistencias','('+fmt(a.app,2)+'/P)')}
+    ${tile(fmt(a.qPP,2),'Quites/P')}
+    ${tile(fmt(a.ocgPP,2),'Ocasiones gen./P')}
+    ${tile(fmt(a.atPP,2),'Atajadas/P')}
     ${tile(a.minArcoPP==null?'–':fmt(a.minArcoPP,1),'Min. al arco/P')}
     ${tile(a.golMin==null?'–':fmt(a.golMin,2),'Goles/min arco')}
     ${tile(pct(a.winpct),'Win %')}
