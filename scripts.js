@@ -461,17 +461,18 @@ function leadMinutes(m){ const total=m.minutos; if(!total)return null;
   const st=s1>s2?1:s2>s1?2:0; acc[st]+=Math.max(0,total-prev); return acc; }
 // RESUMEN del partido (como el del anotador)
 function matchResumen(m){
-  const per={}; [1,2].forEach(t=>(m.players?.[t]||[]).forEach(p=>per[p]={g:0,a:0,sh:0,sv:0,q:0,oc:0,t}));
+  const per={}; [1,2].forEach(t=>(m.players?.[t]||[]).forEach(p=>per[p]={g:0,a:0,sh:0,shArco:0,sv:0,q:0,oc:0,t}));
   (m.events||[]).forEach(e=>{
     if(e.type==='gol'){ if(!e.enContra&&e.p1&&per[e.p1])per[e.p1].g++; if(e.p2&&per[e.p2])per[e.p2].a++; }
     else if(e.type==='tiro'){ if(e.p1&&per[e.p1])per[e.p1].sh++;
       if(e.p2&&per[e.p2])per[e.p2].oc++; }                                          // pase a remate = ocasión generada
     else if(e.type==='atajada'){ const k=e.gk||e.p1; if(k&&per[k])per[k].sv++;      // arquero que atajó (gk formato nuevo / p1 formato viejo)
+      if(e.gk&&e.p1&&per[e.p1]){ per[e.p1].sh++; per[e.p1].shArco++; }              // formato nuevo: p1 = pateador → tiro (al arco, atajado)
       if(e.p2&&per[e.p2])per[e.p2].oc++; }                                          // pase a remate atajado = ocasión generada
     else if(e.type==='quite'){ if(e.p1&&per[e.p1])per[e.p1].q++; }
     else if(e.type==='ocasion'){ if(e.p1&&per[e.p1])per[e.p1].oc++; }               // ocasión donde fue el pasador
   });
-  const xtra=v=>{ const p=[]; if(v.sh)p.push(v.sh+' T'); if(v.sv)p.push(v.sv+' 🧤'); if(v.q)p.push(v.q+' Q'); if(v.oc)p.push(v.oc+' Oc'); return p.length?`<span class="resx">${p.join(' · ')}</span>`:''; };
+  const xtra=v=>{ const p=[]; if(v.sh)p.push(v.sh+' T'+(v.shArco?' ('+v.shArco+' al arco)':'')); if(v.sv)p.push(v.sv+' 🧤'); if(v.q)p.push(v.q+' Q'); if(v.oc)p.push(v.oc+' Oc'); return p.length?`<span class="resx">${p.join(' · ')}</span>`:''; };
   const col=t=>{ const arr=Object.entries(per).filter(([p,v])=>v.t===t&&(v.g||v.a||v.sh||v.sv||v.q||v.oc))
       .map(([p,v])=>({p,v,tot:v.g+v.a})).sort((a,b)=>b.tot-a.tot||b.v.g-a.v.g||(b.v.sh+b.v.sv+b.v.q+b.v.oc)-(a.v.sh+a.v.sv+a.v.q+a.v.oc));
     const arco=(m.resumenJugadores||[]).filter(r=>r.equipo===t&&(r.minutosArco||0)>0).sort((a,b)=>b.minutosArco-a.minutosArco).map(r=>`${nm(r.jugador)} ${Math.round(r.minutosArco)}'`).join(' · ');
@@ -482,7 +483,7 @@ function matchResumen(m){
   const lm=leadMinutes(m); let chips='';
   if(lm)chips=`<div class="reschips"><span class="rchip t1">${m.t1||'Paredón'} ganó ${lm[1]}'</span><span class="rchip d">Empatados ${lm[0]}'</span><span class="rchip t2">${m.t2||'Canchita'} ganó ${lm[2]}'</span></div>`;
   const hasX=(m.events||[]).some(e=>e.type==='tiro'||e.type==='atajada'||e.type==='quite'||e.type==='ocasion');
-  const leg=hasX?`<div class="reslegend">G goles · A asist. · T tiros · 🧤 atajadas · Q quites · Oc ocasiones generadas</div>`:'';
+  const leg=hasX?`<div class="reslegend">G goles · A asist. · T tiros totales (al arco = atajados por el rival) · 🧤 atajadas · Q quites · Oc ocasiones generadas</div>`:'';
   return `<div class="resumen">${chips}${leg}<div class="rescols">${col(1)}${col(2)}</div></div>`;
 }
 // MODAL: timeline completo filtrable por tipo de jugada
