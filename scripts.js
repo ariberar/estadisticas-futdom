@@ -2,8 +2,8 @@
 
 let RAW = null;
 const PAL = ['--s1','--s2','--s3','--s4','--s5','--s6','--s7','--s8'];
-// Partidos que tienen timeline del anotador con links a YouTube (id -> ruta). Agregar acá los nuevos.
-const TIMELINES = {"32":"timelines/20260906_timeline.html","33":"timelines/20260913_timeline.html","34":"timelines/20260920_timeline.html"};
+// Partidos con timeline del anotador (id -> ruta). Se completa/actualiza desde manifest.json (`timelines`) al cargar; esto es solo el fallback para uso local (file://).
+let TIMELINES = {"32":"timelines/20260906_timeline.html","33":"timelines/20260913_timeline.html","34":"timelines/20260920_timeline.html"};
 // Partidos anotados con OTRO criterio de "ocasiones" → NO cuentan para Ocasiones generadas/P. Vacío: ya se limpiaron las ocasiones mal anotadas (P5/P6). Agregar ids acá si vuelve a pasar.
 const OCG_EXCLUDE = new Set([]);
 
@@ -582,6 +582,7 @@ async function loadRemote(){
   try{
     const base='data/';
     const mf=await fetch(base+'manifest.json',{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject('no manifest'));
+    if(mf.timelines){ Object.keys(mf.timelines).forEach(k=>{ TIMELINES[String(k)]='timelines/'+mf.timelines[k]; }); }  // el manifest es la fuente de los timelines
     if(mf.jugadores){ const j=await fetch(base+mf.jugadores,{cache:'no-store'}).then(r=>r.json()); ingest({jugadores:j.jugadores||j},true); }
     const files=mf.partidos||[];
     const objs=await Promise.all(files.map(f=>fetch(base+f,{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null)));

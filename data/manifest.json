@@ -35,5 +35,10 @@
   "partido_32_2026-09-06.json",
   "partido_33_2026-09-13.json",
   "partido_34_2026-09-20.json"
- ]
+ ],
+ "timelines": {
+  "32": "20260906_timeline.html",
+  "33": "20260913_timeline.html",
+  "34": "20260920_timeline.html"
+ }
 }

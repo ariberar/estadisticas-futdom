@@ -1,0 +1,1803 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anotador · Fútbol 7</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Public+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+  :root{
+    --bg:#0d1310; --surface:#141d18; --surface-2:#1a251e; --surface-3:#22302799;
+    --ink:#e7efe8; --muted:#9aa99f; --faint:#728278;
+    --line:#26332b; --line-strong:#37483d;
+    --pitch:#3fae74; --pitch-deep:#2b8b5a; --pitch-soft:#16271e;
+    --accent:#f0a836; --accent-ink:#f0a836;
+    --team1:#3f8fae; --team2:#e06a4f;
+    --gol:#3fae74; --tiro:#e0a53f; --atajada:#8f7fe0; --arquero:#e07fb0; --quite:#3fb0a0; --ocasion:#d08bc4; --falta:#e3d24e;
+    --danger:#e2724f;
+    --radius:12px;
+    --mono:"JetBrains Mono",ui-monospace,monospace;
+    --sans:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{margin:0;text-wrap:balance}
+  button{font-family:inherit;cursor:pointer}
+  .mono{font-family:var(--mono)}
+  .display{font-family:"Anton",var(--sans);font-weight:400;text-transform:uppercase;letter-spacing:.02em}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--pitch)}
+  a{color:var(--pitch)}
+  :focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+  .topbar{display:flex;align-items:center;gap:14px;padding:12px 20px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#0f3a26,#0d2a1c);position:sticky;top:0;z-index:20}
+  .topbar .logo{font-family:"Anton";text-transform:uppercase;letter-spacing:.03em;font-size:20px;color:#fff;line-height:1}
+  .topbar .logo span{color:var(--accent)}
+  .topbar .meta{font-family:var(--mono);font-size:12px;color:#bcd4c4;display:flex;gap:14px;flex-wrap:wrap}
+  .topbar .meta b{color:#fff;font-weight:700}
+  .topbar .spacer{flex:1}
+  .btn{border:1px solid var(--line-strong);background:var(--surface-2);color:var(--ink);border-radius:9px;padding:8px 13px;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:7px}
+  .btn:hover{border-color:var(--pitch)}
+  .btn.ghost{background:transparent}
+  .btn.small{padding:6px 10px;font-size:13px}
+  .btn.accent{background:var(--accent);color:#3a2600;border-color:var(--accent)}
+
+  .app{display:grid;grid-template-columns:1fr 400px;gap:0;height:calc(100vh - 57px)}
+  .stage{padding:18px 20px;overflow:auto}
+  .nv-banner{display:none;background:var(--pitch-soft);border:1px solid var(--pitch-deep);border-radius:12px;padding:14px 16px;font-size:14px;line-height:1.6;color:var(--ink);margin-bottom:14px}
+  body.no-video .nv-banner{display:block}
+  body.no-video .videowrap,body.no-video .timeline,body.no-video .transport,body.no-video .hint{display:none}
+  .side{border-left:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;overflow:hidden}
+  @media (max-width:960px){.app{grid-template-columns:1fr;height:auto}.side{border-left:0;border-top:1px solid var(--line)}}
+
+  .videowrap{background:#000;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);position:relative;aspect-ratio:16/9}
+  video{width:100%;height:100%;display:block;background:#000}
+  .videowrap .badge-speed{position:absolute;top:10px;right:10px;font-family:var(--mono);font-size:13px;font-weight:700;background:rgba(0,0,0,.6);color:var(--accent);padding:4px 9px;border-radius:7px;pointer-events:none}
+  .videowrap .badge-speed.hide{display:none}
+
+  .timeline{margin:14px 0 6px}
+  .scrub{position:relative;height:34px}
+  .scrub input[type=range]{position:absolute;inset:0;width:100%;height:34px;margin:0;-webkit-appearance:none;background:transparent;cursor:pointer}
+  .track{position:absolute;left:0;right:0;top:14px;height:6px;background:var(--surface-2);border-radius:4px;overflow:hidden}
+  .track .fill{position:absolute;left:0;top:0;bottom:0;background:var(--pitch);width:0}
+  .track .kick{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--accent);opacity:.85}
+  .track .kick.end{background:var(--danger)}
+  .scrub{cursor:pointer;touch-action:none}
+  .knob{position:absolute;top:8px;width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--pitch);transform:translateX(-50%);box-shadow:0 1px 5px rgba(0,0,0,.55);pointer-events:none;z-index:6}
+  .seg{position:absolute;top:11px;height:12px;width:2px;background:var(--faint);opacity:.7}
+  .mk{position:absolute;top:8px;width:9px;height:18px;transform:translateX(-50%);border-radius:2px;cursor:pointer;border:1px solid rgba(0,0,0,.4)}
+  .mk.gol{background:var(--gol)} .mk.tiro{background:var(--tiro)} .mk.atajada{background:var(--atajada)} .mk.arquero{background:var(--arquero)} .mk.quite{background:var(--quite)} .mk.ocasion{background:var(--ocasion)} .mk.falta{background:var(--falta)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:34px;background:transparent;cursor:pointer}
+  .clockrow{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:4px}
+  .clock{display:flex;align-items:baseline;gap:10px;font-family:var(--mono)}
+  .clock .big{font-size:26px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums}
+  .clock .sub{font-size:12px;color:var(--muted)}
+  .offset{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:5px 8px}
+  .offset b{color:var(--accent)}
+  .offset .btn{padding:5px 9px;font-size:12px}
+
+  .transport{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}
+  .transport .grp{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:4px}
+  .tbtn{border:0;background:transparent;color:var(--ink);border-radius:7px;padding:8px 11px;font-weight:600;font-size:14px;min-width:42px}
+  .tbtn:hover{background:var(--surface-2)}
+  .tbtn.play{background:var(--pitch);color:#04140b;min-width:52px}
+  .grp.speed{flex-wrap:wrap}
+  .speed .tbtn.on{background:var(--accent);color:#3a2600}
+  .transport .lbl{font-family:var(--mono);font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;align-self:center;margin-left:4px}
+
+  .actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
+  @media (max-width:560px){.actions{grid-template-columns:repeat(2,1fr)}}
+  .act{border:1px solid var(--line-strong);border-radius:var(--radius);padding:15px 10px;background:var(--surface);text-align:center;transition:transform .08s ease,border-color .12s}
+  .act:hover{transform:translateY(-2px)}
+  .act .k{font-family:var(--mono);font-size:11px;color:var(--faint);display:block;margin-bottom:8px}
+  .act .k kbd{background:var(--surface-2);border:1px solid var(--line-strong);border-radius:5px;padding:1px 7px;color:var(--ink);font-weight:700}
+  .act .name{font-family:"Anton";text-transform:uppercase;font-size:20px;letter-spacing:.02em}
+  .act.gol{border-color:#2c5d44} .act.gol .name{color:var(--gol)}
+  .act.tiro .name{color:var(--tiro)}
+  .act.atajada .name{color:var(--atajada)}
+  .act.arquero .name{color:var(--arquero);font-size:16px}
+  .act.quite .name{color:var(--quite);font-size:18px}
+  .act.ocasion .name{color:var(--ocasion);font-size:18px}
+  .act.falta .name{color:var(--falta);font-size:18px}
+  .act:hover.gol{border-color:var(--gol)} .act:hover.tiro{border-color:var(--tiro)} .act:hover.atajada{border-color:var(--atajada)} .act:hover.arquero{border-color:var(--arquero)} .act:hover.quite{border-color:var(--quite)} .act:hover.ocasion{border-color:var(--ocasion)} .act:hover.falta{border-color:var(--falta)}
+
+  .hint{font-family:var(--mono);font-size:12px;color:var(--faint);margin-top:16px;line-height:1.7}
+  .hint kbd{background:var(--surface-2);border:1px solid var(--line-strong);border-radius:5px;padding:1px 6px;color:var(--muted)}
+
+  .score{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;padding:16px 18px;border-bottom:1px solid var(--line)}
+  .score .t{text-align:center}
+  .score .t .nm{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .score .t .n{font-family:"Anton";font-size:44px;line-height:.9}
+  .score .t1 .n{color:var(--team1)} .score .t2 .n{color:var(--team2)}
+  .score .t .gk{font-size:11px;color:var(--arquero);font-family:var(--mono);margin-top:2px}
+  .score .dash{color:var(--faint);font-family:"Anton";font-size:26px}
+
+  .side .tabs{display:flex;border-bottom:1px solid var(--line)}
+  .side .tabs button{flex:1;background:transparent;border:0;color:var(--muted);padding:11px 6px;font-weight:700;font-size:13px;border-bottom:2px solid transparent}
+  .side .tabs button.on{color:var(--ink);border-bottom-color:var(--accent)}
+  .side .panel{flex:1;overflow:auto;padding:6px 0}
+  .side .panel.hide{display:none}
+
+  .evt{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;padding:9px 16px;border-bottom:1px solid var(--line);cursor:pointer}
+  .evt:hover{background:var(--surface-2)}
+  .evt .min{font-family:var(--mono);font-weight:700;font-size:14px;color:#fff;text-align:right;font-variant-numeric:tabular-nums}
+  .evt .min small{display:block;font-size:9px;color:var(--faint);font-weight:400}
+  .evt .desc .top{font-size:14px;font-weight:600}
+  .evt .desc .sub{font-size:12px;color:var(--muted)}
+  .evt .pill{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.05em;padding:3px 7px;border-radius:20px;font-weight:700}
+  .pill.gol{background:#14311f;color:var(--gol)}
+  .pill.tiro{background:#2f2812;color:var(--tiro)}
+  .pill.atajada{background:#211d33;color:var(--atajada)}
+  .pill.arquero{background:#2f1826;color:var(--arquero)}
+  .pill.quite{background:#122b28;color:var(--quite)}
+  .pill.ocasion{background:#2a1a28;color:var(--ocasion)}
+  .pill.falta{background:#2a2812;color:var(--falta)}
+  .evt .del{opacity:0;border:0;background:transparent;color:var(--danger);font-size:16px;padding:2px 6px}
+  .evt:hover .del{opacity:1}
+  .empty{padding:34px 20px;text-align:center;color:var(--faint);font-size:13px}
+  .empty .display{font-size:30px;color:var(--line-strong);display:block;margin-bottom:8px}
+
+  .exp{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+  .exp .row{display:flex;gap:8px;align-items:center}
+  .exp .row .btn{flex:1;justify-content:space-between}
+  .exp .cnt{font-family:var(--mono);font-size:12px;color:var(--faint)}
+  .exp h4{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);font-family:var(--mono);margin:8px 0 2px;font-weight:700}
+  .exp .note{font-size:12px;color:var(--muted);line-height:1.6}
+  .clipctl{display:flex;flex-direction:column;gap:8px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:2px 0 8px}
+  .clip-secs{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .clip-secs label{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);display:flex;align-items:center;gap:6px}
+  .clip-secs input{width:56px;background:var(--surface);border:1px solid var(--line-strong);border-radius:7px;padding:5px 7px;color:var(--ink);font-family:var(--mono);font-size:14px;text-align:center}
+  .clip-types{display:flex;gap:6px;flex-wrap:wrap}
+  .clipf{border:1px solid var(--line-strong);background:var(--surface);color:var(--faint);border-radius:20px;padding:4px 11px;font-weight:700;font-size:12px}
+  .clipf.on[data-f=gol]{color:var(--gol);border-color:var(--gol)}
+  .clipf.on[data-f=tiro]{color:var(--tiro);border-color:var(--tiro)}
+  .clipf.on[data-f=atajada]{color:var(--atajada);border-color:var(--atajada)}
+  .clipf.on[data-f=falta]{color:var(--falta);border-color:var(--falta)}
+  .clipctl select{background:var(--surface);color:var(--ink);border:1px solid var(--line-strong);border-radius:8px;padding:6px 9px;font-weight:600;font-size:13px}
+  .clip-secs select{background:var(--surface);color:var(--ink);border:1px solid var(--line-strong);border-radius:7px;padding:5px 7px;font-family:var(--mono);font-size:13px}
+  .tlf.allp.on,.clipf.allp.on{color:var(--accent);border-color:var(--accent)}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--pitch);color:#04140b;font-weight:700;padding:11px 20px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.5);z-index:60;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+
+  .setup{max-width:820px;margin:0 auto;padding:40px 22px 80px}
+  .setup h1{font-family:"Anton";text-transform:uppercase;font-size:clamp(2rem,6vw,3.2rem);line-height:.95;color:#fff}
+  .setup h1 span{color:var(--accent)}
+  .setup .lede{color:var(--muted);margin:12px 0 30px;max-width:56ch}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:18px}
+  .card h2{font-size:16px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+  .card h2 .num{font-family:"Anton";color:var(--pitch);font-size:22px}
+  .field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+  .field label{font-size:12px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--faint);font-weight:700}
+  .field input,.field select{background:var(--surface-2);border:1px solid var(--line-strong);border-radius:9px;padding:10px 12px;color:var(--ink);font-family:inherit;font-size:15px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:640px){.grid2{grid-template-columns:1fr}}
+  .teamcard{border:1px solid var(--line-strong);border-radius:10px;padding:14px}
+  .teamcard.t1{border-top:3px solid var(--team1)} .teamcard.t2{border-top:3px solid var(--team2)}
+  .roster{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}
+  .chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:20px;padding:5px 6px 5px 12px;font-size:13px;font-weight:600}
+  .chip button{border:0;background:transparent;color:var(--faint);font-size:14px;line-height:1;padding:0 2px}
+  .chip.gk{border-color:var(--accent)}
+  .chip .star{color:var(--accent);cursor:pointer;font-size:13px}
+  .addrow{display:flex;gap:8px}
+  .addrow input{flex:1}
+  .quick{font-size:12px;color:var(--muted);margin-top:6px}
+  .quick a{cursor:pointer}
+  .drop{border:2px dashed var(--line-strong);border-radius:12px;padding:26px;text-align:center;color:var(--muted);transition:.15s}
+  .drop.hot{border-color:var(--pitch);background:var(--pitch-soft)}
+  .vidlist{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+  .vidrow{display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;padding:7px 11px;background:var(--surface-2);border-radius:7px}
+  .vidrow .d{color:var(--pitch)}
+  .start{position:sticky;bottom:0;background:linear-gradient(180deg,transparent,var(--bg) 40%);padding-top:18px;display:flex;justify-content:flex-end;gap:12px}
+
+  .modal-bg{position:fixed;inset:0;background:rgba(4,10,7,.72);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+  .modal-bg.hide{display:none}
+  .modal{background:var(--surface);border:1px solid var(--line-strong);border-radius:16px;width:100%;max-width:520px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+  .modal .mhead{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+  .modal .mhead .display{font-size:24px}
+  .modal .mhead .display.gol{color:var(--gol)} .modal .mhead .display.tiro{color:var(--tiro)} .modal .mhead .display.atajada{color:var(--atajada)} .modal .mhead .display.arquero{color:var(--arquero)}
+  .modal .mhead .t-min{font-family:var(--mono);color:var(--accent);font-weight:700}
+  .modal .mbody{padding:18px 20px;display:flex;flex-direction:column;gap:16px;max-height:70vh;overflow:auto}
+  .modal .mfoot{padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .pickr label{font-size:12px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--faint);font-weight:700;display:block;margin-bottom:8px}
+  .opts{display:flex;flex-wrap:wrap;gap:7px}
+  .opt{border:1px solid var(--line-strong);background:var(--surface-2);color:var(--ink);border-radius:8px;padding:7px 12px;font-size:14px;font-weight:600}
+  .opt.on{background:var(--pitch);color:#04140b;border-color:var(--pitch)}
+  .opt.t1.on{background:var(--team1);border-color:var(--team1);color:#04121a}
+  .opt.t2.on{background:var(--team2);border-color:var(--team2);color:#1a0603}
+  .opt.none{color:var(--faint);font-style:italic}
+  .contra-note{font-size:12px;color:var(--arquero);font-family:var(--mono);margin-top:6px;display:none}
+  .contra-note.show{display:block}
+  .minirow{display:flex;align-items:center;gap:10px}
+  .minirow input{width:80px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:8px;padding:8px;color:var(--ink);font-family:var(--mono);font-size:15px;text-align:center}
+  .hidden{display:none!important}
+
+  /* ---- timeline overlay ---- */
+  .tl-overlay{position:fixed;inset:0;background:var(--bg);z-index:55;overflow:auto}
+  .tl-overlay.hide{display:none}
+  .tl-head{position:sticky;top:0;background:linear-gradient(180deg,#0f3a26,#0d2a1c);border-bottom:2px solid var(--accent);padding:16px 20px;display:flex;flex-direction:column;gap:10px;z-index:2}
+  .tl-score{display:flex;align-items:center;justify-content:center;gap:18px;font-family:"Anton";font-size:30px;color:#fff;line-height:1}
+  .tl-score .tl-tn{font-size:15px;font-family:var(--sans);font-weight:800;text-transform:uppercase;letter-spacing:.05em;max-width:34vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tl-score .t1{color:var(--team1)} .tl-score .t2{color:var(--team2)}
+  .tl-sub-head{text-align:center;font-family:var(--mono);font-size:12px;color:#a9c6b3}
+  .tl-filters{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  .tlf{border:1px solid var(--line-strong);background:rgba(0,0,0,.25);color:var(--faint);border-radius:20px;padding:5px 12px;font-weight:700;font-size:12px;user-select:none}
+  .ci{width:1em;height:1em;vertical-align:-0.15em;margin-right:1px;display:inline-block}
+  .tlf.on[data-f="gol"]{color:var(--gol);border-color:var(--gol)}
+  .tlf.on[data-f="tiro"]{color:var(--tiro);border-color:var(--tiro)}
+  .tlf.on[data-f="atajada"]{color:var(--atajada);border-color:var(--atajada)}
+  .tlf.on[data-f="asist"]{color:#56b6d9;border-color:#56b6d9}
+  .tlf.on[data-f="pase"]{color:#b39ddb;border-color:#b39ddb}
+  .tlf.on[data-f="ocasion"]{color:var(--ocasion);border-color:var(--ocasion)}
+  .tlf.on[data-f="quite"]{color:var(--quite);border-color:var(--quite)}
+  .tlf.on[data-f="falta"]{color:var(--falta);border-color:var(--falta)}
+  .clipf.on[data-f="asist"]{color:#56b6d9;border-color:#56b6d9}
+  .clipf.on[data-f="pase"]{color:#b39ddb;border-color:#b39ddb}
+  .clipf.on[data-f="ocasion"]{color:var(--ocasion);border-color:var(--ocasion)}
+  .clipf.on[data-f="quite"]{color:var(--quite);border-color:var(--quite)}
+  .tl-track{max-width:800px;margin:26px auto;position:relative;padding:0 10px}
+  .tl-track::before{content:"";position:absolute;top:6px;bottom:6px;left:50%;width:2px;background:var(--line-strong);transform:translateX(-50%)}
+  .tl-row{display:grid;grid-template-columns:1fr 72px 1fr;align-items:center;margin:12px 0}
+  @media (max-width:600px){.tl-row{grid-template-columns:1fr 52px 1fr}.tl-track{margin:16px auto}}
+  .tl-axis{display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;z-index:1}
+  .tl-dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--bg)}
+  .tl-dot.gol{width:19px;height:19px;background:var(--gol);box-shadow:0 0 0 3px rgba(63,174,116,.2)}
+  .tl-dot.tiro{background:var(--tiro)} .tl-dot.atajada{background:var(--atajada)} .tl-dot.falta{background:var(--falta)} .tl-dot.ocasion{background:var(--ocasion)} .tl-dot.quite{background:var(--quite)}
+  .tl-min{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--bg);padding:0 4px}
+  .tl-cell.L{display:flex;justify-content:flex-end}
+  .tl-card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 13px;cursor:pointer;transition:border-color .12s;max-width:340px}
+  .tl-card:hover{border-color:var(--pitch)}
+  .tl-row.left .tl-card{text-align:right}
+  .tl-card.gol{border-left:3px solid var(--gol)}
+  .tl-row.right .tl-card.gol{border-left:1px solid var(--line);border-right:3px solid var(--gol)}
+  .tl-card.falta{border-color:var(--line);opacity:.92}
+  .tl-card.ocasion,.tl-card.quite{border-color:var(--line);opacity:.95}
+  .tl-scoremini{font-family:"Anton";font-size:19px;color:#fff;line-height:1;margin-bottom:3px}
+  .tl-main{font-weight:700;font-size:14px}
+  .tl-detail{font-size:12px;color:var(--muted);margin-top:1px}
+  .tl-card .c{color:var(--arquero)}
+  .tl-empty{max-width:520px;margin:60px auto;text-align:center;color:var(--faint)}
+  .tl-filters select{background:rgba(0,0,0,.25);color:var(--ink);border:1px solid var(--line-strong);border-radius:20px;padding:5px 10px;font-weight:700;font-size:12px}
+  .tl-bookend{text-align:center;margin:20px 0;position:relative;z-index:1}
+  .tl-bookend a,.tl-bookend span.bk{display:inline-block;background:var(--surface);border:1px solid var(--accent);border-radius:22px;padding:6px 16px;font-family:"Anton";text-transform:uppercase;letter-spacing:.03em;font-size:14px;color:var(--accent);text-decoration:none}
+  .tl-bookend a:hover{background:var(--pitch-soft)}
+  /* ---- resumen ---- */
+  .sum{max-width:820px;margin:8px auto 50px;padding:0 16px}
+  .sum h3{font-family:"Anton";text-transform:uppercase;text-align:center;font-size:22px;color:#fff;margin:26px 0 12px}
+  .sum-flow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:0 0 24px}
+  .sum-flow .pill{font-family:var(--mono);font-size:12px;font-weight:700;border-radius:20px;padding:7px 14px;border:1px solid var(--line-strong);background:var(--surface)}
+  .sum-flow .pill.p1{color:var(--team1);border-color:var(--team1)}
+  .sum-flow .pill.p2{color:var(--team2);border-color:var(--team2)}
+  .sum-flow .pill.pe{color:var(--muted)}
+  .sum-teams{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:600px){.sum-teams{grid-template-columns:1fr}}
+  .sum-team{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .sum-team.sum-t1{border-top:3px solid var(--team1)} .sum-team.sum-t2{border-top:3px solid var(--team2)}
+  .sum-team h4{font-size:13px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;font-weight:800}
+  .sum-team.sum-t1 h4{color:var(--team1)} .sum-team.sum-t2 h4{color:var(--team2)}
+  .imp-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--line)}
+  .imp-row:last-child{border-bottom:0}
+  .imp-row .who{font-weight:700;font-size:14px}
+  .imp-row .st{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap;text-align:right}
+  .imp-row{align-items:flex-start}
+  .imp-x{color:var(--faint);font-size:10px}
+  .imp-row .st b{color:var(--accent)}
+  .imp-empty{color:var(--faint);font-size:13px;padding:6px 0}
+  .arco{margin-top:10px;font-size:12px;color:var(--muted);font-family:var(--mono);border-top:1px dashed var(--line-strong);padding-top:8px}
+</style>
+</head>
+<body>
+
+<!-- ============ SETUP ============ -->
+<section id="setup" class="setup">
+  <div class="eyebrow">Anotador de partidos</div>
+  <h1>Cargá el partido<br>y <span>a marcar</span></h1>
+  <p class="lede">Reproducí los videos del partido como una sola línea de tiempo, marcá goles, tiros, atajadas y cambios de arquero con el teclado, y exportá filas listas para pegar en tu Google Sheet. Todo corre en tu compu — los videos no se suben a ningún lado.</p>
+  <p class="quick" style="margin:-18px 0 26px">¿Retomar un partido que ya anotaste? <a onclick="document.getElementById('loadjson').click()"><b>Abrí su archivo .json</b></a> y después: cargás los videos y seguís anotando, o le das <b>"✎ Editar sin video"</b> (abajo) para corregir/borrar anotaciones sin subir ningún video.<input id="loadjson" type="file" accept=".json,application/json" class="hidden"></p>
+
+  <div class="card">
+    <h2><span class="num">1</span> Datos del partido</h2>
+    <div class="grid2">
+      <div class="field"><label>ID partido</label><input id="s-id" type="number" min="1" placeholder="p. ej. 24"></div>
+      <div class="field"><label>Fecha</label><input id="s-fecha" type="date"></div>
+    </div>
+    <div class="grid2">
+      <div class="field"><label>Torneo</label><input id="s-torneo" value="dominguero" placeholder="p. ej. dominguero"></div>
+      <div class="field"><label>Formato</label><select id="s-formato"><option value="F7">F7</option><option value="F5">F5</option><option value="F6">F6</option><option value="F8">F8</option><option value="F11">F11</option></select></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">2</span> Equipos y jugadores</h2>
+    <p class="note" style="color:var(--muted);font-size:13px;margin:-6px 0 14px">Marcá al arquero <b>inicial</b> de cada equipo con la ⭐. Durante el partido registrás los cambios de arquero con el botón/tecla <b>C</b>, y la app calcula los minutos en el arco de cada uno.</p>
+    <div class="grid2">
+      <div class="teamcard t1">
+        <div class="field"><label>Nombre equipo 1 (id_equipo 1)</label><input id="s-t1name" value="Paredón"></div>
+        <div class="roster" id="roster1"></div>
+        <div class="addrow"><input id="add1" placeholder="Agregar jugador + Enter"><button class="btn small" onclick="addPlayer(1)">Agregar</button></div>
+      </div>
+      <div class="teamcard t2">
+        <div class="field"><label>Nombre equipo 2 (id_equipo 2)</label><input id="s-t2name" value="Canchita"></div>
+        <div class="roster" id="roster2"></div>
+        <div class="addrow"><input id="add2" placeholder="Agregar jugador + Enter"><button class="btn small" onclick="addPlayer(2)">Agregar</button></div>
+      </div>
+    </div>
+    <p class="quick">Rápido: <a onclick="fillSample()">cargar un roster de ejemplo</a></p>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">3</span> Videos del partido</h2>
+    <div class="drop" id="drop">
+      <input id="files" type="file" accept="video/*" multiple class="hidden">
+      <b>Arrastrá tus .mp4 acá</b> o <a onclick="document.getElementById('files').click()">elegí los archivos</a><br>
+      <span style="font-size:13px">Seleccioná los videos en orden (video_1, video_2, …), sean los que sean. Se encadenan solos.</span>
+    </div>
+    <div class="vidlist" id="vidlist"></div>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">4</span> Links para compartir <span style="font-size:12px;color:var(--faint);font-weight:400;font-family:var(--mono)">(opcional)</span></h2>
+    <div class="field">
+      <label>YouTube — partido completo <span style="color:var(--pitch)">(recomendado: anda en el celular)</span></label>
+      <input id="s-youtube" placeholder="https://www.youtube.com/watch?v=XXXX" style="font-family:var(--mono);font-size:13px">
+    </div>
+    <p class="note" style="color:var(--muted);font-size:13px;margin:2px 0 4px">Subí el partido <b>unido</b> a YouTube (podés dejarlo "no listado") y pegá el link acá. Al generar la página para compartir, cada jugada abre YouTube en el segundo exacto (15 s antes), también en el teléfono.</p>
+    <details style="margin-top:10px">
+      <summary style="cursor:pointer;font-size:13px;color:var(--faint)">…o usar Google Drive (los 5 videos, solo compu)</summary>
+      <p class="note" style="color:var(--muted);font-size:13px;margin:8px 0 8px">Pegá el link de cada video de Drive, <b>uno por línea, en el mismo orden que arriba</b>, compartidos como "cualquiera con el enlace". Si cargás YouTube, se usa YouTube.</p>
+      <textarea id="s-drive" rows="4" placeholder="https://drive.google.com/file/d/XXXX/view&#10;..." style="width:100%;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:9px;padding:10px 12px;color:var(--ink);font-family:var(--mono);font-size:12px;resize:vertical"></textarea>
+    </details>
+  </div>
+
+  <div class="start">
+    <button class="btn" style="font-size:15px;padding:12px 18px" onclick="startEditNoVideo()" title="Corregir anotaciones de un .json sin cargar el video">✎ Editar sin video</button>
+    <button class="btn accent" style="font-size:16px;padding:12px 22px" onclick="startMatch()">Empezar a anotar ▸</button>
+  </div>
+</section>
+
+<!-- ============ APP ============ -->
+<div id="main" class="hidden">
+  <div class="topbar">
+    <div class="logo">FÚTBOL<span>7</span></div>
+    <div class="meta">
+      <span>Partido <b id="m-id">—</b></span>
+      <span id="m-fecha">—</span>
+      <span id="m-vid">vid 1/5</span>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn ghost small" onclick="openTimeline()">📊 Timeline</button>
+    <button class="btn ghost small" onclick="saveJSON()">⬇ Guardar partido</button>
+    <button class="btn ghost small" onclick="clearEvents()" title="Borra todas las anotaciones de este partido">🗑 Borrar todo</button>
+    <button class="btn ghost small" onclick="newMatch(false)" title="Empezar a anotar otro partido (mantiene los jugadores)">＋ Partido nuevo</button>
+    <button class="btn ghost small" onclick="backToSetup()">Editar equipos</button>
+  </div>
+
+  <div class="app">
+    <!-- STAGE -->
+    <div class="stage">
+      <div id="novideo-banner" class="nv-banner">
+        <b>✎ Modo edición sin video.</b> Editá o borrá anotaciones desde la lista de la derecha (doble-clic para editar, ✕ para borrar). Para agregar una nueva, tocá el evento (o su tecla) y poné el <b>minuto</b> a mano. Al terminar, <b>⬇ Guardar partido</b>.
+      </div>
+      <div class="videowrap">
+        <video id="video" playsinline></video>
+        <div class="badge-speed hide" id="speedBadge">2×</div>
+      </div>
+
+      <div class="timeline">
+        <div class="scrub" id="scrub" role="slider" tabindex="0" aria-label="Línea de tiempo del partido" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="track"><div class="fill" id="fill"></div><div class="kick hidden" id="kick"></div><div class="kick end hidden" id="kickend"></div></div>
+          <div id="segs"></div>
+          <div id="marks"></div>
+          <div class="knob" id="knob" style="left:0%"></div>
+        </div>
+        <div class="clockrow">
+          <div class="clock">
+            <span class="big" id="clock">00:00</span>
+            <span class="sub">/ <span id="clocktot">00:00</span> · minuto <b id="clockmin">0</b></span>
+          </div>
+          <div class="offset">
+            <span>inicio</span> <b id="offlbl">00:00</b>
+            <button class="btn small" onclick="setKickoff()" title="El minuto 0 del partido arranca acá">⚑ acá</button>
+            <button class="btn small ghost" onclick="clearKickoff()" title="Borrar inicio">✕</button>
+            <span style="margin-left:8px">fin</span> <b id="endlbl">—</b>
+            <button class="btn small" onclick="setMatchEnd()" title="El partido termina acá (no cuenta la cola de filmación)">⚑ acá</button>
+            <button class="btn small ghost" onclick="clearMatchEnd()" title="Borrar fin">✕</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="transport">
+        <div class="grp">
+          <button class="tbtn" onclick="skip(-10)" title="−10s (J)">«10</button>
+          <button class="tbtn" onclick="skip(-5)" title="−5s (←)">«5</button>
+          <button class="tbtn play" id="playbtn" onclick="togglePlay()" title="Espacio">▶</button>
+          <button class="tbtn" onclick="skip(5)" title="+5s (→)">5»</button>
+          <button class="tbtn" onclick="skip(10)" title="+10s (L)">10»</button>
+        </div>
+        <div class="grp speed" id="speedgrp">
+          <span class="lbl">vel</span>
+          <button class="tbtn" data-rate="0.5" onclick="setRate(0.5)">.5×</button>
+          <button class="tbtn on" data-rate="1" onclick="setRate(1)">1×</button>
+          <button class="tbtn" data-rate="1.5" onclick="setRate(1.5)">1.5×</button>
+          <button class="tbtn" data-rate="2" onclick="setRate(2)">2×</button>
+          <button class="tbtn" data-rate="3" onclick="setRate(3)">3×</button>
+          <button class="tbtn" data-rate="4" onclick="setRate(4)">4×</button>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="act gol" onclick="openEvent('gol')"><span class="k"><kbd>G</kbd></span><span class="name">Gol</span></button>
+        <button class="act tiro" onclick="openEvent('tiro')"><span class="k"><kbd>T</kbd></span><span class="name">Tiro</span></button>
+        <button class="act atajada" onclick="openEvent('atajada')"><span class="k"><kbd>A</kbd></span><span class="name">Atajada</span></button>
+        <button class="act quite" onclick="openEvent('quite')"><span class="k"><kbd>Q</kbd></span><span class="name">Quite</span></button>
+        <button class="act ocasion" onclick="openEvent('ocasion')"><span class="k"><kbd>O</kbd></span><span class="name">Ocasión</span></button>
+        <button class="act falta" onclick="openEvent('falta')"><span class="k"><kbd>F</kbd></span><span class="name">Falta</span></button>
+        <button class="act arquero" onclick="openEvent('arquero')"><span class="k"><kbd>C</kbd></span><span class="name">Cambio arq.</span></button>
+      </div>
+
+      <div class="hint">
+        Atajos: <kbd>Espacio</kbd> pausa · <kbd>←</kbd><kbd>→</kbd> ±5s · <kbd>J</kbd><kbd>L</kbd> ±10s · <kbd>1</kbd>…<kbd>6</kbd> velocidad (.5/1/1.5/2/3/4×) · <kbd>G</kbd> gol · <kbd>T</kbd> tiro · <kbd>A</kbd> atajada · <kbd>Q</kbd> quite · <kbd>O</kbd> ocasión · <kbd>F</kbd> falta · <kbd>C</kbd> cambio de arquero.<br>
+        <b style="color:var(--muted)">Atajada</b> = remate al arco que ataja el arquero (lleva asistencia). <b style="color:var(--muted)">Tiro</b> = remate desviado, al palo o tapado.<br>
+        Marcá primero el <b>inicio del partido</b> (⚑) cuando termina el calentamiento: los minutos se cuentan netos desde ahí.
+      </div>
+    </div>
+
+    <!-- SIDE -->
+    <div class="side">
+      <div class="score">
+        <div class="t t1"><div class="nm" id="sc-n1">Paredón</div><div class="n" id="sc-g1">0</div><div class="gk" id="sc-gk1"></div></div>
+        <div class="dash">–</div>
+        <div class="t t2"><div class="nm" id="sc-n2">Canchita</div><div class="n" id="sc-g2">0</div><div class="gk" id="sc-gk2"></div></div>
+      </div>
+      <div class="tabs">
+        <button class="on" data-tab="eventos" onclick="setTab('eventos')">Eventos</button>
+        <button data-tab="export" onclick="setTab('export')">Exportar</button>
+      </div>
+      <div class="panel" id="panel-eventos"></div>
+      <div class="panel hide" id="panel-export">
+        <div class="exp">
+          <p class="note">Copiá cada bloque y pegalo en la pestaña correspondiente de tu Sheet, <b>arrancando en la columna <span class="mono">id_partido</span></b>. Las columnas salen en el orden exacto de tu planilla.</p>
+          <h4>Filas por tabla</h4>
+          <div class="row"><button class="btn" onclick="copyTable('gol')">Copiar <b>goles</b> <span class="cnt" id="cnt-gol">0</span></button></div>
+          <div class="row"><button class="btn" onclick="copyTable('tiro')">Copiar <b>tiros</b> <span class="cnt" id="cnt-tiro">0</span></button></div>
+          <div class="row"><button class="btn" onclick="copyTable('atajada')">Copiar <b>atajadas</b> <span class="cnt" id="cnt-atajada">0</span></button></div>
+          <div class="row"><button class="btn" onclick="copyArqueros()">Copiar <b>equipos</b> (minutos en arco)</button></div>
+          <div class="row"><button class="btn" onclick="copyTable('quite')">Copiar <b>quites</b> <span class="cnt" id="cnt-quite">0</span></button></div>
+          <div class="row"><button class="btn" onclick="copyTable('ocasion')">Copiar <b>ocasiones</b> <span class="cnt" id="cnt-ocasion">0</span></button></div>
+          <div class="row"><button class="btn" onclick="copyTable('falta')">Copiar <b>faltas</b> <span class="cnt" id="cnt-falta">0</span></button></div>
+          <p class="note"><b>atajadas</b>: id_partido · minuto · id_atajador · id_pateador · id_asistidor · tipo (agregá la columna <span class="mono">id_asistidor</span>). &nbsp; <b>quites</b>: id_partido · id_equipo · jugador · minuto · tipo. &nbsp; <b>ocasiones</b> → pestaña pases. &nbsp; <b>faltas</b>: id_partido · id_equipo · minuto · infractor · receptor · tipo.</p>
+          <h4>Resumen del partido</h4>
+          <div class="row"><button class="btn" onclick="copyPartido()">Copiar fila de <b>partidos</b></button></div>
+          <h4>Clips (highlights)</h4>
+          <div class="clipctl">
+            <div class="clip-secs">
+              <label>seg. antes <input id="clip-pre" type="number" min="0" value="17"></label>
+              <label>seg. después <input id="clip-post" type="number" min="0" value="3"></label>
+              <label>calidad
+                <select id="clip-res"><option value="">4K / original</option><option value="1080">1080p</option><option value="720">720p</option></select>
+              </label>
+            </div>
+            <div class="clip-types">
+              <button class="clipf on" data-f="gol" onclick="this.classList.toggle('on')">Goles</button>
+              <button class="clipf on" data-f="asist" onclick="this.classList.toggle('on')">Asistencias</button>
+              <button class="clipf" data-f="tiro" onclick="this.classList.toggle('on')">Tiros</button>
+              <button class="clipf" data-f="pase" onclick="this.classList.toggle('on')">Pases</button>
+              <button class="clipf on" data-f="atajada" onclick="this.classList.toggle('on')">Atajadas</button>
+              <button class="clipf" data-f="ocasion" onclick="this.classList.toggle('on')">Ocasiones</button>
+              <button class="clipf" data-f="quite" onclick="this.classList.toggle('on')">Quites</button>
+              <button class="clipf" data-f="falta" onclick="this.classList.toggle('on')">Faltas</button>
+            </div>
+            <div class="clip-secs">
+              <select id="clip-player"><option value="">Todos los jugadores</option></select>
+            </div>
+          </div>
+          <div class="row"><button class="btn" onclick="copyClips()">Copiar comandos <b>ffmpeg</b> (video local)</button></div>
+          <div class="row"><button class="btn" onclick="copyClipsYT()">Copiar comandos <b>yt-dlp</b> (desde YouTube)</button></div>
+          <p class="note">Los comandos respetan los filtros de arriba (segundos antes/después, tipo de jugada y jugador). <b>ffmpeg</b>: corta del partido unido en tu disco. <b>yt-dlp</b>: baja <b>solo</b> esos tramos desde tu video de YouTube — no necesitás el partido guardado en el disco.</p>
+          <h4>Compartir</h4>
+          <div class="row"><button class="btn" onclick="shareTimeline()">🔗 Página del timeline (links a YouTube)</button></div>
+          <p class="note">Genera un <span class="mono">.html</span> con el timeline; al tocar una jugada abre el video en YouTube 15 s antes (también en el celular). Cargá el link de YouTube en el paso 4 del inicio. Si no cargaste YouTube, usa los links de Drive.</p>
+          <h4>Respaldo</h4>
+          <div class="row"><button class="btn" onclick="saveJSON()">⬇ Descargar partido (.json)</button></div>
+          <p class="note">Guardá el .json para retomar después o para que otro lo abra en <b>modo espectador</b> junto con los videos.</p>
+          <h4>☁ Publicar al repo (GitHub)</h4>
+          <div class="row"><button class="btn accent" id="gh-pub-btn" onclick="publishToRepo(this)">☁ Publicar partido al repo</button></div>
+          <div id="gh-status" style="font-size:12px;color:var(--muted);margin:2px 0 6px;font-family:var(--mono);white-space:pre-wrap"></div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin:2px 0 4px">
+            <input id="gh-repo" placeholder="repo (ariberar/estadisticas-futdom)" spellcheck="false" style="padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font-family:var(--mono);font-size:12px">
+            <input id="gh-branch" placeholder="rama (main)" spellcheck="false" style="padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font-family:var(--mono);font-size:12px">
+            <input id="gh-token" type="password" placeholder="token (github_pat_…)" autocomplete="off" spellcheck="false" style="padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font-family:var(--mono);font-size:12px">
+          </div>
+          <p class="note">Sube el <b>.json</b> a <span class="mono">data/</span>, el <b>timeline</b> a <span class="mono">timelines/</span> y actualiza <span class="mono">manifest.json</span>, todo en <b>un commit</b>. GitHub Pages re-publica solo en ~1–2 min. El token se guarda <b>solo en este navegador</b>. Creá un <b>fine-grained token</b> con acceso a este único repo y permiso <b>Contents: Read and write</b> en <span class="mono">github.com/settings/tokens?type=beta</span>. Podés revocarlo cuando quieras.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL ============ -->
+<div class="modal-bg hide" id="modal">
+  <div class="modal">
+    <div class="mhead">
+      <span class="display" id="mo-title">Gol</span>
+      <span class="t-min mono">min <span id="mo-min-lbl">0</span></span>
+    </div>
+    <div class="mbody">
+      <div class="pickr" id="grp-team">
+        <label id="lbl-team">¿Qué equipo marcó?</label>
+        <div class="opts">
+          <button class="opt t1" data-team="1" onclick="pickTeam(1)"></button>
+          <button class="opt t2" data-team="2" onclick="pickTeam(2)"></button>
+        </div>
+      </div>
+      <div class="pickr" id="grp-tipo"><label>Tipo</label><div class="opts" id="opts-tipo"></div></div>
+      <div class="pickr" id="grp-p1"><label id="lbl-p1">Anotador</label><div class="opts" id="opts-p1"></div><div class="contra-note" id="contra-note">Gol en contra: elegí al jugador del equipo rival que lo hizo.</div></div>
+      <div class="pickr" id="grp-p2"><label id="lbl-p2">Asistencia</label><div class="opts" id="opts-p2"></div></div>
+      <div class="pickr" id="grp-gk"><label id="lbl-gk">Arquero</label><div class="opts" id="opts-gk"></div></div>
+      <div class="pickr">
+        <label>Minuto</label>
+        <div class="minirow">
+          <input id="mo-min" type="number" min="0">
+          <span class="note" style="color:var(--muted)">se prellena con el minuto neto; ajustalo si querés</span>
+        </div>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn ghost" onclick="closeModal()">Cancelar (Esc)</button>
+      <button class="btn accent" onclick="saveEvent()">Guardar (Enter)</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TIMELINE OVERLAY ============ -->
+<div class="tl-overlay hide" id="tloverlay">
+  <div class="tl-head">
+    <div class="tl-score">
+      <span class="tl-tn t1" id="tl-n1">Equipo 1</span>
+      <span class="tl-gg"><b id="tl-g1">0</b> – <b id="tl-g2">0</b></span>
+      <span class="tl-tn t2" id="tl-n2">Equipo 2</span>
+    </div>
+    <div class="tl-sub-head" id="tl-meta"></div>
+    <div class="tl-filters">
+      <span id="tl-chipbar"></span>
+      <select id="tl-player" onchange="tlPlayer=this.value;renderTimeline()"><option value="">Todos los jugadores</option></select>
+      <button class="btn small" onclick="closeTimeline()">Cerrar ✕</button>
+    </div>
+  </div>
+  <div class="tl-scroll" id="tl-scroll"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ ESTADO ============ */
+const TIPOS_GOL = ['en contra','cabeza','rebote','pierna no habil','olimpico','tiro fuera del area','dentro del area','mano a mano','pecho','penal','tiro libre','volea','tres dedos','taco','picadita'];
+const TIPOS_TIRO = ['en contra','cabeza','rebote','pierna no habil','olimpico','tiro fuera del area','dentro del area','mano a mano','pecho','penal','travesaño','palo','tiro libre'];
+const TYPES = {
+  gol:{label:'Gol', tipos:TIPOS_GOL},
+  tiro:{label:'Tiro', tipos:TIPOS_TIRO},
+  atajada:{label:'Atajada', tipos:TIPOS_GOL},
+  quite:{label:'Quite / Robo', tipos:['area propia','genera gol','normal']},
+  ocasion:{label:'Ocasión', tipos:[]},
+  falta:{label:'Falta', tipos:['foul','mano','penal']},
+  arquero:{label:'Cambio de arquero', tipos:[]}
+};
+let M = {
+  id:'', fecha:'', t1:'Paredón', t2:'Canchita', offset:0, matchEnd:0,
+  driveLinks:[], durs:[], youtube:'', torneo:'dominguero', formato:'F7',
+  players:{1:[],2:[]}, gk:{1:null,2:null},
+  events:[]   // {id,type,tSec,minOverride,team,p1,p2,tipo,gk}
+};
+let files=[], urls=[], durs=[], offs=[], total=0, curIdx=0, curRate=1;
+let noVideo=false;
+let modalCtx=null;
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const vid=$('#video');
+
+/* ============ SETUP ============ */
+$('#s-fecha').valueAsDate=new Date();
+function addPlayer(team, name){
+  const inp=$('#add'+team);
+  name = name || inp.value.trim();
+  if(!name) return;
+  name.split(',').map(s=>s.trim()).filter(Boolean).forEach(n=>{
+    if(!M.players[team].includes(n)) M.players[team].push(n);
+  });
+  inp.value=''; renderRosters();
+}
+['add1','add2'].forEach((id,i)=>$('#'+id).addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addPlayer(i+1);}}));
+function removePlayer(team,n){ M.players[team]=M.players[team].filter(x=>x!==n); if(M.gk[team]===n)M.gk[team]=null; renderRosters(); }
+function setGK(team,n){ M.gk[team]= M.gk[team]===n?null:n; renderRosters(); }
+function renderRosters(){
+  [1,2].forEach(t=>{
+    const el=$('#roster'+t); el.innerHTML='';
+    M.players[t].forEach(n=>{
+      const isgk=M.gk[t]===n;
+      const c=document.createElement('span'); c.className='chip'+(isgk?' gk':'');
+      c.innerHTML=`<span class="star" title="Marcar arquero inicial">${isgk?'⭐':'☆'}</span> ${n} <button title="Quitar">✕</button>`;
+      c.querySelector('.star').onclick=()=>setGK(t,n);
+      c.querySelector('button').onclick=()=>removePlayer(t,n);
+      el.appendChild(c);
+    });
+  });
+}
+function fillSample(){
+  M.players[1]=['Lunge','Berar','J','Julo','Gordo','Fer','Nico'];
+  M.players[2]=['NicoP','Vic','Alejo','TomiL','Godo','Lea','Ale'];
+  M.gk[1]='Gordo'; M.gk[2]='Godo'; renderRosters();
+}
+
+const drop=$('#drop');
+$('#files').addEventListener('change',e=>loadFiles([...e.target.files]));
+['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('hot')}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('hot')}));
+drop.addEventListener('drop',e=>loadFiles([...e.dataTransfer.files].filter(f=>f.type.startsWith('video'))));
+function loadFiles(fl){
+  if(!fl.length)return;
+  fl.sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true}));
+  files=fl; urls=fl.map(f=>URL.createObjectURL(f));
+  const list=$('#vidlist'); list.innerHTML='';
+  durs=new Array(fl.length).fill(0);
+  fl.forEach((f,i)=>{
+    const row=document.createElement('div'); row.className='vidrow';
+    row.innerHTML=`<span>${i+1}. ${f.name}</span><span class="d" id="dur${i}">…</span>`;
+    list.appendChild(row);
+    const tmp=document.createElement('video'); tmp.preload='metadata'; tmp.src=urls[i];
+    tmp.onloadedmetadata=()=>{ durs[i]=tmp.duration; $('#dur'+i).textContent=fmt(tmp.duration); recalcOffsets(); };
+  });
+}
+function recalcOffsets(){ offs=[]; let acc=0; durs.forEach(d=>{offs.push(acc); acc+=d||0;}); total=acc; }
+
+/* ============ START ============ */
+function startMatch(){
+  if(!files.length){toast('Cargá al menos un video');return;}
+  if(!M.players[1].length||!M.players[2].length){toast('Cargá jugadores en los dos equipos');return;}
+  M.id=$('#s-id').value||''; M.fecha=$('#s-fecha').value||'';
+  M.t1=$('#s-t1name').value||'Equipo 1'; M.t2=$('#s-t2name').value||'Equipo 2';
+  M.torneo=($('#s-torneo').value||'').trim(); M.formato=$('#s-formato').value||'F7';
+  M.durs=durs.slice();
+  M.driveLinks=($('#s-drive').value||'').split('\n').map(s=>s.trim()).filter(Boolean);
+  M.youtube=($('#s-youtube').value||'').trim();
+  noVideo=false; document.body.classList.remove('no-video');
+  $('#setup').classList.add('hidden'); $('#main').classList.remove('hidden');
+  $('#m-id').textContent=M.id||'—';
+  $('#m-fecha').textContent=fmtDate(M.fecha);
+  $('#sc-n1').textContent=M.t1; $('#sc-n2').textContent=M.t2;
+  buildSegs(); loadVideo(0,0,false); renderAll(); updateOffsetUI();
+  saveLocal();
+}
+/* ---- editar anotaciones sin cargar video ---- */
+function startEditNoVideo(){
+  if(!M.players[1].length||!M.players[2].length){toast('Abrí primero un .json (o cargá los jugadores)');return;}
+  M.id=$('#s-id').value||M.id||''; M.fecha=$('#s-fecha').value||M.fecha||'';
+  M.t1=$('#s-t1name').value||M.t1||'Equipo 1'; M.t2=$('#s-t2name').value||M.t2||'Equipo 2';
+  M.torneo=($('#s-torneo').value||M.torneo||'').trim(); M.formato=$('#s-formato').value||M.formato||'F7';
+  M.driveLinks=($('#s-drive').value||'').split('\n').map(s=>s.trim()).filter(Boolean);
+  M.youtube=($('#s-youtube').value||'').trim();
+  noVideo=true; document.body.classList.add('no-video');
+  files=[]; urls=[]; durs=(M.durs&&M.durs.length)?M.durs.slice():[]; recalcOffsets();
+  $('#setup').classList.add('hidden'); $('#main').classList.remove('hidden');
+  $('#m-id').textContent=M.id||'—'; $('#m-vid').textContent='sin video';
+  $('#m-fecha').textContent=fmtDate(M.fecha);
+  $('#sc-n1').textContent=M.t1; $('#sc-n2').textContent=M.t2;
+  renderAll(); updateOffsetUI(); saveLocal();
+  toast('Modo edición sin video ✎ — editá/borrá desde la lista, poné el minuto a mano para agregar.');
+}
+function backToSetup(){ noVideo=false; document.body.classList.remove('no-video'); $('#main').classList.add('hidden'); $('#setup').classList.remove('hidden'); renderRosters(); }
+
+/* ============ VIDEO / TIMELINE ============ */
+function loadVideo(idx, localT=0, play=false){
+  if(idx<0||idx>=urls.length)return;
+  curIdx=idx; vid.src=urls[idx];
+  vid.onloadedmetadata=()=>{ vid.currentTime=localT; vid.playbackRate=curRate; if(play)vid.play(); $('#m-vid').textContent=`vid ${idx+1}/${urls.length}`; };
+  vid.playbackRate=curRate;
+}
+function matchTime(){ return (offs[curIdx]||0) + (vid.currentTime||0); }
+function seekMatch(t){
+  t=Math.max(0,Math.min(t,total-0.1));
+  let idx=0; for(let i=0;i<offs.length;i++){ if(t>=offs[i])idx=i; }
+  const localT=t-offs[idx];
+  if(idx!==curIdx){ loadVideo(idx,localT,!vid.paused); } else { vid.currentTime=localT; }
+}
+vid.addEventListener('play',()=>{$('#playbtn').textContent='❚❚'});
+vid.addEventListener('pause',()=>{$('#playbtn').textContent='▶'});
+vid.addEventListener('ended',()=>{ if(curIdx<urls.length-1) loadVideo(curIdx+1,0,true); });
+
+/* --- scrubber: perilla en vivo (rAF) + arrastre para buscar --- */
+const scrub=$('#scrub');
+let dragging=false;
+function fracFromEvent(e){ const r=scrub.getBoundingClientRect(); return Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)); }
+function paintHead(pct,t){
+  $('#fill').style.width=(pct*100)+'%';
+  $('#knob').style.left=(pct*100)+'%';
+  $('#clock').textContent=fmt(t);
+  const nm=netMinute(t);
+  $('#clocktot').textContent=fmt(total);
+  $('#clockmin').textContent=nm;
+  scrub.setAttribute('aria-valuenow',Math.round(pct*100));
+}
+scrub.addEventListener('pointerdown',e=>{ e.preventDefault(); dragging=true; try{scrub.setPointerCapture(e.pointerId);}catch(_){} const f=fracFromEvent(e); paintHead(f,f*total); });
+scrub.addEventListener('pointermove',e=>{ if(!dragging)return; const f=fracFromEvent(e); paintHead(f,f*total); });
+function endDrag(e){ if(!dragging)return; dragging=false; const f=fracFromEvent(e); seekMatch(f*total); }
+scrub.addEventListener('pointerup',endDrag);
+scrub.addEventListener('pointercancel',()=>{dragging=false;});
+function tickHead(){
+  if(!dragging && total){ const t=matchTime(); paintHead(t/total, t); }
+  requestAnimationFrame(tickHead);
+}
+requestAnimationFrame(tickHead);
+function buildSegs(){
+  const s=$('#segs'); s.innerHTML='';
+  offs.forEach((o,i)=>{ if(i===0)return; const d=document.createElement('div'); d.className='seg'; d.style.left=(o/total*100)+'%'; s.appendChild(d); });
+}
+function togglePlay(){ vid.paused?vid.play():vid.pause(); }
+function skip(s){ seekMatch(matchTime()+s); }
+function setRate(r){
+  curRate=r; vid.playbackRate=r;
+  $$('#speedgrp .tbtn').forEach(b=>b.classList.toggle('on', parseFloat(b.dataset.rate)===r));
+  const bd=$('#speedBadge'); bd.textContent=r+'×'; bd.classList.toggle('hide', r===1);
+}
+
+/* ============ OFFSET (partido neto) ============ */
+function setKickoff(){ M.offset=matchTime(); updateOffsetUI(); renderAll(); saveLocal(); toast('Inicio del partido marcado en '+fmt(M.offset)); }
+function clearKickoff(){ M.offset=0; updateOffsetUI(); renderAll(); saveLocal(); }
+function setMatchEnd(){ M.matchEnd=matchTime(); updateOffsetUI(); renderAll(); saveLocal(); toast('Fin del partido marcado en '+fmt(M.matchEnd)); }
+function clearMatchEnd(){ M.matchEnd=0; updateOffsetUI(); renderAll(); saveLocal(); }
+function updateOffsetUI(){
+  $('#offlbl').textContent=fmt(M.offset);
+  $('#endlbl').textContent = M.matchEnd? fmt(M.matchEnd) : '—';
+  const k=$('#kick');
+  if(total&&M.offset>0){ k.classList.remove('hidden'); k.style.left=(M.offset/total*100)+'%'; } else k.classList.add('hidden');
+  const ke=$('#kickend');
+  if(total&&M.matchEnd>0){ ke.classList.remove('hidden'); ke.style.left=(M.matchEnd/total*100)+'%'; } else ke.classList.add('hidden');
+}
+function netTime(t){ let tt=t||0; if(M.matchEnd>0 && tt>M.matchEnd) tt=M.matchEnd; return Math.max(0, tt-M.offset); }
+function netMinute(t){ const n=netTime(t); return n<=0?0:Math.max(1,Math.round(n/60)); }
+function netTotal(){ return Math.max(0,(M.matchEnd>0?M.matchEnd:total)-M.offset); }
+
+/* ============ MODAL / EVENTOS ============ */
+function openEvent(type, editId=null){
+  vid.pause();
+  const ev = editId!=null ? M.events.find(e=>e.id===editId) : null;
+  const tSec = ev? ev.tSec : matchTime();
+  modalCtx={type, editId, tSec};
+  const tc=TYPES[type];
+  $('#modal').classList.remove('hide');
+  const title=$('#mo-title'); title.textContent=tc.label; title.className='display '+type;
+  const shownMin = ev? displayMin(ev) : netMinute(tSec);
+  $('#mo-min-lbl').textContent = shownMin;
+  $('#mo-min').value = shownMin;
+
+  const cfg={
+    gol:{team:'¿Qué equipo marcó?',p1:'Anotador',p2:'Asistencia',gk:'Arquero (rival)',showTipo:true,showP2:true,showGK:true},
+    tiro:{team:'¿Qué equipo remató? (tiro desviado / al palo)',p1:'Pateador',p2:'Asistencia',gk:'',showTipo:true,showP2:true,showGK:false},
+    atajada:{team:'¿Qué equipo remató? (tiro atajado)',p1:'Pateador',p2:'Asistencia',gk:'Arquero que atajó (rival)',showTipo:true,showP2:true,showGK:true},
+    quite:{team:'¿Qué equipo robó?',p1:'Quién robó',p2:'',gk:'',showTipo:true,showP2:false,showGK:false},
+    ocasion:{team:'¿Qué equipo?',p1:'Pasador',p2:'Receptor (quedó mano a mano)',gk:'',showTipo:false,showP2:true,showGK:false},
+    falta:{team:'¿Equipo del infractor?',p1:'Infractor',p2:'Recibió la falta (rival)',gk:'',showTipo:true,showP2:true,showGK:false},
+    arquero:{team:'¿En qué equipo?',p1:'Entra al arco',p2:'',gk:'',showTipo:false,showP2:false,showGK:false}
+  }[type];
+  $('#lbl-team').textContent=cfg.team;
+  $('#lbl-p1').textContent=cfg.p1; $('#lbl-p2').textContent=cfg.p2;
+  $('#grp-tipo').classList.toggle('hidden',!cfg.showTipo);
+  $('#grp-p2').classList.toggle('hidden',!cfg.showP2);
+  $('#grp-gk').classList.toggle('hidden',!cfg.showGK);
+  $('#lbl-gk').textContent=cfg.gk;
+  $('#contra-note').classList.remove('show');
+
+  modalCtx.team = ev? ev.team : null;
+  modalCtx.p1 = ev? ev.p1 : null;
+  modalCtx.p2 = ev? ev.p2 : null;
+  modalCtx.tipo = ev? ev.tipo : null;
+  modalCtx.gk = ev? ev.gk : null;
+
+  $('.opt.t1').textContent=M.t1; $('.opt.t2').textContent=M.t2;
+  if(cfg.showTipo) renderTipos(tc.tipos);
+  renderTeamButtons();
+  if(modalCtx.team) pickTeam(modalCtx.team,true);
+  else { $('#opts-p1').innerHTML=''; $('#opts-p2').innerHTML=''; $('#opts-gk').innerHTML=''; }
+}
+function renderTeamButtons(){ $$('#grp-team .opt').forEach(b=>b.classList.toggle('on', modalCtx.team===parseInt(b.dataset.team))); }
+function pickTeam(t, keep){
+  modalCtx.team=t;
+  if(!keep){ modalCtx.p1=null; modalCtx.p2=null; modalCtx.gk=null; }
+  renderTeamButtons();
+  const type=modalCtx.type;
+  const isContra = type==='gol' && modalCtx.tipo==='en contra';
+  if(type==='arquero'){
+    renderPlayers('#opts-p1', t, 'p1');
+  } else if(type==='quite'){
+    renderPlayers('#opts-p1', t, 'p1');
+  } else if(type==='ocasion'){
+    renderPlayers('#opts-p1', t, 'p1');
+    renderPlayers('#opts-p2', t, 'p2');
+  } else if(type==='falta'){
+    renderPlayers('#opts-p1', t, 'p1');
+    renderPlayers('#opts-p2', other(t), 'p2', true);
+  } else { // gol / tiro / atajada (todos centrados en el remate)
+    renderPlayers('#opts-p1', isContra? other(t) : t, 'p1');
+    renderPlayers('#opts-p2', t, 'p2', true);
+    if(type==='gol'||type==='atajada'){
+      renderPlayers('#opts-gk', other(t), 'gk');
+      if(!keep) selPlayer('gk', gkAtTime(other(t), modalCtx.tSec));
+    }
+    $('#contra-note').classList.toggle('show', isContra);
+  }
+}
+function renderPlayers(sel, team, key, allowNone){
+  const box=$(sel); box.innerHTML='';
+  if(allowNone){
+    const b=document.createElement('button'); b.className='opt none'; b.textContent='sin asistencia';
+    b.onclick=()=>selPlayer(key,null); box.appendChild(b);
+  }
+  M.players[team].forEach(n=>{
+    const b=document.createElement('button'); b.className='opt'; b.textContent=n;
+    b.onclick=()=>selPlayer(key,n); box.appendChild(b);
+  });
+  markSel(key);
+}
+function selPlayer(key,n){ modalCtx[key]=n; markSel(key); }
+function markSel(key){
+  const sel={p1:'#opts-p1',p2:'#opts-p2',gk:'#opts-gk'}[key];
+  $$(sel+' .opt').forEach(b=>{
+    const isNone=b.classList.contains('none');
+    b.classList.toggle('on', isNone? modalCtx[key]==null : b.textContent===modalCtx[key]);
+  });
+}
+function renderTipos(tipos){
+  const box=$('#opts-tipo'); box.innerHTML='';
+  tipos.forEach(t=>{
+    const b=document.createElement('button'); b.className='opt'+(modalCtx.tipo===t?' on':''); b.textContent=t;
+    b.onclick=()=>{
+      modalCtx.tipo=t; $$('#opts-tipo .opt').forEach(x=>x.classList.toggle('on',x.textContent===t));
+      if(modalCtx.type==='gol' && modalCtx.team){ // recargar anotador si cambia a/desde "contra"
+        const isContra=t==='en contra';
+        renderPlayers('#opts-p1', isContra? other(modalCtx.team):modalCtx.team, 'p1');
+        modalCtx.p1=null; markSel('p1');
+        $('#contra-note').classList.toggle('show', isContra);
+      }
+    };
+    box.appendChild(b);
+  });
+}
+function saveEvent(){
+  const c=modalCtx;
+  if(!c.team){toast('Elegí el equipo');return;}
+  if(!c.p1){toast('Falta el jugador');return;}
+  const shownMin=parseInt($('#mo-min').value);
+  // sin video y evento NUEVO: derivar el tSec del minuto ingresado (para ordenar y los links)
+  let tSec=c.tSec;
+  if(noVideo && c.editId==null){ const mm=isNaN(shownMin)?0:Math.max(0,shownMin); tSec=(M.offset||0)+mm*60; }
+  const auto=netMinute(tSec);
+  const obj={
+    id: c.editId!=null? c.editId : Date.now()+Math.random(),
+    type:c.type, tSec:tSec,
+    minOverride: (isNaN(shownMin)||shownMin===auto)? null : shownMin,
+    team:c.team, p1:c.p1, p2:c.p2||null, tipo:c.tipo||null, gk:c.gk||null
+  };
+  if(c.editId!=null){ const i=M.events.findIndex(e=>e.id===c.editId); M.events[i]=obj; }
+  else M.events.push(obj);
+  M.events.sort((a,b)=>a.tSec-b.tSec);
+  closeModal(); renderAll(); saveLocal();
+  toast(TYPES[c.type].label+' guardado ✓');
+}
+function closeModal(){ $('#modal').classList.add('hide'); modalCtx=null; }
+function delEvent(id,e){ e.stopPropagation(); M.events=M.events.filter(x=>x.id!==id); renderAll(); saveLocal(); }
+function other(t){ return t===1?2:1; }
+function displayMin(e){ return e.minOverride!=null? e.minOverride : netMinute(e.tSec); }
+
+/* arquero activo en un instante dado */
+function gkAtTime(team, tSec){
+  let gk=M.gk[team];
+  M.events.filter(e=>e.type==='arquero'&&e.team===team&&e.tSec<=tSec)
+    .sort((a,b)=>a.tSec-b.tSec).forEach(e=>gk=e.p1);
+  return gk;
+}
+function gkIntervals(team){
+  const nt=netTotal();
+  const pts=[{t:0,gk:M.gk[team]}];
+  M.events.filter(e=>e.type==='arquero'&&e.team===team)
+    .map(e=>({t:netTime(e.tSec),gk:e.p1})).sort((a,b)=>a.t-b.t)
+    .forEach(c=>pts.push(c));
+  const ivs=[];
+  for(let i=0;i<pts.length;i++){
+    const start=pts[i].t, end= i<pts.length-1? pts[i+1].t : nt;
+    if(pts[i].gk && end>start) ivs.push({gk:pts[i].gk,start,end});
+  }
+  return ivs;
+}
+
+/* ============ RENDER ============ */
+function renderAll(){ renderEvents(); renderScore(); renderMarks(); renderCounts(); updateOffsetUI(); }
+function renderScore(){
+  const g1=M.events.filter(e=>e.type==='gol'&&e.team===1).length;
+  const g2=M.events.filter(e=>e.type==='gol'&&e.team===2).length;
+  $('#sc-g1').textContent=g1; $('#sc-g2').textContent=g2;
+  const now=matchTime();
+  const k1=gkAtTime(1,now), k2=gkAtTime(2,now);
+  $('#sc-gk1').textContent=k1?('🧤 '+k1):''; $('#sc-gk2').textContent=k2?('🧤 '+k2):'';
+}
+function renderEvents(){
+  const p=$('#panel-eventos');
+  if(!M.events.length){ p.innerHTML=`<div class="empty"><span class="display">0–0</span>Todavía no marcaste eventos.<br>Mirá el partido y apretá <b>G</b>, <b>T</b>, <b>A</b> o <b>C</b>.</div>`; return; }
+  p.innerHTML='';
+  M.events.forEach(e=>{
+    const row=document.createElement('div'); row.className='evt';
+    const teamName=e.team===1?M.t1:M.t2;
+    let desc='';
+    if(e.type==='gol'){
+      const contra=e.tipo==='en contra';
+      desc=`<div class="top">⚽ ${e.p1}${contra?' <span style="color:var(--arquero)">(en contra)</span>':''}${e.p2?` <span style="color:var(--muted)">(asist. ${e.p2})</span>`:''}</div><div class="sub">${teamName} · ${e.tipo||'—'}${e.gk?` · arq. ${e.gk}`:''}</div>`;
+    }
+    if(e.type==='tiro') desc=`<div class="top">${e.p1}</div><div class="sub">${teamName} · ${e.tipo||'—'}${e.p2?` · asist. ${e.p2}`:''}</div>`;
+    if(e.type==='atajada') desc=`<div class="top">🧤 atajó ${e.gk||'—'}</div><div class="sub">remató ${e.p1}${e.p2?` (asist. ${e.p2})`:''} · ${e.tipo||'—'}</div>`;
+    if(e.type==='arquero') desc=`<div class="top">🧤 ${e.p1} entra al arco</div><div class="sub">${teamName}</div>`;
+    if(e.type==='quite') desc=`<div class="top">🛡 ${e.p1} roba</div><div class="sub">${teamName} · ${e.tipo||'—'}</div>`;
+    if(e.type==='ocasion') desc=`<div class="top">🎯 ${e.p1} → ${e.p2||'?'}</div><div class="sub">${teamName} · ocasión (mano a mano)</div>`;
+    if(e.type==='falta') desc=`<div class="top">⚠ ${e.p1}${e.p2?` → ${e.p2}`:''}</div><div class="sub">${teamName} · ${e.tipo||'—'}</div>`;
+    const pillTxt={arquero:'arq',ocasion:'ocas'}[e.type]||e.type;
+    row.innerHTML=`<div class="min">${displayMin(e)}'<small>${fmt(e.tSec)}</small></div>
+      <div class="desc">${desc}</div>
+      <div style="display:flex;align-items:center;gap:6px"><span class="pill ${e.type}">${pillTxt}</span><button class="del" title="Borrar">✕</button></div>`;
+    row.onclick=()=>seekMatch(e.tSec-15);
+    row.ondblclick=()=>openEvent(e.type,e.id);
+    row.querySelector('.del').onclick=(ev)=>delEvent(e.id,ev);
+    p.appendChild(row);
+  });
+}
+function renderMarks(){
+  const m=$('#marks'); m.innerHTML='';
+  if(!total) return;   // sin video/durs no hay barra donde ubicar las marcas
+  M.events.forEach(e=>{
+    const d=document.createElement('div'); d.className='mk '+e.type;
+    d.style.left=(e.tSec/total*100)+'%'; d.title=`${displayMin(e)}' ${e.type} ${e.p1}`;
+    d.onclick=()=>seekMatch(e.tSec-15);
+    m.appendChild(d);
+  });
+}
+function renderCounts(){ ['gol','tiro','atajada','quite','ocasion','falta'].forEach(t=>{const el=$('#cnt-'+t); if(el)el.textContent=M.events.filter(e=>e.type===t).length;}); }
+function setTab(t){
+  $$('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+  $('#panel-eventos').classList.toggle('hide',t!=='eventos');
+  $('#panel-export').classList.toggle('hide',t!=='export');
+  if(t==='export') fillClipPlayers();
+}
+
+/* ============ TIMELINE DEL PARTIDO ============ */
+/* Chips (buckets). Sin jugador = tipos del partido entero; con jugador = su rol. */
+const CHIP_KEYS=['gol','asist','tiro','pase','atajada','ocasion','quite','falta'];
+/* íconos SVG (heredan color del chip/tarjeta). Los que no existen como emoji van dibujados. */
+const ICO={
+  tiro:'<svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.3"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg>',
+  ocasion:'<svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="6" width="18" height="12" rx="1"/><path d="M3 10h18M3 14h18M9 6v12M15 6v12"/></svg>',
+  quite:'<svg class="ci" viewBox="0 0 24 24"><path fill="currentColor" d="M3 8h4l2.5 3.5H15c2.8 0 5 2.2 5 5V18H5a2 2 0 0 1-2-2z"/><circle cx="18.5" cy="9" r="2.3" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>',
+  asist:'<svg class="ci" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 18h18"/><path d="M5 18a7 7 0 0 1 14 0"/><path d="M12 6.3v2.2"/></svg>',
+  pase:'<svg class="ci" viewBox="0 0 24 24"><path fill="currentColor" d="M2 21l20-9L2 3v6.5L15 12 2 14.5z"/></svg>'
+};
+const CHIP_LABELS={gol:'⚽ Goles',asist:ICO.asist+' Asistencias',tiro:ICO.tiro+' Tiros',pase:ICO.pase+' Pases',atajada:'🧤 Atajadas',ocasion:ICO.ocasion+' Ocasiones',quite:ICO.quite+' Quites',falta:'⚠ Faltas'};
+let tlFilters={gol:true,asist:true,tiro:true,pase:true,atajada:true,ocasion:true,quite:true,falta:true};
+let tlPlayer='';
+/* ¿el evento cae en este chip? (P = jugador filtrado, o '' = partido entero) */
+function matchChip(e, key, P){
+  if(P){
+    switch(key){
+      case 'gol':     return e.type==='gol' && e.p1===P && !isContra(e);           // goles que metió
+      case 'asist':   return e.type==='gol' && e.p2===P && !isContra(e);           // asistencias que dio
+      case 'tiro':    return (e.type==='tiro'||e.type==='atajada') && e.p1===P;    // remató (desviado o atajado)
+      case 'pase':    return ((e.type==='tiro'||e.type==='atajada') && e.p2===P) || (e.type==='ocasion' && e.p1===P); // pase que llevó a remate/ocasión
+      case 'atajada': return e.type==='atajada' && e.gk===P;                        // atajadas que hizo
+      case 'ocasion': return e.type==='ocasion' && e.p2===P;                        // le dieron un pase bueno y no definió
+      case 'quite':   return e.type==='quite' && e.p1===P;                          // quites que hizo
+      case 'falta':   return e.type==='falta' && (e.p1===P || e.p2===P);            // hizo o le hicieron
+      default:        return false;
+    }
+  } else {
+    switch(key){
+      case 'gol':     return e.type==='gol';
+      case 'asist':   return e.type==='gol' && !!e.p2 && !isContra(e);
+      case 'tiro':    return e.type==='tiro';
+      case 'pase':    return ((e.type==='tiro'||e.type==='atajada') && !!e.p2) || e.type==='ocasion';
+      case 'atajada': return e.type==='atajada';
+      case 'ocasion': return e.type==='ocasion';
+      case 'quite':   return e.type==='quite';
+      case 'falta':   return e.type==='falta';
+      default:        return false;
+    }
+  }
+}
+/* ¿mostrar/clipear el evento con estos chips activos y este jugador? */
+function eventShown(e, active, P){
+  for(let i=0;i<active.length;i++){ if(matchChip(e,active[i],P)) return true; }
+  return false;
+}
+function presentChips(){ return CHIP_KEYS.filter(k=>M.events.some(e=>matchChip(e,k,''))); }
+function buildChipBar(){
+  const keys=presentChips();
+  tlFilters={}; keys.forEach(k=>tlFilters[k]=true);
+  const bar=$('#tl-chipbar'); bar.innerHTML='';
+  keys.forEach(k=>{
+    const b=document.createElement('button'); b.className='tlf on'; b.dataset.f=k; b.innerHTML=CHIP_LABELS[k];
+    b.addEventListener('click',()=>{ b.classList.toggle('on'); tlFilters[k]=b.classList.contains('on'); renderTimeline(); });
+    b.addEventListener('dblclick',(e)=>{ e.preventDefault(); soloTl(k); });
+    bar.appendChild(b);
+  });
+}
+function soloTl(key){
+  $$('#tl-chipbar .tlf[data-f]').forEach(el=>{ const k=el.dataset.f; tlFilters[k]=(k===key); el.classList.toggle('on', tlFilters[k]); });
+  renderTimeline();
+}
+function openTimeline(){
+  $('#tl-n1').textContent=M.t1; $('#tl-n2').textContent=M.t2;
+  const sel=$('#tl-player'); const all=[...new Set([...M.players[1],...M.players[2]])];
+  sel.innerHTML='<option value="">Todos los jugadores</option>'+all.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join('');
+  sel.value=tlPlayer;
+  buildChipBar();
+  renderTimeline(); $('#tloverlay').classList.remove('hide');
+}
+function bookendRow(label, minTxt, tSec){
+  const row=document.createElement('div'); row.className='tl-bookend';
+  const txt=label+(minTxt!=null?` · ${minTxt}`:'');
+  const a=document.createElement('a'); a.textContent=txt; a.href='#';
+  a.onclick=(ev)=>{ ev.preventDefault(); closeTimeline(); seekMatch((tSec||0)-2); };
+  row.appendChild(a); return row;
+}
+function closeTimeline(){ $('#tloverlay').classList.add('hide'); }
+function renderTimeline(){
+  const evs=M.events.slice().sort((a,b)=>a.tSec-b.tSec);
+  const active=CHIP_KEYS.filter(k=>tlFilters[k]);
+  let s1=0,s2=0;
+  const scroll=$('#tl-scroll'); scroll.innerHTML='';
+  const track=document.createElement('div'); track.className='tl-track';
+  track.appendChild(bookendRow('▶ Inicio del partido','min 0', M.offset||0));
+  let shown=0;
+  evs.forEach(e=>{
+    if(e.type==='gol'){ if(e.team===1)s1++; else s2++; }
+    if(e.type==='arquero') return;
+    if(!eventShown(e, active, tlPlayer)) return;
+    const min=displayMin(e);
+    // atajada: la protagoniza el arquero (equipo defensor); el resto, el equipo que actuó
+    const dispTeam = e.type==='atajada'? other(e.team) : e.team;
+    const side=dispTeam===1?'left':'right';
+    let card='';
+    if(e.type==='gol'){
+      const contra=isContra(e);
+      card=`<div class="tl-card gol">
+        <div class="tl-scoremini">${s1}–${s2}</div>
+        <div class="tl-main">⚽ ${e.p1}${contra?' <span class="c">(en contra)</span>':''}</div>
+        <div class="tl-detail">${e.p2?'asist. '+e.p2+' · ':''}${e.tipo||''}</div></div>`;
+    } else if(e.type==='tiro'){
+      card=`<div class="tl-card tiro"><div class="tl-main">${ICO.tiro} ${e.p1}</div>
+        <div class="tl-detail">tiro · ${e.tipo||''}${e.p2?' · asist. '+e.p2:''}</div></div>`;
+    } else if(e.type==='atajada'){
+      card=`<div class="tl-card atajada"><div class="tl-main">🧤 atajó ${e.gk||'—'}</div>
+        <div class="tl-detail">remató ${e.p1}${e.p2?' (asist. '+e.p2+')':''} · ${e.tipo||''}</div></div>`;
+    } else if(e.type==='falta'){
+      card=`<div class="tl-card falta"><div class="tl-main">⚠ ${e.p1}${e.p2?' → '+e.p2:''}</div>
+        <div class="tl-detail">falta · ${e.tipo||''}</div></div>`;
+    } else if(e.type==='ocasion'){
+      card=`<div class="tl-card ocasion"><div class="tl-main">${ICO.ocasion} ${e.p1}${e.p2?' → '+e.p2:''}</div>
+        <div class="tl-detail">ocasión (mano a mano)</div></div>`;
+    } else if(e.type==='quite'){
+      card=`<div class="tl-card quite"><div class="tl-main">${ICO.quite} ${e.p1}</div>
+        <div class="tl-detail">quite${e.tipo?' · '+e.tipo:''}</div></div>`;
+    }
+    const row=document.createElement('div'); row.className='tl-row '+side;
+    const axis=`<div class="tl-axis"><span class="tl-dot ${e.type}"></span><span class="tl-min">${min}'</span></div>`;
+    row.innerHTML = side==='left'
+      ? `<div class="tl-cell L">${card}</div>${axis}<div class="tl-cell R"></div>`
+      : `<div class="tl-cell L"></div>${axis}<div class="tl-cell R">${card}</div>`;
+    row.onclick=()=>{ closeTimeline(); seekMatch(e.tSec-15); if(vid.paused)vid.play(); };
+    track.appendChild(row); shown++;
+  });
+  const mins=Math.round(netTotal()/60);
+  track.appendChild(bookendRow('⏹ Final del partido', 'min '+mins, (M.matchEnd>0?M.matchEnd:total)||0));
+  $('#tl-g1').textContent=s1; $('#tl-g2').textContent=s2;
+  $('#tl-meta').textContent = (M.fecha?fmtDate(M.fecha)+' · ':'') + (mins?mins+' min · ':'') + `${M.events.filter(e=>e.type==='gol').length} goles · ${M.events.filter(e=>e.type==='tiro').length} tiros · ${M.events.filter(e=>e.type==='atajada').length} atajadas`;
+  scroll.appendChild(track);
+  if(shown===0){ const em=document.createElement('div'); em.className='tl-empty'; em.textContent='No hay jugadas para mostrar con los filtros actuales.'; track.insertBefore(em, track.lastChild); }
+  const sum=document.createElement('div'); sum.className='sum'; sum.innerHTML=summaryInner(); scroll.appendChild(sum);
+}
+
+/* ============ EXPORT ============ */
+function tsv(rows){ return rows.map(r=>r.join('\t')).join('\n'); }
+function copyTable(type){
+  const evs=M.events.filter(e=>e.type===type);
+  if(!evs.length){toast('No hay '+type+'s');return;}
+  let rows;
+  if(type==='gol') rows=evs.map(e=>[M.id,e.p1,e.p2||'',displayMin(e),e.tipo||'',e.gk||'']);
+  if(type==='tiro') rows=evs.map(e=>[M.id,e.p1,e.p2||'',displayMin(e),e.tipo||'']);
+  if(type==='atajada') rows=evs.map(e=>[M.id,displayMin(e),e.gk||'',e.p1,e.p2||'',e.tipo||'']);
+  if(type==='quite') rows=evs.map(e=>[M.id,e.team,e.p1,displayMin(e),e.tipo||'']);
+  if(type==='ocasion') rows=evs.map(e=>[M.id,e.p1,e.p2||'','casi asistencia','si','']);
+  if(type==='falta') rows=evs.map(e=>[M.id,e.team,displayMin(e),e.p1,e.p2||'',e.tipo||'']);
+  const dest={quite:'quites',ocasion:'pases (como casi asistencia)',falta:'faltas',atajada:'atajadas (con id_asistidor nuevo)'}[type]||type+'s';
+  clip(tsv(rows), `${evs.length} copiado(s) — pegá en la pestaña ${dest}`);
+}
+/* ---- gol en contra robusto (acepta 'contra' o 'en contra') ---- */
+function isContra(e){ return e.type==='gol' && e.tipo && e.tipo.indexOf('contra')>=0; }
+
+/* ---- minutos ganando cada equipo / empatados ---- */
+function computeFlow(){
+  const nt=netTotal();
+  const goals=M.events.filter(e=>e.type==='gol').map(e=>({t:netTime(e.tSec),team:e.team})).sort((a,b)=>a.t-b.t);
+  let s1=0,s2=0,prev=0; const acc={t1:0,t2:0,emp:0};
+  const seg=(from,to)=>{ const d=Math.max(0,to-from); if(s1>s2)acc.t1+=d; else if(s2>s1)acc.t2+=d; else acc.emp+=d; };
+  goals.forEach(g=>{ seg(prev,g.t); if(g.team===1)s1++; else s2++; prev=g.t; });
+  seg(prev,nt);
+  return {t1:Math.round(acc.t1/60), t2:Math.round(acc.t2/60), emp:Math.round(acc.emp/60)};
+}
+/* ---- ranking de impacto (goles + asistencias, desempate por goles) ---- */
+function computeImpact(team){
+  const rows=M.players[team].map(p=>{
+    const g=M.events.filter(e=>e.type==='gol'&&e.team===team&&e.p1===p&&!isContra(e)).length;
+    const a=M.events.filter(e=>e.type==='gol'&&e.team===team&&e.p2===p&&!isContra(e)).length;
+    const tiros=M.events.filter(e=>(e.type==='tiro'&&e.p1===p)||(e.type==='atajada'&&e.gk&&e.p1===p)).length; // tiros totales: desviados (tiro) + atajados (el pateador es p1 en atajada formato nuevo)
+    const tirosArco=M.events.filter(e=>e.type==='atajada'&&e.gk&&e.p1===p).length; // al arco = los atajó el rival
+    const atj=M.events.filter(e=>e.type==='atajada'&&e.gk===p).length; // atajadas como arquero
+    const q=M.events.filter(e=>e.type==='quite'&&e.p1===p).length;
+    const oc=M.events.filter(e=>(e.type==='ocasion'&&e.p1===p)||((e.type==='tiro'||e.type==='atajada')&&e.p2===p)).length; // ocasiones generadas: pases que terminan en tiro/atajada/ocasión
+    return {p,g,a,imp:g+a,tiros,tirosArco,atj,q,oc};
+  }).filter(r=>r.imp>0 || r.tiros>0 || r.atj>0 || r.q>0 || r.oc>0);
+  rows.sort((x,y)=> y.imp-x.imp || y.g-x.g || (y.tiros+y.atj+y.q+y.oc)-(x.tiros+x.atj+x.q+x.oc) || x.p.localeCompare(y.p));
+  return rows;
+}
+/* ---- minutos en el arco por jugador ---- */
+function computeGKmin(team){
+  const ivs=gkIntervals(team); const by={};
+  ivs.forEach(iv=>{ by[iv.gk]=(by[iv.gk]||0)+(iv.end-iv.start)/60; });
+  return Object.keys(by).map(gk=>({gk,min:Math.round(by[gk])})).filter(r=>r.min>0).sort((a,b)=>b.min-a.min);
+}
+/* ---- HTML del resumen (reutilizable in-app / exportado) ---- */
+function summaryInner(){
+  const flow=computeFlow();
+  const teamBlock=(t)=>{
+    const imp=computeImpact(t), gkm=computeGKmin(t);
+    const name=t===1?M.t1:M.t2;
+    const xtra=(r)=>{ const p=[]; if(r.tiros)p.push(r.tiros+' T'+(r.tirosArco?' ('+r.tirosArco+' al arco)':'')); if(r.atj)p.push(r.atj+' 🧤'); if(r.q)p.push(r.q+' Q'); if(r.oc)p.push(r.oc+' Oc'); return p.length?`<br><span class="imp-x">${p.join(' · ')}</span>`:''; };
+    const rows= imp.length
+      ? imp.map((r,i)=>`<div class="imp-row"><span class="who">${i+1}. ${esc(r.p)}</span><span class="st">${r.g} G · ${r.a} A · <b>${r.imp}</b>${xtra(r)}</span></div>`).join('')
+      : `<div class="imp-empty">Sin acciones registradas</div>`;
+    const arco= gkm.length? `<div class="arco">🧤 Al arco: ${gkm.map(x=>esc(x.gk)+" "+x.min+"'").join(' · ')}</div>` : '';
+    return `<div class="sum-team sum-t${t}"><h4>${esc(name)}</h4>${rows}${arco}</div>`;
+  };
+  return `<h3>Resumen del partido</h3>
+    <div class="sum-flow">
+      <span class="pill p1">${esc(M.t1)} ganó ${flow.t1}′</span>
+      <span class="pill pe">Empatados ${flow.emp}′</span>
+      <span class="pill p2">${esc(M.t2)} ganó ${flow.t2}′</span>
+    </div>
+    <div class="sum-teams">${teamBlock(1)}${teamBlock(2)}</div>`;
+}
+
+function computeArqueros(){
+  const out=[];
+  [1,2].forEach(team=>{
+    const ivs=gkIntervals(team);
+    const against=M.events.filter(e=>e.type==='gol'&&e.team===other(team));
+    const minBy={}, concBy={};
+    ivs.forEach(iv=>{
+      minBy[iv.gk]=(minBy[iv.gk]||0)+(iv.end-iv.start)/60;
+      concBy[iv.gk]=(concBy[iv.gk]||0)+against.filter(g=>{const n=netTime(g.tSec);return n>=iv.start&&n<iv.end;}).length;
+    });
+    M.players[team].forEach(p=>{
+      const min=Math.round(minBy[p]||0), conc=concBy[p]||0;
+      const glm= min>0? (conc/min).toFixed(2):'0.00';
+      const goles=M.events.filter(e=>e.type==='gol'&&e.team===team&&e.p1===p&&!isContra(e)).length;
+      const asist=M.events.filter(e=>e.type==='gol'&&e.team===team&&e.p2===p&&!isContra(e)).length;
+      out.push([M.id, team, p, min, glm, goles, asist]);
+    });
+  });
+  return out;
+}
+function copyArqueros(){
+  const rows=computeArqueros();
+  clip(tsv(rows), 'Copiado — pegá en la pestaña equipos (id_partido · id_equipo · apodo · minutos_arco · GolesArco/Min · Goles · Asistencias)');
+}
+function copyPartido(){
+  const g1=M.events.filter(e=>e.type==='gol'&&e.team===1).length;
+  const g2=M.events.filter(e=>e.type==='gol'&&e.team===2).length;
+  const gan = g1>g2?M.t1 : g2>g1?M.t2 : 'Empate';
+  const minutos = Math.round(netTotal()/60);
+  const row=[M.id, fmtDate(M.fecha), g1, g2, gan, minutos, M.players[1].join(', '), M.players[2].join(', ')];
+  clip(row.join('\t'), 'Fila de partidos copiada');
+}
+/* --- controles de clips (segundos, tipo, jugador) --- */
+function fillClipPlayers(){
+  const sel=$('#clip-player'); if(!sel)return;
+  const cur=sel.value; const all=[...new Set([...M.players[1],...M.players[2]])];
+  sel.innerHTML='<option value="">Todos los jugadores</option>'+all.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join('');
+  sel.value=all.includes(cur)?cur:'';
+}
+function clipSecs(){
+  let pre=parseInt($('#clip-pre').value), post=parseInt($('#clip-post').value);
+  if(isNaN(pre)||pre<0)pre=17; if(isNaN(post)||post<1)post=3;
+  return {pre,post};
+}
+function selectedClipEvents(){
+  const active=$$('.clipf[data-f].on').map(b=>b.dataset.f);
+  const player=$('#clip-player')? $('#clip-player').value : '';
+  return M.events.filter(e=> e.type!=='arquero' && eventShown(e,active,player))
+    .sort((a,b)=>a.tSec-b.tSec);
+}
+function clipName(e,i){
+  const n=String(i+1).padStart(2,'0');
+  let parts;
+  if(e.type==='gol')          parts=['gol', e.p1, e.p2?('asist_'+e.p2):''];
+  else if(e.type==='atajada') parts=['atajada', e.gk, (e.gk&&e.p1)?'ataja_a':'', e.p1, e.p2?('asist_'+e.p2):''];
+  else if(e.type==='tiro')    parts=['tiro', e.p1, e.p2?('asist_'+e.p2):''];
+  else if(e.type==='ocasion') parts=['ocasion', e.p1, e.p2?('a_'+e.p2):''];
+  else if(e.type==='quite')   parts=['quite', e.p1];
+  else if(e.type==='falta')   parts=['falta', e.p1];
+  else                        parts=[e.type, e.p1];
+  return [n].concat(parts.filter(Boolean)).concat(displayMin(e)+'min').join('_').replace(/[^\w\-]+/g,'_').replace(/_+/g,'_');
+}
+function unidoName(){ const f=(M.fecha||'').split('-'); return (f.length===3? f[0]+f[1]+f[2]+'_':'')+'partido_completo.mp4'; }
+function clipRes(){ return $('#clip-res')? $('#clip-res').value : ''; }
+function copyClips(){
+  const evs=selectedClipEvents();
+  if(!evs.length){toast('No hay jugadas con esos filtros');return;}
+  const {pre,post}=clipSecs(); const dur=pre+post; const src=unidoName();
+  const res=clipRes();
+  const vf = res? ` -vf "scale=-2:${res}"` : '';
+  const lines=evs.map((e,i)=>{
+    const start=Math.max(0,e.tSec-pre);
+    return `ffmpeg -ss ${fmtH(start)} -i "${src}" -t ${dur}${vf} -c:v libx264 -preset veryfast -crf 20 -c:a aac "highlights/${clipName(e,i)}.mp4"`;
+  });
+  const header=[
+    'New-Item -ItemType Directory -Force highlights | Out-Null   # crea la carpeta si no existe (PowerShell)',
+    `# Corta desde el partido unido ("${src}") a ${res? res+'p':'calidad original'}:`
+  ];
+  clip(header.concat(lines).join('\n'), `${evs.length} comando(s) ffmpeg copiados`);
+}
+function copyClipsYT(){
+  const url=(M.youtube||'').trim();
+  if(!url){ toast('Cargá el link de YouTube en el inicio (paso 4)'); return; }
+  const evs=selectedClipEvents();
+  if(!evs.length){ toast('No hay jugadas con esos filtros'); return; }
+  const {pre,post}=clipSecs(); const res=clipRes();
+  const fmt = res? `-f "bv*[height<=${res}]+ba/b[height<=${res}]" ` : '';
+  const lines=evs.map((e,i)=>{
+    const start=Math.max(0,e.tSec-pre), end=e.tSec+post;
+    return `yt-dlp ${fmt}--download-sections "*${fmtH(start)}-${fmtH(end)}" --force-keyframes-at-cuts -o "highlights/${clipName(e,i)}.%(ext)s" "${url}"`;
+  });
+  const header=[
+    'New-Item -ItemType Directory -Force highlights | Out-Null   # crea la carpeta si no existe (PowerShell)',
+    '# Una sola vez, si falta: winget install yt-dlp.yt-dlp  y  winget install ffmpeg',
+    `# Baja SOLO cada tramo (${pre}s antes / ${post}s después) a ${res? res+'p':'la mejor calidad'} desde YouTube:`
+  ];
+  clip(header.concat(lines).join('\n'), `${evs.length} comando(s) yt-dlp copiados`);
+}
+function clip(text,msg){
+  navigator.clipboard.writeText(text).then(()=>toast(msg||'Copiado ✓'),()=>{
+    const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast(msg||'Copiado ✓');
+  });
+}
+/* ---- resumen por jugador (para el .json y la web) ---- */
+function computeResumen(){
+  const out=[];
+  [1,2].forEach(team=>{
+    const ivs=gkIntervals(team);
+    const against=M.events.filter(e=>e.type==='gol'&&e.team===other(team));
+    const minBy={}, concBy={};
+    ivs.forEach(iv=>{
+      minBy[iv.gk]=(minBy[iv.gk]||0)+(iv.end-iv.start)/60;
+      concBy[iv.gk]=(concBy[iv.gk]||0)+against.filter(g=>{const n=netTime(g.tSec);return n>=iv.start&&n<iv.end;}).length;
+    });
+    M.players[team].forEach(p=>{
+      const min=Math.round(minBy[p]||0), conc=concBy[p]||0;
+      out.push({
+        equipo:team, jugador:p,
+        minutosArco:min,
+        golesArcoMin: min>0? +(conc/min).toFixed(2) : 0,
+        goles:      M.events.filter(e=>e.type==='gol'&&e.p1===p&&e.team===team&&!isContra(e)).length,
+        asistencias:M.events.filter(e=>e.type==='gol'&&e.p2===p&&e.team===team).length,
+        tiros:      M.events.filter(e=>e.type==='tiro'&&e.p1===p).length,
+        atajadas:   M.events.filter(e=>e.type==='atajada'&&e.gk===p).length,
+        quites:     M.events.filter(e=>e.type==='quite'&&e.p1===p).length
+      });
+    });
+  });
+  return out;
+}
+/* ---- objeto completo del partido (lo que consume la web) ---- */
+function buildExport(){
+  const exp=JSON.parse(JSON.stringify(M));
+  exp.events=M.events.map(e=>{
+    const o=Object.assign({}, e, {minuto:displayMin(e)});
+    if(e.type==='gol') o.enContra=isContra(e);
+    return o;
+  });
+  const g1=M.events.filter(e=>e.type==='gol'&&e.team===1).length;
+  const g2=M.events.filter(e=>e.type==='gol'&&e.team===2).length;
+  exp.minutos=Math.round(netTotal()/60);
+  exp.golesEquipo={1:g1,2:g2};
+  exp.ganador= g1>g2?1 : g2>g1?2 : 0;
+  exp.torneo=M.torneo||'';
+  exp.formato=M.formato||'F7';
+  exp.resumenJugadores=computeResumen();
+  return exp;
+}
+function exportName(){ const id=String(M.id||'').trim(); const nn= /^\d+$/.test(id)? id.padStart(2,'0') : (id||'sin-id'); return `partido_${nn}_${M.fecha||''}.json`; }
+function saveJSON(){
+  const blob=new Blob([JSON.stringify(buildExport(),null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=exportName(); a.click();
+  toast('Partido descargado ✓ ('+exportName()+')');
+}
+
+/* ============ PÁGINA PARA COMPARTIR (Drive deep-links) ============ */
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function driveId(link){ if(!link)return null; const m=link.match(/\/d\/([^/?#]+)/)||link.match(/[?&]id=([^&]+)/); return m?m[1]:null; }
+function ytId(link){ if(!link)return null; const m=link.match(/[?&]v=([^&]+)/)||link.match(/youtu\.be\/([^?&/]+)/)||link.match(/\/(?:embed|shorts|live)\/([^?&/]+)/); return m?m[1]:null; }
+function buildSpectatorHTML(){
+  const d=(M.durs&&M.durs.length)?M.durs:durs;
+  const offs2=[]; let acc=0; d.forEach(x=>{offs2.push(acc); acc+=x||0;});
+  const totalDur=acc;
+  const YT=ytId(M.youtube);
+  function urlFor(tSec){
+    let idx=0; for(let i=0;i<offs2.length;i++){ if(tSec>=offs2[i])idx=i; }
+    const localStart=Math.max(0,(tSec-(offs2[idx]||0))-15);
+    if(YT){ const yt=Math.max(0,Math.floor(tSec-15)); return {url:`https://www.youtube.com/watch?v=${YT}&t=${yt}s`, label:`▶ ver en YouTube · ${fmt(yt)}`}; }
+    const id=driveId(M.driveLinks[idx]);
+    if(id) return {url:`https://drive.google.com/file/d/${id}/view?t=${Math.floor(localStart)}`, label:`▶ ver · video ${idx+1} desde ${fmt(localStart)}`};
+    return {url:null,label:''};
+  }
+  const evs=M.events.slice().sort((a,b)=>a.tSec-b.tSec);
+  let s1=0,s2=0; const rows=[]; let linked=0;
+  evs.forEach(e=>{
+    if(e.type==='gol'){ if(e.team===1)s1++; else s2++; }
+    if(e.type==='arquero') return;
+    const min=displayMin(e);
+    const dispTeam=e.type==='atajada'?other(e.team):e.team;
+    const side=dispTeam===1?'left':'right';
+    const u=urlFor(e.tSec); const url=u.url, label=u.label;
+    if(url)linked++;
+    let main='',detail='';
+    const contra=isContra(e);
+    if(e.type==='gol'){ main=`⚽ ${esc(e.p1)}${contra?' (en contra)':''}`; detail=`<b>${s1}–${s2}</b> · ${e.p2?'asist. '+esc(e.p2)+' · ':''}${esc(e.tipo||'')}`; }
+    else if(e.type==='tiro'){ main=`${ICO.tiro} ${esc(e.p1)}`; detail=`tiro · ${esc(e.tipo||'')}${e.p2?' · asist. '+esc(e.p2):''}`; }
+    else if(e.type==='atajada'){ main=`🧤 atajó ${esc(e.gk||'—')}`; detail=`remató ${esc(e.p1)}${e.p2?' (asist. '+esc(e.p2)+')':''} · ${esc(e.tipo||'')}`; }
+    else if(e.type==='ocasion'){ main=`${ICO.ocasion} ${esc(e.p1)}${e.p2?' → '+esc(e.p2):''}`; detail=`ocasión (mano a mano)`; }
+    else if(e.type==='quite'){ main=`${ICO.quite} ${esc(e.p1)}`; detail=`quite${e.tipo?' · '+esc(e.tipo):''}`; }
+    else if(e.type==='falta'){ main=`⚠ ${esc(e.p1)}${e.p2?' → '+esc(e.p2):''}`; detail=`falta · ${esc(e.tipo||'')}`; }
+    else return;
+    rows.push({type:e.type,min,side,main,detail,url,label,tSec:e.tSec,p1:e.p1||'',p2:e.p2||'',gk:e.gk||'',contra:contra});
+  });
+  const gg=`${s1}–${s2}`;
+  const finalMin=Math.round(netTotal()/60);
+  const iniU=urlFor(M.offset||0);
+  const finU=urlFor((M.matchEnd>0?M.matchEnd:totalDur)||0);
+  const presentKeys=CHIP_KEYS.filter(k=>M.events.some(e=>matchChip(e,k,'')));
+  const allPlayers=[...new Set([...M.players[1],...M.players[2]])];
+  const playerOpts=allPlayers.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join('');
+  // pre-render del timeline (para que se vea aunque iOS no ejecute el script)
+  function rowHTMLb(r,i){
+    var inner='<span class="c '+r.type+'"><span class="m">'+r.main+'</span><span class="dt">'+r.detail+'</span>'+(r.url?'<span class="pl">'+r.label+'</span>':'')+'</span>';
+    var axis='<span class="ax"><span class="dot '+r.type+'"></span><span class="mn">'+r.min+"'"+'</span></span>';
+    var body=r.side==='left'?('<span class="L">'+inner+'</span>'+axis+'<span class="R"></span>'):('<span class="L"></span>'+axis+'<span class="R">'+inner+'</span>');
+    var a=r.url?('<a class="row '+r.side+'" href="'+r.url+'" target="_blank" rel="noopener">'+body+'</a>'):('<div class="row '+r.side+'">'+body+'</div>');
+    var chk=YT?('<input type="checkbox" class="pick" data-i="'+i+'">'):'';
+    return '<div class="rw">'+chk+a+'</div>';
+  }
+  function bookendb(u,label,min){ var b='<span class="bk">'+label+(min?' · '+min:'')+'</span>'; return u&&u.url?('<a class="bookend" href="'+u.url+'" target="_blank" rel="noopener">'+b+'</a>'):('<div class="bookend">'+b+'</div>'); }
+  let initialTrack=bookendb(iniU,'▶ Inicio del partido','min 0');
+  rows.forEach((r,i)=>{ initialTrack+=rowHTMLb(r,i); });
+  initialTrack+=bookendb(finU,'⏹ Final del partido','min '+finalMin);
+  const canDL=!!YT;
+  const note = linked? `Tocá una jugada para abrir el video en ${YT?'YouTube':'Drive'}${canDL?' · marcá el ☑ y armá tus propios clips abajo':''}.` : `⚠ Sin link de video cargado: el timeline se ve, pero las jugadas no abren video.`;
+  const CSS=`*{box-sizing:border-box}body{margin:0;background:#0d1310;color:#e7efe8;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+a{color:inherit;text-decoration:none}
+.head{position:sticky;top:0;background:linear-gradient(180deg,#0f3a26,#0d2a1c);border-bottom:2px solid #f0a836;padding:16px;text-align:center;z-index:20}
+.sc{font-family:Arial Black,system-ui;font-weight:900;font-size:30px}
+.sc .n1{color:#3f8fae}.sc .n2{color:#e06a4f}.tn{font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.meta{font-size:12px;color:#a9c6b3;margin-top:6px}
+.filters{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:12px 0 0}
+.filters .f{border:1px solid #37483d;background:rgba(0,0,0,.25);color:#728278;border-radius:20px;padding:5px 12px;font-weight:700;font-size:12px;cursor:pointer}
+.filters .f{user-select:none}
+.ci{width:1em;height:1em;vertical-align:-0.15em;margin-right:1px;display:inline-block}
+.filters .f.on[data-f=gol]{color:#3fae74;border-color:#3fae74}
+.filters .f.on[data-f=asist]{color:#56b6d9;border-color:#56b6d9}
+.filters .f.on[data-f=pase]{color:#b39ddb;border-color:#b39ddb}
+.filters .f.on[data-f=tiro]{color:#e0a53f;border-color:#e0a53f}
+.filters .f.on[data-f=atajada]{color:#8f7fe0;border-color:#8f7fe0}
+.filters .f.on[data-f=ocasion]{color:#d08bc4;border-color:#d08bc4}
+.filters .f.on[data-f=quite]{color:#3fb0a0;border-color:#3fb0a0}
+.filters .f.on[data-f=falta]{color:#e3d24e;border-color:#e3d24e}
+.filters select{background:rgba(0,0,0,.25);color:#e7efe8;border:1px solid #37483d;border-radius:20px;padding:5px 10px;font-weight:700;font-size:12px}
+.filters .allp.on{color:#f0a836;border-color:#f0a836}
+.track{max-width:820px;margin:22px auto;position:relative;padding:0 10px}
+.track:before{content:"";position:absolute;top:6px;bottom:6px;left:50%;width:2px;background:#37483d;transform:translateX(-50%)}
+.rw{position:relative}
+.pick{position:absolute;left:0;top:50%;transform:translateY(-50%);z-index:4;width:17px;height:17px;cursor:pointer;accent-color:#f0a836}
+.row{display:grid;grid-template-columns:1fr 68px 1fr;align-items:center;margin:12px 0}
+.L{display:flex;justify-content:flex-end}.R{display:flex}
+.ax{display:flex;flex-direction:column;align-items:center;gap:3px;z-index:1}
+.dot{width:13px;height:13px;border-radius:50%;border:2px solid #0d1310}
+.dot.gol{width:19px;height:19px;background:#3fae74}.dot.tiro{background:#e0a53f}.dot.atajada{background:#8f7fe0}.dot.falta{background:#e3d24e}.dot.ocasion{background:#d08bc4}.dot.quite{background:#3fb0a0}
+.mn{font-family:ui-monospace,monospace;font-size:11px;color:#9aa99f;background:#0d1310;padding:0 4px}
+.c{display:inline-block;background:#141d18;border:1px solid #26332b;border-radius:10px;padding:9px 13px;max-width:340px;transition:border-color .12s}
+a.row:hover .c{border-color:#3fae74}
+.row.left .c{text-align:right}
+.c.gol{border-left:3px solid #3fae74}.row.right .c.gol{border-left:1px solid #26332b;border-right:3px solid #3fae74}
+.m{display:block;font-weight:700;font-size:14px}.dt{display:block;font-size:12px;color:#9aa99f;margin-top:1px}.dt b{color:#fff}
+.pl{display:inline-block;margin-top:5px;font-size:11px;font-weight:700;color:#f0a836}
+.bookend{display:block;text-align:center;margin:20px 0;position:relative;z-index:1}
+.bookend .bk{display:inline-block;background:#141d18;border:1px solid #f0a836;border-radius:22px;padding:6px 16px;font-family:Arial Black,system-ui;font-weight:900;text-transform:uppercase;letter-spacing:.03em;font-size:13px;color:#f0a836}
+a.bookend:hover .bk{background:#16271e}
+.sum{max-width:820px;margin:8px auto 40px;padding:0 16px}
+.sum h3{font-family:Arial Black,system-ui;font-weight:900;text-transform:uppercase;text-align:center;font-size:20px;color:#fff;margin:26px 0 12px}
+.sum-flow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:0 0 24px}
+.sum-flow .pill{font-family:ui-monospace,monospace;font-size:12px;font-weight:700;border-radius:20px;padding:7px 14px;border:1px solid #37483d;background:#141d18}
+.sum-flow .pill.p1{color:#3f8fae;border-color:#3f8fae}
+.sum-flow .pill.p2{color:#e06a4f;border-color:#e06a4f}
+.sum-flow .pill.pe{color:#9aa99f}
+.sum-teams{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.sum-team{background:#141d18;border:1px solid #26332b;border-radius:12px;padding:14px 16px}
+.sum-team.sum-t1{border-top:3px solid #3f8fae}.sum-team.sum-t2{border-top:3px solid #e06a4f}
+.sum-team h4{font-size:13px;text-transform:uppercase;letter-spacing:.05em;margin:0 0 10px;font-weight:800}
+.sum-team.sum-t1 h4{color:#3f8fae}.sum-team.sum-t2 h4{color:#e06a4f}
+.imp-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #26332b}
+.imp-row:last-child{border-bottom:0}
+.imp-row .who{font-weight:700;font-size:14px}
+.imp-row .st{font-family:ui-monospace,monospace;font-size:12px;color:#9aa99f;white-space:nowrap;text-align:right}
+.imp-row{align-items:flex-start}
+.imp-x{color:#728278;font-size:10px}
+.imp-row .st b{color:#f0a836}
+.imp-empty{color:#728278;font-size:13px;padding:6px 0}
+.arco{margin-top:10px;font-size:12px;color:#9aa99f;font-family:ui-monospace,monospace;border-top:1px dashed #37483d;padding-top:8px}
+.dl{max-width:820px;margin:0 auto 60px;padding:16px;background:#141d18;border:1px solid #26332b;border-radius:12px}
+.dl h3{font-family:Arial Black,system-ui;font-weight:900;text-transform:uppercase;font-size:16px;color:#f0a836;margin:0 0 4px}
+.dl .sub{font-size:12px;color:#9aa99f;margin:0 0 12px}
+.dlctl{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.dlctl label{font-family:ui-monospace,monospace;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#9aa99f;display:flex;align-items:center;gap:6px}
+.dlctl input{width:52px;background:#0d1310;border:1px solid #37483d;border-radius:7px;padding:5px;color:#e7efe8;font-family:ui-monospace,monospace;font-size:13px;text-align:center}
+.dlctl select{background:#0d1310;border:1px solid #37483d;border-radius:7px;padding:5px 8px;color:#e7efe8;font-size:13px}
+.dlctl button{background:#f0a836;color:#3a2600;border:0;border-radius:8px;padding:9px 15px;font-weight:800;cursor:pointer;font-size:13px}
+.dl textarea{width:100%;height:120px;background:#0d1310;border:1px solid #37483d;border-radius:8px;color:#bfe3cd;font-family:ui-monospace,monospace;font-size:11px;padding:8px;resize:vertical;white-space:pre}
+.dl-note{font-size:12px;color:#728278;margin:8px 0 0}
+.jbtn{background:#141d18;border:1px solid #37483d;color:#9aa99f;border-radius:8px;padding:8px 14px;font-weight:700;cursor:pointer;font-size:13px}
+.jbtn:hover{border-color:#f0a836;color:#f0a836}
+@media(max-width:600px){.row{grid-template-columns:1fr 46px 1fr}.sum-teams{grid-template-columns:1fr}}`;
+  const dlPanel = canDL ? (
+      '<div class="dl">'
+    + '<h3>Bajá tus propios clips</h3>'
+    + '<p class="sub">Marcá el ☑ de las jugadas que quieras y copiá el comando: baja solo esos tramos desde tu video de YouTube.</p>'
+    + '<div class="dlctl">'
+    + '<label>seg. antes <input id="dl-pre" type="number" min="0" value="17"></label>'
+    + '<label>seg. después <input id="dl-post" type="number" min="0" value="3"></label>'
+    + '<label>calidad <select id="dl-res"><option value="">4K / original</option><option value="1080">1080p</option><option value="720">720p</option></select></label>'
+    + '<button id="dl-btn">Copiar comando yt-dlp (0)</button>'
+    + '</div>'
+    + '<textarea id="dl-out" readonly placeholder="Marcá jugadas con el ☑ de la izquierda y tocá Copiar…"></textarea>'
+    + '<p class="dl-note">Pegá en PowerShell (necesitás yt-dlp y ffmpeg: winget install yt-dlp.yt-dlp y winget install ffmpeg). Crea la carpeta highlights y baja cada clip ahí.</p>'
+    + '</div>'
+  ) : '';
+  const fInit={}; presentKeys.forEach(k=>fInit[k]=true);
+  const dataDecl = 'var ROWS='+JSON.stringify(rows)+';\n'
+    + 'var INI='+JSON.stringify(iniU)+';\n'
+    + 'var FIN='+JSON.stringify(finU)+';\n'
+    + 'var FINMIN='+finalMin+';\n'
+    + 'var YTURL='+JSON.stringify(M.youtube||'')+';\n'
+    + 'var CANDL='+(canDL?'true':'false')+';\n'
+    + 'var KEYS='+JSON.stringify(presentKeys)+';\n'
+    + 'var F='+JSON.stringify(fInit)+';\n'
+    + 'var MDATA='+JSON.stringify(buildExport())+';\n'
+    + 'var SEL={};\n';
+  const logic = `var PF='';
+function matchChip(r,key,P){
+  if(P){
+    switch(key){
+      case 'gol': return r.type==='gol'&&r.p1===P&&!r.contra;
+      case 'asist': return r.type==='gol'&&r.p2===P&&!r.contra;
+      case 'tiro': return (r.type==='tiro'||r.type==='atajada')&&r.p1===P;
+      case 'pase': return ((r.type==='tiro'||r.type==='atajada')&&r.p2===P)||(r.type==='ocasion'&&r.p1===P);
+      case 'atajada': return r.type==='atajada'&&r.gk===P;
+      case 'ocasion': return r.type==='ocasion'&&r.p2===P;
+      case 'quite': return r.type==='quite'&&r.p1===P;
+      case 'falta': return r.type==='falta'&&(r.p1===P||r.p2===P);
+      default: return false;
+    }
+  } else {
+    switch(key){
+      case 'gol': return r.type==='gol';
+      case 'asist': return r.type==='gol'&&!!r.p2&&!r.contra;
+      case 'tiro': return r.type==='tiro';
+      case 'pase': return ((r.type==='tiro'||r.type==='atajada')&&!!r.p2)||r.type==='ocasion';
+      case 'atajada': return r.type==='atajada';
+      case 'ocasion': return r.type==='ocasion';
+      case 'quite': return r.type==='quite';
+      case 'falta': return r.type==='falta';
+      default: return false;
+    }
+  }
+}
+function shown(r){ for(var k=0;k<KEYS.length;k++){ var key=KEYS[k]; if(F[key]&&matchChip(r,key,PF)) return true; } return false; }
+function rowHTML(r,i){
+  var inner='<span class="c '+r.type+'"><span class="m">'+r.main+'</span><span class="dt">'+r.detail+'</span>'+(r.url?'<span class="pl">'+r.label+'</span>':'')+'</span>';
+  var axis='<span class="ax"><span class="dot '+r.type+'"></span><span class="mn">'+r.min+"'"+'</span></span>';
+  var body=r.side==='left'?('<span class="L">'+inner+'</span>'+axis+'<span class="R"></span>'):('<span class="L"></span>'+axis+'<span class="R">'+inner+'</span>');
+  var a=r.url?('<a class="row '+r.side+'" href="'+r.url+'" target="_blank" rel="noopener">'+body+'</a>'):('<div class="row '+r.side+'">'+body+'</div>');
+  var chk=CANDL?('<input type="checkbox" class="pick" data-i="'+i+'"'+(SEL[i]?' checked':'')+'>'):'';
+  return '<div class="rw">'+chk+a+'</div>';
+}
+function bookend(u,label,min){
+  var b='<span class="bk">'+label+(min?' · '+min:'')+'</span>';
+  return u&&u.url?('<a class="bookend" href="'+u.url+'" target="_blank" rel="noopener">'+b+'</a>'):('<div class="bookend">'+b+'</div>');
+}
+function draw(){
+  var t=document.getElementById('track');
+  var html=bookend(INI,'▶ Inicio del partido','min 0');
+  var cnt=0;
+  for(var i=0;i<ROWS.length;i++){var r=ROWS[i]; if(!shown(r))continue; html+=rowHTML(r,i); cnt++;}
+  if(!cnt){html+='<div style="text-align:center;color:#728278;font-size:13px;margin:30px 0">No hay jugadas con estos filtros.</div>';}
+  html+=bookend(FIN,'⏹ Final del partido','min '+FINMIN);
+  t.innerHTML=html;
+}
+function hms(s){ s=Math.max(0,Math.floor(s)); var h=Math.floor(s/3600),m=Math.floor((s%3600)/60),x=s%60; function p(v){return (v<10?'0':'')+v;} return p(h)+':'+p(m)+':'+p(x); }
+function pgName(r,k){
+  var n=(k<9?'0':'')+(k+1);
+  var parts;
+  if(r.type==='gol') parts=['gol',r.p1,r.p2?('asist_'+r.p2):''];
+  else if(r.type==='atajada') parts=['atajada',r.gk,(r.gk&&r.p1)?'ataja_a':'',r.p1,r.p2?('asist_'+r.p2):''];
+  else if(r.type==='tiro') parts=['tiro',r.p1,r.p2?('asist_'+r.p2):''];
+  else if(r.type==='ocasion') parts=['ocasion',r.p1,r.p2?('a_'+r.p2):''];
+  else if(r.type==='quite') parts=['quite',r.p1];
+  else if(r.type==='falta') parts=['falta',r.p1];
+  else parts=[r.type,r.p1];
+  var arr=[n]; for(var j=0;j<parts.length;j++){ if(parts[j]) arr.push(parts[j]); }
+  arr.push(r.min+'min');
+  return arr.join('_').replace(/[^\\w\\-]+/g,'_').replace(/_+/g,'_');
+}
+function updateDlCount(){ var n=0; for(var i=0;i<ROWS.length;i++){ if(SEL[i])n++; } var b=document.getElementById('dl-btn'); if(b)b.textContent='Copiar comando yt-dlp ('+n+')'; }
+function buildDl(){
+  var pre=parseInt(document.getElementById('dl-pre').value); if(isNaN(pre)||pre<0)pre=17;
+  var post=parseInt(document.getElementById('dl-post').value); if(isNaN(post)||post<1)post=3;
+  var res=document.getElementById('dl-res').value;
+  var fmt=res?('-f "bv*[height<='+res+']+ba/b[height<='+res+']" '):'';
+  var lines=['New-Item -ItemType Directory -Force highlights | Out-Null   # crea la carpeta (PowerShell)']; var k=0;
+  for(var i=0;i<ROWS.length;i++){ if(!SEL[i])continue; var r=ROWS[i];
+    var st=Math.max(0,r.tSec-pre), en=r.tSec+post;
+    lines.push('yt-dlp '+fmt+'--download-sections "*'+hms(st)+'-'+hms(en)+'" --force-keyframes-at-cuts -o "highlights/'+pgName(r,k)+'.%(ext)s" "'+YTURL+'"');
+    k++;
+  }
+  var out=document.getElementById('dl-out');
+  if(!k){ out.value=''; out.placeholder='Primero marcá jugadas con el ☑ de la izquierda.'; return; }
+  out.value=lines.join('\\n'); out.focus(); out.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  var b=document.getElementById('dl-btn'); b.textContent='¡Copiado! ('+k+') ✓'; setTimeout(updateDlCount,1600);
+}
+var fb=document.querySelectorAll('.filters .f[data-f]');
+function soloF(key){ for(var i=0;i<fb.length;i++){ var kk=fb[i].getAttribute('data-f'); F[kk]=(kk===key); fb[i].classList.toggle('on',F[kk]); } draw(); }
+for(var k=0;k<fb.length;k++){
+  fb[k].addEventListener('click',function(){this.classList.toggle('on');F[this.getAttribute('data-f')]=this.classList.contains('on');draw();});
+  fb[k].addEventListener('dblclick',function(e){e.preventDefault();soloF(this.getAttribute('data-f'));});
+}
+var psel=document.querySelector('.filters select');
+if(psel)psel.addEventListener('change',function(){PF=this.value;draw();});
+var trk=document.getElementById('track');
+trk.addEventListener('change',function(e){ var el=e.target; if(el&&el.className&&(''+el.className).indexOf('pick')>=0){ SEL[el.getAttribute('data-i')]=el.checked; updateDlCount(); } });
+var dlb=document.getElementById('dl-btn'); if(dlb)dlb.addEventListener('click',buildDl);
+function dljson(){
+  var blob=new Blob([JSON.stringify(MDATA,null,2)],{type:'application/json'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  var nn=/^[0-9]+$/.test(String(MDATA.id||''))?String(MDATA.id).padStart(2,'0'):(MDATA.id||'sin-id');
+  a.download='partido_'+nn+'_'+(MDATA.fecha||'')+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+}
+var jb=document.getElementById('jbtn'); if(jb)jb.addEventListener('click',dljson);
+draw();`;
+  const pageScript = dataDecl + logic;
+  return '<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Timeline · '+esc(M.t1)+' vs '+esc(M.t2)+'</title><style>'+CSS+'</style></head><body>'
+    + '<div class="head">'
+    + '<div class="sc"><span class="tn n1">'+esc(M.t1)+'</span> &nbsp;'+gg+'&nbsp; <span class="tn n2">'+esc(M.t2)+'</span></div>'
+    + '<div class="meta">'+(M.fecha?esc(fmtDate(M.fecha))+' · ':'')+note+'</div>'
+    + '<div class="filters">'+presentKeys.map(k=>'<button class="f on" data-f="'+k+'">'+CHIP_LABELS[k]+'</button>').join('')+'<select><option value="">Todos los jugadores</option>'+playerOpts+'</select></div>'
+    + '</div>'
+    + '<div class="track" id="track">'+initialTrack+'</div>'
+    + '<div class="sum">'+summaryInner()+'</div>'
+    + dlPanel
+    + '<div style="text-align:center;margin:0 0 50px"><button id="jbtn" class="jbtn">⬇ Descargar el .json de este partido</button></div>'
+    + '<scr'+'ipt>'+pageScript+'<\/scr'+'ipt>'
+    + '</body></html>';
+}
+function dateTag(){ const f=(M.fecha||'').split('-'); return (f.length===3? f[0]+f[1]+f[2] : (M.id||'partido')); }
+function shareTimeline(){
+  if(!M.events.length){ toast('No hay eventos todavía'); return; }
+  const html=buildSpectatorHTML();
+  const blob=new Blob([html],{type:'text/html'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`${dateTag()}_timeline.html`; a.click();
+  toast('Timeline descargado ✓ ('+dateTag()+'_timeline.html)');
+}
+
+/* ============ PUBLICAR AL REPO (GitHub API) ============ */
+function ghCfg(){ try{ return JSON.parse(localStorage.getItem('f7_gh')||'{}'); }catch(e){ return {}; } }
+function ghSave(){ try{ localStorage.setItem('f7_gh', JSON.stringify({ repo:($('#gh-repo').value||'').trim(), branch:($('#gh-branch').value||'').trim(), token:($('#gh-token').value||'').trim() })); }catch(e){} }
+function ghInit(){ const r=$('#gh-repo'), b=$('#gh-branch'), t=$('#gh-token'); if(!r)return; const c=ghCfg();
+  r.value=c.repo||'ariberar/estadisticas-futdom'; b.value=c.branch||'main'; t.value=c.token||'';
+  [r,b,t].forEach(el=>el.addEventListener('change',ghSave)); }
+function ghStatus(m){ const el=$('#gh-status'); if(el)el.textContent=m; }
+function b64utf8(str){ return btoa(unescape(encodeURIComponent(str))); }
+function fromB64utf8(b){ return decodeURIComponent(escape(atob((b||'').replace(/\s/g,'')))); }
+async function ghApi(token, path, opts){
+  const res=await fetch('https://api.github.com'+path, Object.assign({headers:{
+    'Authorization':'Bearer '+token, 'Accept':'application/vnd.github+json', 'X-GitHub-Api-Version':'2022-11-28'
+  }}, opts||{}));
+  if(!res.ok){ let m=res.status+''; try{ const j=await res.json(); m+=' '+(j.message||''); }catch(e){} throw new Error(m); }
+  return res.status===204?null:res.json();
+}
+async function publishToRepo(btn){
+  ghSave(); const c=ghCfg();
+  if(!c.token){ ghStatus('Falta el token: pegalo en el campo de abajo.'); toast('Falta el token de GitHub'); return; }
+  if(!/^[^/\s]+\/[^/\s]+$/.test(c.repo||'')){ ghStatus('Repo inválido: usá owner/nombre (ariberar/estadisticas-futdom).'); return; }
+  if(!M.events.length){ toast('No hay eventos para publicar'); return; }
+  const [owner,repo]=c.repo.split('/'); const branch=(c.branch||'main');
+  const oldTxt=btn?btn.textContent:''; if(btn){ btn.disabled=true; btn.textContent='Publicando…'; }
+  try{
+    const exp=buildExport();
+    const nn=/^[0-9]+$/.test(String(exp.id||''))?String(exp.id).padStart(2,'0'):(exp.id||'sin-id');
+    const jsonName='partido_'+nn+'_'+(exp.fecha||'')+'.json';
+    const jsonContent=JSON.stringify(exp,null,2);
+    const tlName=dateTag()+'_timeline.html';
+    const tlContent=buildSpectatorHTML();
+    const idKey=String(exp.id);
+    // manifest actual -> merge
+    ghStatus('Leyendo manifest…');
+    let manifest={jugadores:'jugadores.json',partidos:[],timelines:{}};
+    try{ const mf=await ghApi(c.token,`/repos/${owner}/${repo}/contents/data/manifest.json?ref=${encodeURIComponent(branch)}`);
+      manifest=JSON.parse(fromB64utf8(mf.content)); }catch(e){ /* no existe aún: arrancamos vacío */ }
+    manifest.jugadores=manifest.jugadores||'jugadores.json';
+    manifest.partidos=Array.isArray(manifest.partidos)?manifest.partidos:[];
+    manifest.timelines=manifest.timelines||{};
+    if(!manifest.partidos.includes(jsonName)) manifest.partidos.push(jsonName);
+    manifest.partidos.sort();
+    manifest.timelines[idKey]=tlName;
+    const manifestContent=JSON.stringify(manifest,null,1);
+    // commit único vía Git Data API
+    ghStatus('Creando commit…');
+    const ref=await ghApi(c.token,`/repos/${owner}/${repo}/git/ref/heads/${encodeURIComponent(branch)}`);
+    const baseSha=ref.object.sha;
+    const baseCommit=await ghApi(c.token,`/repos/${owner}/${repo}/git/commits/${baseSha}`);
+    const mkBlob=async content=>{ const b=await ghApi(c.token,`/repos/${owner}/${repo}/git/blobs`,{method:'POST',body:JSON.stringify({content:b64utf8(content),encoding:'base64'})}); return b.sha; };
+    const [shJson,shTl,shMan]=await Promise.all([mkBlob(jsonContent),mkBlob(tlContent),mkBlob(manifestContent)]);
+    const tree=await ghApi(c.token,`/repos/${owner}/${repo}/git/trees`,{method:'POST',body:JSON.stringify({base_tree:baseCommit.tree.sha,tree:[
+      {path:'data/'+jsonName,mode:'100644',type:'blob',sha:shJson},
+      {path:'timelines/'+tlName,mode:'100644',type:'blob',sha:shTl},
+      {path:'data/manifest.json',mode:'100644',type:'blob',sha:shMan}
+    ]})});
+    const commit=await ghApi(c.token,`/repos/${owner}/${repo}/git/commits`,{method:'POST',body:JSON.stringify({
+      message:'Partido '+(exp.id||'')+' ('+(exp.fecha||'')+') — anotador', tree:tree.sha, parents:[baseSha]})});
+    await ghApi(c.token,`/repos/${owner}/${repo}/git/refs/heads/${encodeURIComponent(branch)}`,{method:'PATCH',body:JSON.stringify({sha:commit.sha})});
+    ghStatus('✓ Publicado: '+jsonName+'  +  '+tlName+'\nmanifest actualizado. GitHub Pages se re-publica en ~1–2 min.');
+    toast('✓ Publicado al repo');
+  }catch(err){ ghStatus('✗ Error: '+err.message+(String(err.message).indexOf('404')>=0?'  (revisá repo/rama/permisos del token)':String(err.message).indexOf('401')>=0?'  (token inválido o vencido)':'')); toast('Error al publicar'); }
+  finally{ if(btn){ btn.disabled=false; btn.textContent=oldTxt; } }
+}
+
+/* ============ BORRAR / PARTIDO NUEVO ============ */
+function clearEvents(){
+  if(!M.events.length){ toast('No hay anotaciones para borrar'); return; }
+  if(!confirm(`¿Borrar las ${M.events.length} anotaciones de este partido? Los jugadores y los videos quedan como están.`)) return;
+  M.events=[]; M.offset=0; M.matchEnd=0;
+  closeModal(); renderAll(); if(!$('#tloverlay').classList.contains('hide')) renderTimeline();
+  saveLocal(); toast('Anotaciones borradas ✓');
+}
+function newMatch(fromSetup){
+  const hasData = M.events.length || (typeof files!=='undefined' && files.length);
+  if(hasData && !confirm('¿Empezar a anotar un partido nuevo? Se borran las anotaciones y los videos cargados (los jugadores se mantienen).')) return;
+  // limpiar eventos y datos del partido, conservar rosters/equipos/arqueros
+  M.events=[]; M.offset=0; M.matchEnd=0; M.durs=[]; M.driveLinks=[]; M.youtube='';
+  files=[]; urls=[]; durs=[]; offs=[]; total=0; curIdx=0;
+  // sugerir siguiente id si es numérico
+  const nid = /^\d+$/.test(String(M.id||'')) ? String(parseInt(M.id)+1) : '';
+  M.id=nid;
+  try{ localStorage.removeItem('f7_match'); }catch(e){}
+  // reset UI de setup
+  $('#s-id').value=nid; $('#s-fecha').valueAsDate=new Date();
+  $('#s-drive').value=''; $('#s-youtube').value='';
+  $('#vidlist').innerHTML='';
+  const oldbar=document.getElementById('restore-bar'); if(oldbar) oldbar.remove();
+  noVideo=false; document.body.classList.remove('no-video');
+  $('#main').classList.add('hidden'); $('#setup').classList.remove('hidden');
+  renderRosters();
+  toast('Listo: cargá los videos del partido nuevo');
+}
+
+/* ============ ABRIR PARTIDO GUARDADO (.json) ============ */
+function loadMatchJSON(file){
+  const r=new FileReader();
+  r.onload=()=>{
+    let prev; try{ prev=JSON.parse(r.result); }catch(e){ toast('No pude leer ese .json'); return; }
+    if(!prev || !prev.events){ toast('Ese .json no parece un partido'); return; }
+    $('#s-id').value=prev.id||''; if(prev.fecha)$('#s-fecha').value=prev.fecha;
+    $('#s-t1name').value=prev.t1||'Paredón'; $('#s-t2name').value=prev.t2||'Canchita';
+    M.players=prev.players||{1:[],2:[]}; M.gk=prev.gk||{1:null,2:null};
+    M.events=prev.events||[]; M.offset=prev.offset||0; M.matchEnd=prev.matchEnd||0;
+    M.durs=prev.durs||[]; M.driveLinks=prev.driveLinks||[]; M.youtube=prev.youtube||'';
+    M.torneo=prev.torneo||'dominguero'; M.formato=prev.formato||'F7';
+    $('#s-torneo').value=M.torneo; $('#s-formato').value=M.formato;
+    // refrescar SIEMPRE los links según el .json (vacía los del partido anterior)
+    $('#s-drive').value = M.driveLinks.length? M.driveLinks.join('\n') : '';
+    $('#s-youtube').value = M.youtube || '';
+    // descartar los videos que estaban cargados: hay que cargar el/los de esta fecha
+    files=[]; urls=[]; durs=[]; offs=[]; total=0; curIdx=0; $('#vidlist').innerHTML='';
+    renderRosters(); saveLocal();
+    const bar=document.getElementById('restore-bar'); if(bar) bar.remove();
+    toast(`Partido ${prev.id||''} cargado: ${M.events.length} anotaciones. Ahora cargá el/los video(s) del partido de esa fecha.`);
+  };
+  r.readAsText(file);
+}
+document.getElementById('loadjson').addEventListener('change',e=>{ if(e.target.files[0]) loadMatchJSON(e.target.files[0]); e.target.value=''; });
+
+/* ============ PERSISTENCIA LOCAL ============ */
+function saveLocal(){ try{ localStorage.setItem('f7_match', JSON.stringify(M)); }catch(e){} }
+function tryRestore(){
+  try{
+    const raw=localStorage.getItem('f7_match'); if(!raw)return;
+    const prev=JSON.parse(raw);
+    if(prev.events&&prev.events.length){
+      $('#s-id').value=prev.id||''; if(prev.fecha)$('#s-fecha').value=prev.fecha;
+      $('#s-t1name').value=prev.t1||'Paredón'; $('#s-t2name').value=prev.t2||'Canchita';
+      M.players=prev.players||{1:[],2:[]}; M.gk=prev.gk||{1:null,2:null};
+      M.events=prev.events; M.offset=prev.offset||0; M.matchEnd=prev.matchEnd||0;
+      M.durs=prev.durs||[]; M.driveLinks=prev.driveLinks||[]; M.youtube=prev.youtube||'';
+      if(prev.driveLinks&&prev.driveLinks.length) $('#s-drive').value=prev.driveLinks.join('\n');
+      if(prev.youtube) $('#s-youtube').value=prev.youtube;
+      renderRosters();
+      const n=prev.events.length;
+      const bar=document.createElement('div');
+      bar.id='restore-bar';
+      bar.style.cssText='background:var(--pitch-soft);border:1px solid var(--pitch-deep);border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:14px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap';
+      bar.innerHTML=`<span>Hay un partido en progreso con <b>${n} anotación(es)</b>. Cargá de nuevo los videos y seguí anotando, o empezá uno nuevo.</span>
+        <span style="display:flex;gap:8px">
+          <button class="btn small accent" onclick="newMatch(true)">＋ Partido nuevo (borrar)</button>
+          <button class="btn small" onclick="this.closest('#restore-bar').remove()">Seguir este</button>
+        </span>`;
+      $('.setup').insertBefore(bar, $('.setup .card'));
+    }
+  }catch(e){}
+}
+
+/* ============ TECLADO ============ */
+document.addEventListener('keydown',e=>{
+  const modalOpen=!$('#modal').classList.contains('hide');
+  const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
+  if(modalOpen){
+    if(e.key==='Escape')closeModal();
+    if(e.key==='Enter'){e.preventDefault();saveEvent();}
+    return;
+  }
+  if($('#main').classList.contains('hidden')||typing)return;
+  switch(e.key.toLowerCase()){
+    case ' ': e.preventDefault(); togglePlay(); break;
+    case 'arrowleft': e.preventDefault(); skip(-5); break;
+    case 'arrowright': e.preventDefault(); skip(5); break;
+    case 'j': skip(-10); break;
+    case 'l': skip(10); break;
+    case '1': setRate(0.5); break;
+    case '2': setRate(1); break;
+    case '3': setRate(1.5); break;
+    case '4': setRate(2); break;
+    case '5': setRate(3); break;
+    case '6': setRate(4); break;
+    case 'g': openEvent('gol'); break;
+    case 't': openEvent('tiro'); break;
+    case 'a': openEvent('atajada'); break;
+    case 'q': openEvent('quite'); break;
+    case 'o': openEvent('ocasion'); break;
+    case 'f': openEvent('falta'); break;
+    case 'c': openEvent('arquero'); break;
+  }
+});
+
+/* ============ HELPERS ============ */
+function fmt(s){ s=Math.max(0,s||0); const m=Math.floor(s/60), ss=Math.floor(s%60); return `${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`; }
+function fmtH(s){ s=Math.max(0,s||0); const h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=Math.floor(s%60); return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`; }
+function fmtDate(iso){ if(!iso)return''; const p=iso.split('-'); if(p.length!==3)return iso; return `${parseInt(p[1])}/${parseInt(p[2])}/${p[0]}`; } /* mm/dd/aaaa */
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2600); }
+
+renderRosters(); tryRestore(); ghInit();
+</script>
+</body>
+</html>
