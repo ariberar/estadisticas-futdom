@@ -2,3 +2,4 @@ instrucciones.md
 armador_gen.py
 __pycache__/
 *.pyc
+token.txt

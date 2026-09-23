@@ -477,6 +477,9 @@
               <label>calidad
                 <select id="clip-res"><option value="">4K / original</option><option value="1080">1080p</option><option value="720">720p</option></select>
               </label>
+              <label>formato
+                <select id="clip-fmt"><option value="mp4">mp4</option><option value="webm">webm</option></select>
+              </label>
             </div>
             <div class="clip-types">
               <button class="clipf on" data-f="gol" onclick="this.classList.toggle('on')">Goles</button>
@@ -1234,6 +1237,7 @@ function clipName(e,i){
 }
 function unidoName(){ const f=(M.fecha||'').split('-'); return (f.length===3? f[0]+f[1]+f[2]+'_':'')+'partido_completo.mp4'; }
 function clipRes(){ return $('#clip-res')? $('#clip-res').value : ''; }
+function clipFmt(){ return $('#clip-fmt')? $('#clip-fmt').value : 'mp4'; }
 function copyClips(){
   const evs=selectedClipEvents();
   if(!evs.length){toast('No hay jugadas con esos filtros');return;}
@@ -1255,17 +1259,21 @@ function copyClipsYT(){
   if(!url){ toast('Cargá el link de YouTube en el inicio (paso 4)'); return; }
   const evs=selectedClipEvents();
   if(!evs.length){ toast('No hay jugadas con esos filtros'); return; }
-  const {pre,post}=clipSecs(); const res=clipRes();
-  const fmt = res? `-f "bv*[height<=${res}]+ba/b[height<=${res}]" ` : '';
+  const {pre,post}=clipSecs(); const res=clipRes(); const wantMp4=clipFmt()!=='webm';
+  const cap = res? `[height<=${res}]` : '';
+  // mp4: preferimos H.264 + m4a/AAC y forzamos contenedor mp4 (remux, sin re-encodear). webm: default de yt-dlp.
+  const fmt = wantMp4
+    ? `-f "bv*${cap}+ba/b${cap}" -S ext:mp4:m4a --merge-output-format mp4 --remux-video mp4 `
+    : (res? `-f "bv*${cap}+ba/b${cap}" ` : '');
+  const mk='New-Item -ItemType Directory -Force highlights | Out-Null; ';   // cada comando crea la carpeta si no existe
   const lines=evs.map((e,i)=>{
     const start=Math.max(0,e.tSec-pre), end=e.tSec+post;
-    return `yt-dlp ${fmt}--download-sections "*${fmtH(start)}-${fmtH(end)}" --force-keyframes-at-cuts -o "highlights/${clipName(e,i)}.%(ext)s" "${url}"`;
+    return `${mk}yt-dlp ${fmt}--download-sections "*${fmtH(start)}-${fmtH(end)}" --force-keyframes-at-cuts -o "highlights/${clipName(e,i)}.%(ext)s" "${url}"`;
   });
   const header=[
-    'New-Item -ItemType Directory -Force highlights | Out-Null   # crea la carpeta si no existe (PowerShell)',
     '# Una sola vez, si falta: winget install yt-dlp.yt-dlp  y  winget install ffmpeg',
-    `# Baja SOLO cada tramo (${pre}s antes / ${post}s después) a ${res? res+'p':'la mejor calidad'} desde YouTube:`
-  ];
+    `# Baja SOLO cada tramo (${pre}s antes / ${post}s después) a ${res? res+'p':'la mejor calidad'} desde YouTube, en ${wantMp4?'.mp4 (H.264/AAC)':'.webm'}. Cada comando crea la carpeta highlights si no existe.`
+  ].concat(wantMp4?['# Si un clip solo existe en VP9/AV1 (muy alta resolución) y querés forzar mp4 igual, agregá  --recode-video mp4  (re-encodea, más lento).']:[]);
   clip(header.concat(lines).join('\n'), `${evs.length} comando(s) yt-dlp copiados`);
 }
 function clip(text,msg){
@@ -1467,10 +1475,11 @@ a.bookend:hover .bk{background:#16271e}
     + '<label>seg. antes <input id="dl-pre" type="number" min="0" value="17"></label>'
     + '<label>seg. después <input id="dl-post" type="number" min="0" value="3"></label>'
     + '<label>calidad <select id="dl-res"><option value="">4K / original</option><option value="1080">1080p</option><option value="720">720p</option></select></label>'
+    + '<label>formato <select id="dl-fmt"><option value="mp4">mp4</option><option value="webm">webm</option></select></label>'
     + '<button id="dl-btn">Copiar comando yt-dlp (0)</button>'
     + '</div>'
     + '<textarea id="dl-out" readonly placeholder="Marcá jugadas con el ☑ de la izquierda y tocá Copiar…"></textarea>'
-    + '<p class="dl-note">Pegá en PowerShell (necesitás yt-dlp y ffmpeg: winget install yt-dlp.yt-dlp y winget install ffmpeg). Crea la carpeta highlights y baja cada clip ahí.</p>'
+    + '<p class="dl-note">Pegá en PowerShell (necesitás yt-dlp y ffmpeg: winget install yt-dlp.yt-dlp y winget install ffmpeg). Crea la carpeta highlights y baja cada clip ahí, en .mp4 (H.264/AAC).</p>'
     + '</div>'
   ) : '';
   const fInit={}; presentKeys.forEach(k=>fInit[k]=true);
@@ -1554,11 +1563,14 @@ function buildDl(){
   var pre=parseInt(document.getElementById('dl-pre').value); if(isNaN(pre)||pre<0)pre=17;
   var post=parseInt(document.getElementById('dl-post').value); if(isNaN(post)||post<1)post=3;
   var res=document.getElementById('dl-res').value;
-  var fmt=res?('-f "bv*[height<='+res+']+ba/b[height<='+res+']" '):'';
-  var lines=['New-Item -ItemType Directory -Force highlights | Out-Null   # crea la carpeta (PowerShell)']; var k=0;
+  var wantMp4=(document.getElementById('dl-fmt')?document.getElementById('dl-fmt').value:'mp4')!=='webm';
+  var cap=res?('[height<='+res+']'):'';
+  var fmt=wantMp4?('-f "bv*'+cap+'+ba/b'+cap+'" -S ext:mp4:m4a --merge-output-format mp4 --remux-video mp4 '):(res?('-f "bv*'+cap+'+ba/b'+cap+'" '):'');
+  var mk='New-Item -ItemType Directory -Force highlights | Out-Null; ';   // cada comando crea la carpeta
+  var lines=['# Cada comando crea la carpeta highlights si no existe. Formato: '+(wantMp4?'mp4':'webm')+'.']; var k=0;
   for(var i=0;i<ROWS.length;i++){ if(!SEL[i])continue; var r=ROWS[i];
     var st=Math.max(0,r.tSec-pre), en=r.tSec+post;
-    lines.push('yt-dlp '+fmt+'--download-sections "*'+hms(st)+'-'+hms(en)+'" --force-keyframes-at-cuts -o "highlights/'+pgName(r,k)+'.%(ext)s" "'+YTURL+'"');
+    lines.push(mk+'yt-dlp '+fmt+'--download-sections "*'+hms(st)+'-'+hms(en)+'" --force-keyframes-at-cuts -o "highlights/'+pgName(r,k)+'.%(ext)s" "'+YTURL+'"');
     k++;
   }
   var out=document.getElementById('dl-out');
